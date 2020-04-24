@@ -1,0 +1,43 @@
+$5^?/0-89];_!
+
+
+
+* when copying tiles for display, set boss floor and spawn extra monsters each turn on boss floor??
+* sign ! with random hint/lore; maybe only on starting map?
+* shops that take energy for payment
+* rooms should spawn with monsters
+
+* traps
+   summon adjacent monsters
+   area teleport (random already visited, or anywhere?)
+* staffs
+   xx
+* armor
+  * terror also gives immunity to player-side panic, once that status effect is implemented
+  explosions (destroy adjacent mobs and terrain, but grants no kills)
+  time mastery (randomly/on damage time stop)
+  sunlight (once darkness is in, increases sight radius)
+
+* new generators
+   r(1000)<visited: map is maze level
+   r(100) <disttoorigin: map is dark level (add simple FOV)
+
+
+Mobs
+====
+* assign random name on init
+
+* onDeath:
+timestop/score++/other boons
+
+* flags:
+phasing
+invulnerable
+antimagic - cannot be harmed with magic/when player under influence of magic
+paralysis
+
+* behaviour:
+teleport to player
+dig
+explode when adjacent
+summon

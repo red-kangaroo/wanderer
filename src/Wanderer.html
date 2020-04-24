@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html class="v2" dir="ltr" lang="en">
+<h3 class='post-title entry-title' itemprop='name'>
+Wanderer v2.0
+</h3>
+<div class='post-header'>
+<div class='post-header-line-1'></div>
+</div>
+<div class='post-body entry-content' id='post-body-1670331854895453085' itemprop='description articleBody'>
+<p id="mapText" style="font-family:courier; line-height: 85%;"></p>
+<p id="statusLine" style="font-family:courier; line-height: 85%;"></p>
+
+<script>
+
+// Map gen:
+var mapWidth = 50;
+var wallBreaks = 4; //higher reduces chance
+var worldPos = {x:0,y:0};
+var worldMap = [];
+var currentMap = [];
+var worldName = [];
+
+// Player:
+var userPos = {x:1,y:1};
+var userName = "Nobody";
+var haveWon = false;
+
+var score = 100; // AKA energy, life, self
+var visited = 0;
+var keys = 0;
+var kills = 0;
+
+var staff = 0;
+var staves = [""," of Ethereal Paths"," of Frozen Time"," of Secret Paths"," of Life Triumphant"," of Vorpal Sharpness"," of Soaring Leap"," of Conjuration"];
+
+var armor = 0;
+var armors = ["Green Tunic","Fur Cloak","Padded Jacket","Leather Jacket","Leather Armour","Quilted Leather Armour","Studded Leather Armour","Chitin Cuirass","Brigandine","Chain Shirt","Bulletproof Vest","Scale Mail","Ironbark Breastplate","Chain Mail","Hauberk","Ring Mail","Banded Armour","Splint Mail","Half Plate Mail","Mithril Chain Mail","Full Plate Mail","Crystal Shard Mail","Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail","Solid Gold Armour","Crystal Plate Mail","Nemean Lion Hide","Adamantine Armour","Powered Armour"];
+var glyph = 0;
+var glyphs = [""," of Brimstone"," of Cleansing Waters"," of Mortal Terror"," of Ethereal Escape"," of Bloody Retribution"," of Invulnerability"," of Shadowy Escape"];
+
+// Status effects:
+var aflame = 0;
+var blinded = 0;
+var phased = 0;
+var poisoned = 0;
+var timestop = 0;
+var ward = 0;
+
+var leap = false;
+var orb = false;
+
+// Map tiles:
+var emptyBlock = '&nbsp;';
+var wallBlock = '&#9608;';
+var tileWater = "<t style='background-color:#1E90FF'>~</t>";
+var tileLava = "<t style='background-color:#FF4500'>~</t>";
+var tileKey = "<t style='color:#800080'>9</t>";
+var tileArmor = "<t style='color:#800080'>]</t>"; //enchanted armor, normal is just ']'
+var tileDoor = "<t style='background-color:#8B4513; color:#FFD700;'>#</t>";
+var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
+var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
+var tileTreasure = "<t style='color:#800080'>&#167;</t>";
+var tileBramble = "<t style='color:#32CD32'>!</t>";
+var tileGrassTall = "<t style='color:#32CD32'>;</t>";
+var tileGrassShort = "<t style='color:#32CD32'>.</t>";
+//var tileMacGuffin = "<t style='color:#FF00FF'>&#9959;</t>"; maybe use as summoning circle?
+var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
+var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
+
+var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,tileBramble];
+var rareTerrain = ['/','0',tileKey,'_',']'];
+var impassable = [wallBlock,"<t style='color:#FF0000'>&</t>",tileGoldWall,tileDoor];
+
+var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".split('');
+var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
+                     name:"Wall Demon",
+                     attack:"slams",
+                     quickness:2,
+                     x:0,y:0,
+                     flags: [],
+                     behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
+                    }];
+var allFlags = ["diagonal","venom","flame","agony","regen","blind","trapper","teleother","haste","knockback","steal","lavapool","disenchant","summon"];
+var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
+var currCre = [];
+var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
+               name:"<t style='color:#8B008B'>Reflection of Self</t>",
+               attack: attackVerbs[r(attackVerbs.length)],
+               quickness:100,
+               x:0,y:0,
+               flags: ["diagonal","regen","boss"],
+               behaviour: function(){
+                var i = currCre.indexOf(this);
+                // Change color randomly:
+                this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
+
+                // Summon monsters:
+                if(!r(20)){
+                 var j = this.x + r(3)-1;
+                 var k = this.y + r(3)-1;
+
+                 if(checkEmpty(j,k)){
+                  currCre.push(creatureList[r(creatureList.length/2)]);
+                  currCre[currCre.length-1].x = j;
+                  currCre[currCre.length-1].y = k;
+                  msg += this.icon+" speaks a Word of Summoning. "+currCre[currCre.length-1].icon+" appears out of thin air. ";
+                  return true;
+                 }
+                }
+
+                // Handle panicked boss:
+                if(this.flags.includes("flee")){
+                 if(distanceBetween(userPos,currCre[i])<2 && !r(4)){
+                  do{
+                   this.x = r(mapWidth);
+                   this.y = r(mapWidth);
+                  }while(!checkEmpty(this.x,this.y));
+                  msg += this.icon+" teleports away. ";
+                  return true;
+                 }
+                 else if(distanceBetween(userPos,currCre[i])>=2 && !r(3)){
+                  this.flags = this.flags.removeElement("flee");
+                  msg += this.icon+" calms down. ";
+                  return true;
+                 }
+                }
+
+                // Special attacks:
+                if(distanceBetween(userPos,currCre[i])<2){
+                 msg += this.icon+" "+this.attack+" you. "; // TODO: proper name
+                 playerTakeDamage(r(20)+visited,i);
+
+                 switch(r(15)){
+                  case 0:
+                   msg += "Unimaginable agony tears at the very core of your being. ";
+                   score = parseInt(score/2);
+                  break;
+
+                  case 1: case 2: case 3:
+                   msg += "You are enveloped in hellfire. ";
+                   aflame += r(visited)+r(visited)+r(visited);
+                  break;
+
+                  case 4: case 5: case 6:
+                   msg += "You feel horribly ill. ";
+                   poisoned += r(score/2);
+                  break;
+
+                  case 7:
+                   msg += "Your eyes! You cannot see! ";
+                   blinded += r(30);
+                  break;
+
+                  case 8:
+                   teleportUser();
+                  break;
+
+                  case 9: case 10: case 11:
+                   var dx = userPos.x - currCre[i].x;
+                   var dy = userPos.y - currCre[i].y;
+                   if(inRangeCoords(userPos.x+dx,userPos.y+dy) && checkEmpty(userPos.x+dx,userPos.y+dy)){
+                    userPos.x += dx;
+                    userPos.y += dy;
+                    msg += "You are knocked back. ";
+                   }
+                   break;
+                 }
+                } else if(!r(4) && !this.flags.includes("flee")){
+                 // Teleport near the player.
+                 var j = userPos.x + r(3)-1;
+                 var k = userPos.y + r(3)-1;
+                 if(checkEmpty(j,k) && inRangeCoords(j,k) && (j != 0 || k != 0)){
+                  currentMap[this.x][this.y] = '^';
+                  this.x = j;
+                  this.y = k;
+                  msg += this.icon+" disappears and suddenly reappears near you. ";
+                 }
+                }
+                return false;
+               }
+              };
+var msg = "";
+
+function getMobBehaviour(){
+ switch(r(100)){ //TODO more behaviours
+  default:
+   return function(){ return false; };
+
+  case 0: // Teleport
+   return function(){
+    if(!r(10)){
+     do{
+      this.x = r(mapWidth);
+      this.y = r(mapWidth);
+     }while(!checkEmpty(this.x,this.y));
+     msg += this.icon+" teleports. "; // TODO: proper name
+     return true;
+    }
+    return false;
+   };
+
+  case 1: // Extra attack
+   return function(){
+    var i = currCre.indexOf(this);
+    if(distanceBetween(userPos,currCre[i])<2){
+     msg += currCre[i].icon+" "+currCre[i].attack+" you. "; // TODO: proper name
+     playerTakeDamage(r(10)+visited,i);
+    }
+    return false;
+   };
+
+  case 2:
+   return function(){
+    if(currentMap[this.x][this.y] == emptyBlock){
+     currentMap[this.x][this.y] = tileWater;
+     return true;
+    }
+    return false;
+   };
+
+  case 3:
+   return function(){
+    if(currentMap[this.x][this.y] == emptyBlock){
+     currentMap[this.x][this.y] = tileGrassTall;
+     return true;
+    }
+    return false;
+   };
+
+  case 4:
+   return function(){
+    if(currentMap[this.x][this.y] == emptyBlock){
+     currentMap[this.x][this.y] = tileBramble;
+     return true;
+    }
+    return false;
+   };
+
+  //TODO
+ }
+}
+
+function getMobFlags(){
+ var mobFlags = [];
+
+ while(!r(creatureList.length+1) || (r(creatureList.length)>25)){
+  var nextFlag = allFlags.sampleRec();
+  if(!mobFlags.includes(nextFlag)) mobFlags.push(nextFlag);
+  else break;
+ }
+
+ return mobFlags;
+}
+
+function getUserChar(){
+ var colour = 'red';
+ if(poisoned>0) colour = '#90EE90';
+
+ var bkg = '';
+ if(currentMap[userPos.x][userPos.y] == tileWater) bkg = 'background-color:#1E90FF; ';
+ else if(currentMap[userPos.x][userPos.y] == tileLava) bkg = 'background-color:#FF4500; ';
+
+ return "<t style='"+bkg+"color:"+colour+"; font-weight: 900;'>@</t>";
+}
+
+function r(x){return Math.floor(Math.random() * x);}
+
+var fname = ["Wyatt","Girbach","Galven","Jacinto","Scofield","Donovan","Hyden","Carter","Bucanan","Jann","Armand","Frakes","Willian","Leath","Cordell","Weyer","Crystal","Chalet","Genevive","Lavigne","Jeneva","Lavanchy","Naida","Dowe","Cayla","Armiger","Saturnina","Strachan","Rosette","Voight","Arlean","Sharpey","Matha","Hammacher","Jani","Lockley","Genni","Cherniako","Sandri","Bukheva","Fruri","Sautova","Zivast","Grindina","Raldi","Kovskina","Alell","Seva","Atiin","Seiniko","Tini","Echkov","Fani","Dova","Adir","Kourina","Nata","Ronova","Adkarya","Cheva","Zinia","Limova","Saba","Benkovoi","Albina","Penrova","Xena","Ginieksi","Lana","Dinova","Rina","Shukova","Vikta","Gounova","Zina","Wes","McRaven","Darwin","Blackford","Edison","Ghelfi","Arden","Maille","Lucius","Simril","Branden","Wethern","Brendon","Rosek","Nolan","Carthen","Koerner","Merlin","Haught","Lorilee","Reade","Britteny","Moneaux","Camila","Jennell","Woldt","Maris","Yueh","Edra","Calder","Alder","Denyse","McLaren","Maryln","Caldera","Zsand","Gleep","Wurp","Ul","Thok","Meem","Pubb","Skremp","Nex","Drub","Vree","Gooch","Hargag","Doop","Wozz","Furge","Forby","Grog","Dapp","Kor","Blim","Yar","Tzim","Ursk","Pizzle","Pang","Dhun","Rool","Rapp","Lorg","Xim","Hrum","Bogg","Krotch","Stith","Boof","Tankle","Mooth","Hagat","Raco","Thwyp","Bazh","Stroot","Crad","Ramst","Wump","Mugg","Din","Voll","Gant","Ylur","Paag","Hool","Hass","Stroop","Sass","Ambro","Quisp","Burzy","Koz","Mazz","Rump","Krang","Hulm","Gax","Nex","Glum","Zoot","Jank","Oort","Nex","Molp","Ferd","Sundar","Pipt","Mo","Urz","Ygg","Yann","Tunn","Bipp","Vela","Bork","Ryz","Milsh","Chook","Nabb","Val","Ernst","Bock","Hyggs","Chum","Izzy","Zur","Kal","Uk","Ur","Mon","Joff","Pyu","Kramm","James","John","Robert","Michael","William","David","Richard","Joseph","Thomas","Charles","Christopher","Daniel","Matthew","Anthony","Donald","Mark","Paul","Steven","Andrew","Kenneth","George","Joshua","Kevin","Brian","Edward","Ronald","Timothy","Jason","Jeffrey","Ryan","Jacob","Gary","Nicholas","Eric","Stephen","Jonathan","Larry","Justin","Scott","Brandon","Frank","Benjamin","Gregory","Raymond","Samuel","Patrick","Alexander","Jack","Dennis","Jerry","Tyler","Aaron","Henry","Jose","Douglas","Peter","Adam","Nathan","Zachary","Walter","Kyle","Harold","Carl","Jeremy","Gerald","Keith","Roger","Arthur","Terry","Lawrence","Sean","Christian","Ethan","Austin","Joe","Albert","Jesse","Willie","Billy","Bryan","Bruce","Noah","Jordan","Dylan","Ralph","Roy","Alan","Wayne","Eugene","Juan","Gabriel","Louis","Russell","Randy","Vincent","Philip","Logan","Bobby","Harry","Johnny","Mary","Patricia","Jennifer","Linda","Elizabeth","Barbara","Susan","Jessica","Sarah","Margaret","Karen","Nancy","Lisa","Betty","Dorothy","Sandra","Ashley","Kimberly","Donna","Emily","Carol","Michelle","Amanda","Melissa","Deborah","Stephanie","Rebecca","Laura","Helen","Sharon","Cynthia","Kathleen","Amy","Shirley","Angela","Anna","Ruth","Brenda","Pamela","Nicole","Katherine","Samantha","Christine","Catherine","Virginia","Debra","Rachel","Janet","Emma","Carolyn","Maria","Heather","Diane","Julie","Joyce","Evelyn","Joan","Victoria","Kelly","Christina","Lauren","Frances","Martha","Judith","Cheryl","Megan","Andrea","Olivia","Ann","Jean","Alice","Jacqueline","Hannah","Doris","Kathryn","Gloria","Teresa","Sara","Janice","Marie","Julia","Grace","Judy","Theresa","Madison","Beverly","Denise","Marilyn","Amber","Danielle","Rose","Brittany","Diana","Abigail","Natalie","Jane","Lori","Alexis","Tiffany","Kayla","Bo","Dave"];
+var nname = ["Ace","Lefty","Shorty","Too-Tall","Fatty","Skinny","Jackass","Deadeye","Hawkful","Toothless","All-In","Double-Down","Stabby","Cutter","Punchy","Drippy","Tubs","Stinky","Baldy","Half-Hand","One-Eye","Rotgut","Doom-breath","Cheesey","Cookie","Spanky","Squirt","Britches","Helmet-Head","Mush-mouth","Marbles","Crazy-Legs","Scooter","Daredevil","Pinky","Prettyboy","Loverboy","Firebug","Cutthroat","Eviscerator","Belly-shot","Rumble-belly","Grumpy","Happy","Lucky","The Bastard","Fingers","Lips","Gold-bug","Fangs","Stumpy","Knuckles","Knuckle-dragger","Eyebrows","Hunchback","Honest","Songbird","Itchy","Scratchy","Booze-hound","Dirty","Dingy","Dingbat","Goofball","Sheep-lover","Bloodshot","Ladies' Man","Dapper","Diamond","The Dandy","Hit-man","Bird-man","Breakout","Wipeout","Dusty","Cottonmouth","Sweet","Rattlesnake","Ox","Ogre","Two-Ton","The Card-Sharp","Chuckles","Funnyman","Undertaker","Gravedigger","Goldie","Poet","Doc","Little","Big","Old","Young","the Kid","Smash-mouth","Whiskey","Ice-man","Reverend","Crusher","Hoss","Snake","Admiral","Bird","Fuzz","Flame","Magician","Barber","Dandy","Twinkle Toes","Blush","Cobra","Yank","Sailor","Cloud","Bobo","Pugs","Bash","Shade","Pipi","Mitzi","Toon","Jewel","Angel","Tiny","Hammer","Blade","Mistletoe","Mugsy","Rouge","Dazzle","Rebel","Merry","Butch","Brick","Grim","Mayor","Arrow","Killer","Prince","Silly","Chipper","Sparrow","Dino","Stretch","Piggy","Butterfly","Bugs","Scruffy","Stout","Ruin","Jumbo","Chief","Sizzle","Freak","Vanilla","Grouch","Brow","Pops","Bad Boy","Fury","Hawk","Buster","Dummy","Berry","Joker","Sassy","Pogo","Pug","Hurricane","Moose","Crow","Robin","Slash","Miracle","Boomer","Jackal","Speed","Bingo","Bitsy","Beard","Honey","Beau","Cuddles","Mutt","Bigby","Queenie","Silence","Spud","Bull","Braveheart","Shadow","Stone","Magica","Mad Dog","Fuzzy","Blue","Bigshot","Spuds","Horse","Skippy","Daring","Marvel","Aggy","Red","Terminator","Bones","Worm","Gentle","Deedee","Major","Thunder","Slim","Nimble","Vulture","Thief","Trey","Pretzel","Stuffy","Gibby","Knight","Ziggy","Viper","Coocoo","Smasher","Glider","Darlin","Buck","Chuck","Lock","Beauty","Landslide","Fish","Dutch","Pig","Bambam","Dream","Black Magic","Dodo","Boogie","Mamba","Trouble","Tigress","Biggie","Creed","Tiger","Feathers","Silver","of the Seven Potencies","Grand Terakion","Devourer of Chaos","the White Crow","Bringer of Prophecy","Benevolent Bringer of Chaos","of the Indivisible Chrome","Master of the Mindless Fist","Weaver of Rainbow's Thread","Sailor of the Twenty-One Trials","Unwritten in the Endless Tome of Time","Prince of the Harlequins","Carver of Dragon Teeth","Herald of the False Prophet","Lion Among Men","the Thrice-Cursed","Merrymaker Extraordinaire","Voice of the Desert","First of the Chosen","Deathslayer","the Damned","of the Forbidden Sea","of the Bells","Adjudicator","Dragonblood","of Many Faces","the Noble Coward","the Hussar","Fellblade","the Fine-Fingered","Feyborne","First Voice of the Crimson Choir","Midnight's Squire","the Frozen Tyrant","the Graven","Mistress of the End","First Gate of the Winding Road","the Hunger Immemorial","Herald of Falling Stars","the Beckoning Quiet","the King of Fools","of the Hallowed Skies","the Last March","the Wild Walker","the Unblemished","the Moon Seer","the Answer","the Night Stalker","the Great Bear","the Unbroken","Honour's Blade","the Boulder","the Scarlet Lion","the Unyielding Anvil","the Iron Commander","Fate Breaker","Kingseeker","the Entitled","Ocean Drinker","Lord of the Dance","of the Great Tower","Earthbinder","of the Poisoned Mind","Terror of the Deeps","Bearer of the Unseeing Eye","the Burdened One","Eternal Servant of the Weave","of the Boundless Possibilites","the Eternal","First to Desire","Valiant Protector","Born of Ash","Suntouched","who Smiles at Death","the Ruin Sage","Embraced by the Moon","the Unyielding","Treachery Incarnate","Protector of Hope","the Fading Light","the Promised End","Reality Sculptor","Keeper of Silence","the Black Rose","Apostle of Dusk","the Bloodied","the Crusher","War Tooth","the Generous","Underfoot","Hart-Footed","Witch-Breaker","Horse Lord","the Wisest","Grim Face","North Bound","Little Bear","the Fair","the Crow","the Amorous","the Frantic","the Old","the Stout","Deep Drinker","the Swarthy","Battle-wise","the Learned","Deep Delver","the Champion","the Giant","Far-traveling","Longshanks","the Small","Silvertongue","Stormcrow","Billygoat","the Leech","Star-eyed","Longbeard","the Wild","Bee Friend","the Burned","the Subtle","the Clever","the Young","Gold-friend","Death's Friend","Half-Troll","the Gray","the Judge","Bee Stung","the Dreamer","Thick-skulled","the Hound","He-Man","Iron-side","Moon Jumper","the Quiet","the Gentle","the Unborn","Fox-bearded","the Red","Bald Pate","the Exile","Sword-splitter","the Bright","Far-seer","the Proud","the Fortunate","the Honest","the Unbowed","the Leaper","the Pious","the Lecherous","the Stingy","the Careless","the Crafty","the Diligent","the Innocent","the Blind Visionary","the Brilliant Mind","the Eternal Hunger","Gentle Heart","Light Lord","Lone Wolf","Love Fool","Loyal Heart","Nimble Mind","the Risen","Secret Master","the Unsung Hero","Grey Knight","Cheap Shot","the Bright One","Dead Mind","the Fake King","Ill Tempered","the Lost Hope","the Last Song","Numb Mind","Tragic Eyes","the Wandering Mind","from Above","from Afar","from Below","the Adept","the Albino","the Antiquarian","the Arcane","the Archaic","the Barbarian","the Batrachian","the Battler","the Bilious","the Bold","the Brave","the Civilized","the Collector","the Cryptic","the Curious","the Dandy","the Daring","the Decadent","the Delver","the Distant","the Eldritch","the Exotic","the Explorer","the Fearless","the Fickle","the Foul","the Furtive","the Gambler","the Ghastly","the Gibbous","the Great","the Grizzled","the Gruff","the Hairy","the Bald","the Haunted","the Heavy","the Hooded","the Hunter","the Imposing","the Irreverent","the Loathsome","the Loud","the Lovely","the Mantled","the Masked","the Merciful","the Mercurial","the Mighty","the Morose","the Mutable","the Mysterious","the Obscure","the Ominous","the Peculiar","the Perceptive","the Quick","the Ragged","the Ready","the Rough","the Rugose","the Scarred","the Searcher","the Shadowy","the Short","the Steady","the Uncanny","the Unexpected","the Unkonwable","the Verbose","the Vigorous","the Wanderer","the Wary","the Weird","of the Arid Wastes","of the Beetling Brow","of the Cyclopean City","of the Dread Wilds","of the Eerie Eyes","of the Foetid Swamp","of the Forgotten City","of the Haunted Heath","of the Hidden Valley","of the Howling Hills","of the Jagged Peaks","of the Menacing Mien","of the Savage Isle","of the Tangled Woods","of the Watchful Eyes","the Lean","the Cowled","the Veiled","the Merciless","the Tall"];
+var lname = ["Cagrant","Ustrando","Filius","Scaramanx","Heptimus","Ostrio","Honkus","Agylo","Primbaster","Glindal","Fargle","Grungo","Marworn","Sealor","Boon","Immuth","Yorgach","Klimp","Aster","Gonk","Dundrah","Fantonius","Gaggamore","Vorch","Saunder","Stacha","Addic","Punja","Tatak","Ornul","Khard","Ingrot","Anzel","Nobbilo","Pranxa","Xanadar","Zoopulus","Kromulo","Emzen","Woostifer","Mirthby","Kragamut","Shemiver","Rumtally","Imbrabinus","Ploob","Essem","Kroyden","Gullencast","Flixmander","Bolzagorath","Ummork","Plindle","Durgadang","Manchiver","Oodal","Leegand","Bosko","Haflump","Mordvey","Fernison","Glamgam","Orstrak","Kunstanticus","Ergon","Dassadal","Bleestocles","Wilverham","Zelligant","Irshal","Umber","Happalapa","Zorkon","Thurbert","Maxipoom","Donzany","Klarkash","Merjam","Elziger","Ashteban","Mercoolio","Cazio","Hurlen","Vlamdibulus","Hargus","Bomgoster","Geliphant","Trangol","Moorgang","Gronwhist","Chrontiphar","Lalifax","Raglio","Trulhamar","Linkat","Vergath","Mungo","Rakkatak","Lazorz","Nysbustah","Abeodan","Acwel","Aelle","Agyfen","Aheawan","Alchfrith","Aldhelm","Alfred","Algar","Alger","Almund","Alwin","Andettan","Andsaca","Andswaru","Andwyrdan","Ane","Archerd","Archibald","Arlice","Astyrian","Avery","Baldlice","Bana","Banan","Bar","Bawdewyn","Beadurinc","Benoic","Benwick","Besyrwan","Betlic","Bronson","Caedwalla","Caflice","Camden","Chapman","Cynewulf","Cynn","Dalston","Deogol","Derian","Drefan","Dreogan","Eadig","Eadlyn","Eamon","Ecgfrith","Edmund","Eldrid","Eorl","Farmon","Garrett","Geoff","Gildas","Gimm","Graeme","Grendel","Grimbold","Grimme","Halig","Ham","Landry","Lange","Lar","Leax","Leng","Leof","Lin","List","Lufian","Manton","Norville","Odi","Odin","Oswine","Peada","Perry","Pierce","Prasutagus","Ramm","Rand","Rinc","Ro","Rypan","Scrydan","Seward","Sihtric","Stearc","Stedman","Swift","Tamar","Tolan","Trace","Waelfwulf","Winter","Wissian","Worthington","Acca","Aedre","Aefentid","Aefre","Aethelflaed","Aethelthryth","Alodia","Alodie","Andsware","Anlicnes","Annis","Ar","Ardith","Arianrod","Ashley","Audrey","Bearrocscir","Bernia","Bisgu","Bletsung","Bliss","Blythe","Bodicea","Brigantia","Brimlad","Bysen","Cartimandua","Cearo","Chelsea","Claennis","Clover","Cwen","Cryst","Daedbot","Daisy","Darel","Darelene","Darelle","Darline","Daryl","Dawn","Devona","Dohtor","Don","Eacnung","Eadgyth","Easter","Eda","Edith","Edlyn","Edmunda","Edrys","Eldrida","Elene","Elga","Ellenweorc","Ellette","Elswyth","Elva","Elvina","Engel","Eostre","Erlina","Esma","Estra","Etheswitha","Freya","Garmangabis","Hamia","Harimilla","Hilda","Ifield","Juliana","Kendra","Linette","Lora","Loretta","Lyn","Mae","Maida","Megan","Mercia","Moira","Nelda","Nerthus","Odelia","Ora","Orva","Osberga","Rheda","Rowena","Sibley","Silver","Sulis","Sunniva","Tate","Udele","Viradecthis","Wilda","Willa"];
+var words = ["Absolute","Absorb","Abyss","Acid","Addict","Addiction","Aegis","After","Age","Ailment","Air","Albatross","Alcohol","Altar","Alter","Always","Amber","Analyse","Anchor","Angel","Anger","Animal","Animate","Ant","Antelope","Antennae","Anti","Antler","Ape","Apocalypse","Appendage","Appendix","Arc","Arm","Armadillo","Armor","Arrow","Artery","Ash","Ask","Astral","Attack","Attract","Aura","Aurora","Avenge","Awaken","Away","Axe","Baboon","Back","Badger","Bag","Balance","Ball","Bamboo","Bandage","Bane","Banish","Bark","Barren","Barrier","Basalt","Bat","Beacon","Beak","Beam","Bear","Beard","Beast","Beaver","Become","Bee","Beer","Beetle","Belch","Bellow","Belly","Bend","Bestow","Bewilder","Beyond","Bezoar","Bind","Bite","Black","Blade","Blasphemous","Blast","Blight","Blind","Blink","Blob","Block","Blood","Bloodhound","Blossom","Blow","Blue","Boar","Boat","Body","Boil","Bolt","Bone","Bones","Book","Bow","Brain","Breath","Breathe","Breed","Brew","Bridge","Brine","Bronze","Brown","Brush","Bubble","Build","Bull","Burn","Butterfly","Bypass","Cabal","Call","Camel","Cancel","Candle","Carapace","Carbon","Carry","Carving","Cascade","Cat","Cauldron","Centipede","Chain","Chameleon","Change","Changeling","Chaos","Chariot","Charisma","Charm","Cheat","Cheetah","Child","Chill","Choke","Circle","City","Clap","Claw","Clay","Clean","Cleric","Clinging","Cloak","Clockwork","Clone","Close","Cloth","Cloud","Cloying","Cockroach","Code","Coil","Colossus","Colour","Comb","Combine","Come","Command","Communicate","Communion","Compel","Conceal","Conduit","Cone","Confuse","Confusion","Conjure","Constitution","Consume","Contact","Contaminate","Contemplate","Continual","Control","Copper","Copy","Core","Corpse","Corrupt","Coruscatory","Cough","Courage","Cowardice","Coyote","Craft","Cranial","Crawl","Create","Creep","Cricket","Crime","Crocodile","Cross","Crouch","Crow","Crown","Crush","Cry","Crystal","Cube","Cult","Cure","Curse","Dagger","Damn","Dance","Dark","Darkness","Dash","Day","Dead","Deafen","Death","Decay","Deceive","Decimate","Decipher","Deer","Defend","Degenerate","Delay","Demon","Desecrate","Desire","Detect","Detonation","Devil","Devour","Dexterity","Diamond","Dig","Digestion","Dimension","Diminish","Direction","Dirt","Disc","Discord","Disease","Disembowel","Disguise","Disgust","Disk","Dismember","Dispel","Dissolve","Distant","Distortion","Distract","Divide","Doctor","Dog","Donkey","Doom","Door","Dragon","Drain","Draw","Dream","Drink","Drunk","Dubious","Duck","Duplicate","Dust","Dwarf","Eagle","Ear","Earth","Eat","Echo","Ectoplasm","Egg","Ego","Elbow","Eldritch","Electricity","Elemental","Elephant","Elf","Elk","Elm","Ember","Embolden","Embrace","Enchant","Encode","Endure","Energize","Enfeeble","Enhance","Enlighten","Ennui","Enrage","Envelop","Envy","Epiphany","Eternal","Evil","Eviscerate","Excise","Excrete","Excruciate","Execute","Exercise","Exhale","Existential","Exoskeleton","Expand","Expel","Explode","Explosive","External","Extract","Eye","Fake","Falcon","Fall","Falsehood","Fang","Farm","Fart","Fat","Fate","Fatten","Fear","Fearsome","Feast","Feather","Feculent","Fecundity","Feel","Ferret","Fester","Field","Fiend","Fight","Filth","Fin","Find","Finger","Fire","Fish","Fist","Flail","Flame","Flap","Flee","Flesh","Flex","Flick","Flight","Flower","Fly","Foe","Fog","Food","Foot","Forbidden","Force","Foresee","Forest","Forever","Forge","Form","Fountain","Fox","Free","Freeze","Friend","Frog","Frown","Fulgerous","Fulgurite","Fungal","Fungus","Fur","Furniture","Fuse","Gallow","Gas","Gate","Gaze","Geas","Gem","Ghost","Ghoul","Gill","Giraffe","Give","Glamour","Gland","Glare","Glass","Globs","Glow","Glutinous","Glyph","Goat","God","Gold","Golem","Good","Gorilla","Granite","Grasp","Grasshopper","Grave","Gravity","Greed","Green","Grief","Grind","Grip","Grow","Growth","Gruesome","Grunt","Guise","Gut","Hair","Hallucinate","Hallucinatory","Hammer","Hand","Hard","Harm","Harmony","Haruspex","Harvest","Hasten","Hate","Hawk","Heal","Health","Hear","Heart","Heat","Hedgehog","Heel","Heir","Hell","Hermit","Hero","Hex","Hide","Hinder","Hips","Hold","Hole","Hone","Honey","Hoof","Hook","Hope","Horn","Horror","Horse","Hug","Hummingbird","Hyena","Ice","Identify","Ignite","Iguana","Illuminate","Illusion","Imbue","Immoral","Immunity","Implant","Imprison","Indigo","Induce","Infect","Infernal","Infest","Inflict","Insanity","Insect","Instantaneous","Instill","Intelligence","Internal","Intestine","Intoxicate","Invest","Invisible","Iris","Iron","Jackal","Jar","Jaw","Jaws","Jellyfish","Joint","Journal","Joy","Judge","Jump","Justify","Kangaroo","Karma","Key","Kick","Kill","King","Kiss","Knee","Know","Knowledge","Knuckle","Lair","Lake","Lament","Land","Language","Lapse","Lash","Laugh","Laughter","Launch","Lava","Law","Lead","Leaf","Lean","Leap","Learn","Leech","Leg","Lemur","Lens","Leprous","Lessen","Lever","Levitate","Lick","Lie","Life","Lift","Light","Lightning","Limb","Limbo","Link","Lion","Lips","Liquid","Liver","Lizard","Lobster","Locate","Lock","Look","Loop","Lore","Loss","Love","Lucid","Lung","Lurk","Lust","Lynx","Machine","Madden","Magic","Magpie","Mahogany","Maidens","Make","Mane","Mask","Masochism","Meat","Meld","Melt","Memories","Memory","Mend","Mermaid","Mesmerize","Message","Metal","Meteor","Miasma","Mighty","Mind","Mindread","Mineral","Mirror","Missile","Mist","Mistake","Modify","Mole","Molt","Moment","Mongoose","Monkey","Monolith","Monster","Moon","Moose","Morph","Moss","Moth","Mouth","Move","Mucus","Mud","Mule","Murder","Muscle","Mustache","Mutate","Mutation","Mutilate","Nails","Name","Nature","Navel","Neck","Negate","Negation","Nerve","Never","Nexus","Nickel","Night","Nightmare","Noise","Nomad","Nose","Nullify","Oak","Object","Obsequious","Obsidian","Obstruct","Ocean","Octopus","Offend","Offset","Oil","Ooze","Open","Opiate","Opossum","Orange","Orbit","Orc","Order","Organ","Orifice","Orphan","Ostrich","Otter","Outermost","Owl","Ox","Pact","Pain","Palm","Panic","Panther","Paper","Paradigm","Paralyze","Paranoia","Parasite","Parrot","Pass","Pat","Path","Peace","Peacock","Permanent","Person","Petrify","Phantom","Phase","Pheromones","Phlegm","Phoenix","Pierce","Pig","Pinch","Pink","Pique","Piranha","Pit","Plague","Plant","Plasm","Plasma","Platinum","Platypus","Play","Poetry","Point","Poison","Porcupine","Pores","Portal","Possess","Potion","Pound","Power","Pride","Prismatic","Prison","Probability","Proboscis","Prophet","Protect","Pull","Pulse","Punch","Purify","Purple","Pursue","Push","Pyramid","Quake","Queen","Quell","Quiet","Quill","Quintessence","Rabbit","Racoon","Rage","Rain","Raise","Ram","Rashness","Rat","Rattlesnake","Ravage","Raven","Ray","Razor","Reach","Read","Realm","Reap","Recoil","Red","Reflect","Regenerate","Release","Remove","Rend","Repair","Repel","Return","Reveal","Revenge","Reverse","Revolt","Rhinoceros","Rib","Ring","Riot","Rip","Ripen","Ritual","Road","Robe","Robot","Rod","Rope","Rot","Rub","Ruin","Rumors","Run","Rune","Rupture","Rust","Sacrifice","Sadism","Sadness","Salt","Sanctum","Sand","Sap","Sapphire","Savage","Say","Scale","Scorch","Scorpion","Scramble","Scratch","Scream","Screech","Scry","Scythe","Seal","Secret","See","Seethe","Send","Sentinel","Separate","Serpent","Servant","Shadow","Shake","Shape","Shard","Share","Shark","Sharp","Shatter","Sheep","Shell","Shield","Shift","Shine","Ship","Shrewd","Shrink","Shrivel","Sight","Sigil","Signal","Silence","Silver","Sin","Sinister","Sit","Skeleton","Skin","Skull","Skunk","Sky","Slap","Slave","Sleep","Slide","Slime","Slither","Sloth","Slow","Sludge","Smell","Smile","Smite","Smoke","Snail","Snake","Snap","Sneeze","Snow","Sober","Soft","Soil","Song","Soothe","Sorrow","Soul","Sound","Space","Spasm","Spawn","Speak","Spear","Spell","Sphere","Spheres","Spider","Spin","Spine","Spirit","Spit","Spleen","Splice","Splinter","Sponge","Spore","Spray","Squamous","Square","Squeeze","Squid","Squirm","Squirrel","Stack","Staff","Stalker","Stand","Star","Stare","Stasis","Statue","Steal","Steam","Steed","Steel","Step","Sting","Stingray","Stitch","Stomp","Stone","Stork","Storm","Strain","Strength","Stretch","Strike","Stroke","Stun","Success","Sucker","Summon","Surprise","Swallow","Swan","Swarm","Sweat","Swift","Swing","Sword","Symbol","Table","Tail","Take","Talon","Tangible","Tap","Tar","Taste","Teak","Tear","Teeth","Tempo","Tendril","Tenebrous","Tentacle","Terrain","Terrify","Terror","Test","Thief","Think","Thorn","Thought","Threaten","Throat","Throne","Thunder","Tiger","Till","Time","Tin","Tiny","Titanic","Toe","Tomb","Tongue","Tool","Torch","Torment","Torrent","Tortoise","Torture","Touch","Tower","Transfer","Transform","Transmute","Transport","Trap","Travel","Traveling","Tree","Trust","Truth","Tusk","Unclaimed","Undead","Unhinged","Unique","Unlucky","Unseen","Uranium","Use","Useful","Uttermost","Vague","Vampire","Vanity","Vegetable","Vein","Vigour","Vile","Villain","Vine","Violent","Violet","Vision","Vodka","Voice","Void","Vomit","Vortex","Vulgarity","Vulture","Wail","Walk","Wall","War","Ward","Warp","Wasp","Waste","Water","Waterfall","Wave","Wax","Weak","Weapon","Weary","Weather","Web","Weird","Whale","Whisker","Whisper","White","Wiggle","Wight","Wind","Wine","Wing","Wisdom","Wish","Wither","Wizard","Wolf","Wood","Word","Worm","Worship","Wounding","Wrack","Wrath","Wriggle","Wrist","Write","Writhe","Yak","Years","Yellow","Yew","Zeal","Zealot","Zombie"];
+
+function newName(){
+  var i;
+ switch(r(20)){
+  default:
+   return fname.sampleRec()+' '+lname.sampleRec();
+
+  case 1: case 2: case 3: case 4: case 5:
+   return fname.sampleRec()+' "'+nname.sampleRec()+'" '+lname.sampleRec();
+
+  case 6:
+   return lname.sampleRec()+' '+String(111+r(889));
+
+  case 7:
+   return fname.sampleRec();
+
+  case 8:
+   return ' "'+nname.sampleRec()+'" '+lname.sampleRec();
+
+  case 9:
+   return String(50+r(50))+" "+["White","Black","Red","Blue","Green","Aquamarine","Golden","Indigo","Radiant","Dark","Bright","Juggernaut","Liminal","Furious","Vigilant","Wilful","Turbulent","Shining","Sorrowful","Ardent","Adamant","Painful","Docile","Frozen","Burning","Cold","Hot","Verdant","Silent","Hopeful","Endless","Infinite","Gilded","Paper","Bloody","Recursive","Empty","Holy","Final"].sampleRec() + " " + ["Chain","Blossom","Star","Gaze","Blade","Disc","Stream","River","Ocean","Mountain","Tower","Temple","Shield","Spear","Flame","Cloud","Storm","Wave","Tide","Tree","Gale","Dome","Tome","Orb","Scar","Breath","Song","Voice","Word","Thorn","Stone","Concordance","Spirit","Field","Hammer","Chisel","Ingot","Smoke","Crown","Wing","Chariot","Bridge","Flower","Continent","Comet","Moon","Meteor","Anvil","Forge","Mask","Student","Feather","Scale","Hand","Eye","Sigil"].sampleRec() + " " + ["Subdues","Scours","Punctures","Purges","Accuses","Protects","Combats","Apprehends","Breaks","Shatters","Heals","Repairs","Engulfs","Questions","Crushes","Perceives","Analyzes","Enlightens","Seals","Defeats","Vanquishes","Knows","Finds","Obliterates","Preserves"].sampleRec()+" "+["Evil","the Universe","the Unrepentant","the Horizon","the Void","Darkness","the Truthful","the Untruthful","the Fortunate","the Unfortunate","the Sinful","God","the Gods","the Repentant","the Wise","the Unwise","the Holy","the Unholy","the World","Civilization","the Proud","the Greedy","the Lustful","the Wrathful","the Gluttonous","the Envious","the Slothful","the Meek","the Poor","the Hungry","the Dead","the Living","the Sun","Space-Time","the Wicked","Truth","Reality","Lies","the Virtuous","all Heretics and Cowards"].sampleRec();
+
+  case 10:
+   return ' "'+nname.sampleRec()+'" ';
+
+  case 11:
+   var wNP = ["Alch","Ambro","Aug","Baggy","Bals","Bazh","Beaver","Beggars","Bipp","Blim","Bock","Bogg","Boof","Bork","Bottom","Broad","Buck","Bumb","Burner","Burzy","Bush","Bushy","Castle","Charm","Chook","Chum","Clutter","Cocin","Conju","Cra","Crad","Cumber","Dapp","Dhun","Din","Dinker","Divin","Doodle","Doop","Dread","Drub","Elmsley","Ernst","Eston","Exo","Fany","Fartle","Feffer","Ferd","Figgy","Finch","Fister","Forby","Fordshire","Fudge","Furge","Gae","Gant","Gap","Gax","Giggles","Gleep","Glum","Gooch","Grog","Gross","Hagat","Hal","Hale","Hand","Hard","Hargag","Hass","Hex","Hocus","Hool","Horn","Hossen","Hrum","Hulm","Hyggs","Ington","Jank","Jinx","Joff","Jolly","Kal","Kill","Knacker","Knicker","Kor","Koz","Kramm","Krang","Krotch","Lack","Lapper","Lick","Lord","Lorg","Magus","Maxi","Mus","Pow","Er","Man","Mazz","Meat","Meem","Milsh","Minge","Mo","Moisten","Molp","Mon","Moon","Mooth","Mugg","Nabb","Napper","Nasty","Nether","Nex","Oort","Paag","Packer","Pang","Panty","Penny","Piddle","Pimple","Pincher","Pipt","Pizzle","Pizzle","Plinker","Pocus","Prick","Prissy","Pubb","Pudding","Pyu","Quisp","Raco","Rams","Ramst","Rapp","Riddle","Road","Rod","Rool","Rump","Rune","Ryz","Sass","Seer","Shaft","Shafts","Shag","Shitling","Shoot","Shuffle","Skremp","Slapper","Slipper","Smelly","Snatch","Snicker","Sniffen","Sniffer","Spittle","Staff","Staffer","Star","Stith","Stone","Strating","Stratling","Stroop","Stroot","Stumble","Sundar","Tankle","Thok","Thorpe","Throck","Thwyp","Tinker","Tunn","Turkey","Tzim","Uk","Ul","Ur","Ursk","Urz","Val","Vela","Vex","Voll","Vree","Waddle","Waggler","Wall","Wallop","Wand","Washer","Wattle","Whistle","Wick","Wiggle","Willow","Wimple","Worme","Wort","Worthy","Wozz","Wump","Wurp","Xim","Yann","Yar","Ygg","Ylur","Zap","Zoot","Zsand","Zur","Curse","Flame","Dark","Null","Light","Vill","Green","Red","Blue","Time","Space","Redact","Scroll","Skull","Grow","Never","Alway","Fever","Silk","Diab","Illus","Magnet","Ism","Ology","Sorc","One","Seven","Eleven","Cipher","Ur"];
+   var sillyConnect = [" "," "," "," "," "," "," de "," von "," val "," ix ","-"," a "," zu "," y "," of "," d'"];
+
+   return wNP.sampleRec()+wNP.sampleRec().toLowerCase()+sillyConnect.sampleRec()+wNP.sampleRec()+wNP.sampleRec().toLowerCase()+" A.K.A. "+fname.sampleRec();
+
+  case 12:
+   // return Math.random().toString(100).substring(2,7).toCase()
+   // return a.slice(0,4+r(4))+", ""+fname.sampleRec()+"""
+   var a = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+   var b = "";
+   for(i = 4+r(4); i>-1; i--){
+     b += a.sampleRec(); }
+   return b+', "'+fname.sampleRec()+'"';
+
+  case 13:
+   var cons = "bcdfghjklmnpqrstvwxz".split("");
+   var vowels = "aeiouy".split("");
+   var o = "";
+   for (i = 8+r(4); i>-1; i--) {
+    if (i%2==0)
+     o += cons.sampleRec();
+    else
+     o += vowels.sampleRec();
+   }
+   return o.charAt(0).toUpperCase() + o.slice(1);
+
+  case 14:
+   return words.sampleRec()+" "+words.sampleRec();
+
+  case 15:
+   var roman = ["II","III","IV","V","VI","IX","XIII","XIV","XCI","CLVI"];
+   return fname.sampleRec()+" "+roman.sampleRec();
+
+  case 16:
+   return fname.sampleRec()+" "+words.sampleRec();
+ }
+}
+
+var aland = ["Abandoned","Aberrant","Abhorrent","Abominable","Abyssal","Accidental","Accursed","Acidous","Acrid","Actinic","Aerial","Afflicted","Akratic","Alien","Alpha","Amaranthine","Amethyst","Anarchic","Ancient","Angel","Angelic","Animalistic","Animistic","Antediluvian","Arcane","Archaic","Arctic","Argent","Arid","Artful","Ascendant","Ashen","Astral","Awoken","Axiomatic","Azure","Baleful","Banished","Barbaric","Barren","Bawdy","Beastly","Beautiful","Belligerent","Bewitched","Bizarre","Black","Blessed","Blighted","Blind","Blissful","Bloody","Blue","Boiling","Bone","Bountiful","Brave New","Brazen","Broken","Brooding","Brown","Brutal","Buried","Burning","Burnt","Calm","Cancerous","Cannibal","Capitalist","Capricious","Captivating","Carnal","Carrion","Cataclysmic","Caustic","Cavernous","Celestial","Central","Ceramic","Cerulean","Chained","Chaotic","Chthonic","Clockwise","Clockwork","Cobalt","Cold","Colourless","Communist","Conquering","Contaminated","Corpse","Corrupt","Coruscant","Cracked","Cratered","Creepy","Crenellated","Crimson","Crooked","Crown","Cruel","Cursed","Damned","Dancing","Dangerous","Dank","Dead","Deadly","Deathless","Deathly","Decaying","Deep","Deeper","Deepest","Defiant","Deformed","Demon","Demonic","Dendroid","Depraved","Deranged","Desecrated","Deserted","Desolate","Despoiled","Destroyed","Devil","Diabolic","Diamond","Dire","Diseased","Divine","Dolm","Doomed","Draconic","Dragon","Dreadful","Dreaming","Dreary","Drowned","Dry","Dusty","Dwarven","Dying","Earthen","Eastern","Ebon","Eldritch","Electric","Elven","Emerald","Empty","Empyrean","Enchanted","Enclosed","Enigmatic","Enlightened","Epic","Errant","Eternal","Ethereal","Evening","Exalted","Experimental","Extradimansional","Fading","Failed","Fair","Fairy","Fallen","False","Familiar","Fancy","Far","Faraway","Fearful","Fearless","Fearsome","Feral","Ferric","Fertile","Fetid","Fey","Fiery","Filthy","Final","Flaming","Flawed","Flayed","Floating","Flowing","Forbidden","Forgotten","Forlorn","Forsaken","Forsworn","Foul","Fractal","Fractured","Fragrant","Frail","Freakish","Frenetic","Friendly","Frigid","Frosty","Frozen","Fuligin","Fungal","Gargantuan","Gay","Ghastly","Ghostly","Ghoulish","Giant","Ginger","Glacial","Gloomy","Glowing","Gnomish","Golden","Good","Grand","Grandiose","Gray","Great","Greater","Green","Grim","Gruesome","Guarded","Hallowed","Hanging","Harsh","Haunted","Heavenly","Hellish","Hidden","Higher","Hoary","Hollow","Holy","Homeward","Hostile","Hot","Hungry","Hypergreen","Icy","Igneous","Ill-Fated","Illustrated","Immaculate","Immortal","Imperial","Inbred","Indigo","Industrial","Infected","Infernal","Infrared","Inhuman","Insidious","Irradiated","Jagged","Jale","Joyous","Knotted","Kraken","Lachrymose","Last","Legendary","Leper","Lesser","Leviathan","Lifeless","Little","Long","Lost","Low","Lower","Lunar","Lush","Luxurious","Macabre","Mad","Magenta","Magical","Magnificent","Majestic","Marginal","Marked","Masked","Mechanical","Mercantile","Mercurial","Metablue","Midsummer","Mighty","Miraculous","Mirror","Mirthful","Miserable","Misty","Molten","Monster","Monstrous","Morning","Mouldy","Mournful","Mutant","Mysterious","Mystic","Narrow","Nascent","Negative","Nether","Ninth","Noble","Nocturnal","Nomadic","Northern","Noxious","Nuclear","Occidental","Occult","Octarine","Ogrish","Old","Omega","Orange","Orcish","Organic","Oriental","Ornery","Orthodox","Other","Overgrown","Pale","Pallid","Penitent","Peregrine","Perilous","Petrified","Phallic","Phasic","Phoenix","Pink","Pious","Plagued","Pleasant","Poisoned","Potent","Praised","Prehistoric","Primitive","Primordial","Prismatic","Pristine","Profane","Promiscuous","Pure","Purple","Putrescent","Putrid","Quiet","Radiant","Rambunctious","Rampant","Rapt","Ravaged","Ravenous","Ravished","Red","Reforged","Regal","Resplendent","Revenant","Rich","Rising","Rocky","Rotting","Royal","Ruby","Ruined","Runic","Sacred","Sanguine","Savage","Scarlet","Scarred","Scorched","Screaming","Sealed","Searing","Secret","Sentient","Serene","Serpent","Serpentine","Seventh","Shadowed","Shattered","Shifting","Shrouded","Sidereal","Silent","Sinful","Singing","Sinking","Sinuous","Skeleton","Skull","Sleeping","Snowy","Solar","Southern","Spectral","Spirit","Steampunk","Stinking","Strange","Succulent","Sunken","Supernatural","Supreme","Tattered","Tepid","Terrestrial","Third","Thirteenth","Titanic","Torturous","Toxic","Tranquil","Transdimensional","Tribal","Trollish","Troubled","Turbulent","Twin","Twisted","Ugly","Ulfire","Ultraviolet","Unabashed","Unborn","Unchained","Uncharted","Unconquered","Undying","Unholy","Unicorn","Unknown","Unmapped","Unnamed","Unnatural","Unstable","Untamed","Upper","Vampire","Veiled","Vermillion","Very Small","Vibrant","Vicious","Vile","Violet","Virgin","Viridian","Volcanic","Voltaic","Wandering","War-Torn","Warded","Warm","Warped","Wasting","Watery","Wayward","Wealthy","Weeping","Weird","Western","Whispering","White","Wicked","Wild","Winded","Windy","Witching","Withered","Wooded","Worm","Worthless","Wraith","Wretched","Wyrm","Xanthous","Yawning","Yellow","Zombie"];
+var pland = ["Adamant","Adventure","Alabaster","Amber","Apocalypse","Ash","Asphalt","Autumn","Bark","Beer","Blood","Brass","Briar","Brimstone","Bronze","Chaos","Chrome","Cinder","Cinnamon","Clay","Coal","Concrete","Copper","Coral","Crystal","Dark","Dawn","Deer","Dusk","East","Ember","Evil","Flame","Flint","Fog","Fossil","Glass","God","Gold","Grass","Honey","Ice","Iron","Ivory","Jade","Lichen","Magic","Malachite","Mandrake","Marble","Mead","Meat","Metal","Midnight","Milk","Mithril","Moss","Mourning","Mud","Mystery","Nephrite","Night","Nightmare","Noon","North","Obsidian","Onyx","Ooze","Opal","Pepper","Plastic","Platinum","Porcelain","Prism","Quicksilver","Rainbow","Rime","Rust","Saffron","Salt","Sand","Sap","Seaweed","Shadow","Sheep","Silk","Silver","Skin","Sky","Slime","Sludge","Snow","Soap","South","Spring","Steam","Steel","Stone","Sugar","Sulphur","Summer","Sweat","Throne","Trash","Treasure","Undead","Verdigris","Vinegar","West","Wine","Winter"];
+var nland = ["Plane","Plain","Plains","Place","Hell","Heaven","Haven","Paradise","Manse","Demesne","Domain","Glade","Meadow","Clearing","Vale","Valley","Gorge","Oubliette","Dungeon","Deeps","Depths","Tunnels","Mine","Mines","Realm","Reich","Empire","City","Ruins","Halls","Abyss","Paths","Crossroads","Bulwark","Rampart","Nexus","Reach","Reaches","Territory","Land","Cave","Caves","Cavern","Caverns","Desert","Sea","March","Borderlands","Graveyard","Vineyard","Kingdom","County","Barony","Shire","Wood","Woods","Laboratory","Forest","Jungle","Towers","Field","Fields","Palace","Temple","Coast","Fjord","Garden","Chasm","Hive","Grounds","Castle","Fort","Fortress","Nest","World","Mountain","Hills","Hillocks","Highlands","Prairie","Wasteland","Monastery","Cathedral","Court","Cliffs","Factory","Wild","Wilds","Wilderness","Marsh","Marshland","Swamp","Bog","Quagmire","Moor","Dale","Pastures","Steppe","Grassland","Caliphate","Sultanate","Emirate","Province","Country","Earldom","Fiefdom","Dunes","Tundra","Taiga","Beach","Warrens","Burrow","Den","Lair","Refuge","Retreat","Sanctuary","Sanctum","Oasis","Savanna","Badlands","Plateau","Wastes","Borough","Canton","District","Prefecture","Region","State","Town","Parish","Colony","Hamlet","Precinct","Protectorate","Exarchate","Necropolis","Stronghold","Cloister","Academy","Gulch","Grotto","Trenches","Channels","Canyon","Ravine","Fissures","Glen","Pass","Dell","Chambers","Hollow","Underworld","Underground","Expanse","Pit","Pits","Fen","Wetland","Edge","Citadel","Bastion","Keep","Barrows","Catacombs","Crypt","Vault","Sepulcher","Tomb","Mausoleum","Holdings","Estate","Freehold","Volcano","Camp","Shrine","Labyrinth","Maze","Sewers","Desolation","Road","Prison","Gaol","Crater","Caldera","Dimension","Springs","Battlefield","Pyramid","Rift","Library","Utopia","Dystopia","League","Outlands","Cove","Eyrie","Lowlands","Ossuary","Ziggurat","Cemetery"];
+var lland = ["Abortion","Adversity","Agony","Air","Alchemy","Alcohol","Angels","Anger","Anguish","Annihilation","Anomalies","Answers","Anxiety","Apes","Apotheosis","Apparitions","Architecture","Arson","Art","Artifice","Ascension","Ashes","Aspirations","Avarice","Baboons","Bandits","Banners","Baubles","Bears","Beasts","Bee-Eaters","Bees","Beggars","Bells","Berries","Berserks","Birds","Blades","Bliss","Blizzards","Bloodlust","Bloodshed","Boars","Bodies","Bogeymen","Bondage","Bones","Books","Boulders","Brambles","Bravery","Bread","Buffalos","Butterflies","Cacophony","Cactae","Cakes","Camels","Cancer","Candy","Carnage","Catastrophes","Cats","Cattle","Cauldron","Celebration","Centaurs","Chains","Chants","Charity","Chastity","Cheese","Chickens","Chimneys","Chocolate","Claws","Clergy","Clocks","Clones","Clowns","Colossi","Compassion","Conquest","Contempt","Crabs","Crates","Crime","Crime","Crocodiles","Crows","Crucible","Crucifixion","Curses","Darkness","Daughters","Death","Decay","Deception","Deicide","Delight","Delirium","Delusion","Dementia","Demise","Demons","Depression","Desires","Despair","Desperation","Destiny","Destruction","Devolution","Dew","Diligence","Dinosaurs","Disasters","Discord","Domes","Doom","Dragons","Dread","Drizzle","Drugs","Ducks","Dust","Duty","Dwarves","Earth","Earthquake","Echoes","Ectoplasm","Elephants","Elves","Endings","Ennui","Envy","Essence","Eternity","Etiquette","Eunuchs","Exorcism","Explosions","Eyes","Fables","Fae","Failure","Fairies","Faith","Famine","Fangs","Fata Morgana","Fate","Fathers","Fear","Feasts","Feathers","Festivities","Fire","Fish","Flesh","Flotsam","Flowers","Forges","Forgiveness","Fortune","Freaks","Freedom","Fright","Frogs","Fruit","Funerals","Fungi","Furniture","Gambling","Garbage","Gardens","Gates","Gems","Genesis","Ghosts","Ghouls","Giants","Glory","Gluttony","Goblins","Golems","Gossip","Grace","Grandfathers","Grandmothers","Grapes","Gratitude","Graves","Greed","Growth","Hallucinations","Hammers","Harmony","Hatred","Haunts","Hazards","Healing","Hearts","Hellfire","Heresy","Heroes","Heroics","Herrings","Honour","Hope","Horrors","Horses","Hymns","Idols","Illusions","Imagination","Imps","Incest","Ink","Insanity","Insects","Intimacy","Invaders","Jaywalking","Jesters","Jewels","Journeys","Joy","Keys","Knights","Knives","Koans","Kobolds","Kung Fu","Lakes","Lamentation","Lamentations","Lances","Lava","Leeches","Legends","Lemmings","Liars","Liberty","Lice","Lies","Life","Light","Lightning","Limbs","Lions","Lizard Kings","Lizards","Locks","Loot","Lords","Lore","Loss","Love","Lovers","Lust","Madness","Magma","Magpies","Maids","Mana","Masochism","Mathematics","Melancholy","Memories","Mercury","Mercy","Mermaids","Mice","Might","Mildew","Mirrors","Mirth","Misery","Misfortune","Mist","Mockery","Monkeys","Monsters","Monuments","Moon","Mothers","Mucus","Murder","Muses","Mushrooms","Music","Mutants","Myths","Narwhals","Nature","Nausea","Needles","Nobility","Noise","Nymphs","Obelisks","Obliteration","Oblivion","Occultism","Octopi","Olm","Orcs","Ordeals","Outlaws","Owls","Oysters","Pacifism","Pacts","Pain","Panthers","Parrots","Passion","Patience","Peace","Peacocks","Pearls","Penance","Penguins","Perdition","Peril","Perversion","Pestilence","Phantoms","Philosophy","Pigeons","Pillars","Pirates","Pitchforks","Plague","Plants","Plenty","Poetry","Power","Powers","Predators","Pride","Promises","Prophecy","Prosperity","Protection","Providence","Puissance","Punishment","Purity","Pus","Putrescence","Pygmies","Pyres","Questions","Quests","Raiders","Rain","Rats","Ravens","Reason","Rebels","Rebirth","Reflections","Regret","Reincarnation","Remorse","Responsibility","Rest","Revelations","Rhythm","Riches","Rituals","Rivers","Roses","Rot","Sacrifice","Sadism","Saliva","Scorn","Scrap","Screams","Secrets","Serenity","Serpents","Servitude","Sex","Shame","Sharks","Shields","Ships","Sickness","Silence","Simulacra","Sin","Sins","Skulduggery","Skulls","Slaughter","Slavery","Sleep","Sloth","Slumber","Smoke","Snakes","Soldiers","Sons","Soot","Sorcerers","Sorcery","Sorrow","Souls","Spears","Spices","Spiders","Spirals","Spires","Spirits","Spoons","Squids","Stars","Statues","Staves","Storms","Strength","Strife","Succour","Suffering","Sun","Sunlight","Swans","Sweat","Swords","Sympathy","Taboos","Tea","Tears","Teatime","Teeth","Temperance","Temptation","Tentacles","Terror","Thieves","Thorns","Thoughts","Thunder","Tides","Tigers","Timber","Time","Titans","Tongues","Torment","Tornados","Torture","Tragedy","Traitors","Traps","Travels","Travesty","Treason","Trees","Trials","Trombones","Trouble","Trust","Truth","Tumult","Turnips","Turtles","Twilight","Underwear","Unicorns","Unrest","Urns","Valour","Vengeance","Vermin","Voices","Void","Vultures","Wands","War","Warlocks","Warmth","Wasps","Water","Wealth","Weapons","Weed","Werewolves","Whales","Whispers","Whores","Winds","Wisdom","Wizards","Woe","Wolves","Women","Wonder","Wood","Worms","Wrath","Wyrms","Wyverns"];
+var tland = ["Aegis","Amazon","Angel","Archangel","Archon","Army","Avatar","Behemoth","Bull","Butcher","Cadaver","Cenobite","Champion","Child","Chimera","Clan","Council","Daeva","Damned","Dead","Demigod","Demon","Devil","Druid","Eater","Eidolon","Emperor","Executioner","Fiend","Genie","God","Heir","Herald","Hermit","Hero","Hierophant","Horror","Imp","Juggernaut","King","Knave","Knight","Lady","Lich","Lord","Lotus","Mage","Master","Messenger","Mistress","Monk","Monolith","Mummy","Necromancer","Oracle","Orb","Paladin","Paragon","Parasite","Prince","Princess","Queen","Reaper","Saint","Scoundrel","Scourge","Seer","Sentinel","Seraph","Shaman","Sorcerer","Sorceress","Stag","Star","Starspawn","Syndicate","Tormentor","Trickster","Tyrant","Warlock","Warlord","Witch","Wizard","Worm","Wyrm"];
+var rland = ["Arcadia","Yendor","Mordor","Valhalla","Jotunheim","Helheim","Nirvana","Matrix","Zion","Eden","the Promised Land","Wonderland","Avalon","Azeroth","Barsoom","Bas-Lag","Camelot","the Dreamlands","Limbo","Purgatory","Netherworld","Faeria","Hyperborea","Hyrule","Neverwhere","Midgard","the Moominland","Narnia","Oz","Pern","Pangaea","the Wyld","Xanth","Asgard","Atlantis","Cimmeria","Lemuria","Mu","Albion","Tartarus","Lordran","Quendor","Alfheim","Annwn","Brahmapura","El Dorado","Irkalla","Mictlan","Muspelheim","Niflheim","Pandaemonium","Sierra de la Plata","Shambala","Shangri-La","Sodom","Themiscyra","Thule","Xibalba","Xanadu","Arendelle","Illyria","Qwghlm","Sokovia","Ur","Cocytus","Dis","Stygia","Bytopia","Elysium","Carceri","Gehennom","Acheron","Infernum","the Upside Down","Lankhmar","Ankh-Morpork","Caipi-Taal"];
+
+function newWorldName(){
+ var wName = "";
+ switch(r(16)){
+  default:
+   wName = "the "+["",pland,aland,aland].sampleRec()+" "+nland.sampleRec()+" of "+[pland,lland,lland].sampleRec();
+   break;
+
+  case 0:
+   wName = fname.sampleRec()+"'s "+nland.sampleRec();
+   break;
+
+  case 1:
+   if(!r(4)){ wName = rland.sampleRec(); break; } // Make this one more rare.
+   //fallthrough
+
+  case 2: case 3: case 4:
+   wName = "the "+[pland,aland,aland].sampleRec()+" "+nland.sampleRec();
+   break;
+
+  case 5:
+   wName = "the "+aland.sampleRec()+" and "+aland.sampleRec()+" "+nland.sampleRec();
+   break;
+
+  case 6: case 7:
+   wName = "the "+nland.sampleRec()+" of "+[pland,lland].sampleRec()+" and "+[pland,lland].sampleRec();
+   break;
+
+  case 8: case 9: case 10:
+   wName = "the "+nland.sampleRec()+" of "+[pland,aland,aland].sampleRec()+" "+lland.sampleRec();
+   break;
+
+  case 11:
+   wName = "the "+nland.sampleRec()+" of the "+[pland,aland].sampleRec()+" "+tland.sampleRec();
+   break;
+ }
+
+ return "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+wName+"</t>";
+}
+
+function getWorldName(){
+ return worldName[worldPos.x][worldPos.y];
+}
+
+function getArmorName(){
+ var armour = "";
+ if(armor < armors.length) armour = armors[armor];
+ else armour = armors[armors.length-1] + " +" + String(armor - armors.length + 1);
+ armour += glyphs[glyph];
+ return armour;
+}
+
+// Make map:
+function generateMap(){
+ // Tiny chance that we create a crazy level full of special terrain.
+ var chanceTerrain = !r(10000) && (visited>10);
+
+ for (var i = 0; i < mapWidth; i++) {
+  currentMap[i] = []; // empty map
+  for (var j = 0; j < mapWidth; j++) {
+   var edgeDistance = [i, mapWidth-i, j, mapWidth-j];
+   edgeDistance.forEach(function(element){
+    var chanceFilled = 10;
+    if(element>0) chanceFilled = (1/Math.pow(element,2))*10;
+    if(chanceFilled>r(10) && r(wallBreaks)) currentMap[i][j] = wallBlock;
+   }); //makes 1/distance^2 a percentage chance of wall, 0 = 100%
+   // add terrain
+   if (currentMap[i][j]!=wallBlock){
+    if (!r(1000) && r(distanceToOrigin())) {
+     currentMap[i][j] = rareTerrain[r(rareTerrain.length)];
+    }
+    //else if(!r(Math.max(30-distanceToOrigin()))) {
+    else if(!r(Math.max(Math.abs(25-distanceToOrigin()), 4)) || chanceTerrain) {
+     // Terrain chance dependant on distanceToOrigin, first increases, but then decreases as we get too far.
+     currentMap[i][j] = terrain[r(terrain.length)];
+    }
+    else currentMap[i][j] = emptyBlock;
+   }
+  }
+ }
+
+ if(!r(5)) addLake();
+ if(!r(2)) addRiver();
+ if(!r(2)) addRiver();
+ addStructure();
+ if(!r(10)) addStructure();
+
+ visited++;
+}
+
+function addRiver(){
+ var x = 0;
+ var y = 0;
+ var move = 0;
+ var lastMove = 0;
+
+ var liquid = tileWater;
+ if(r(visited)>20) liquid = tileLava;
+
+ switch(r(2)){
+  case 0: //across
+   x = r(mapWidth);
+   while(inRangeCoords(x,y)){
+    currentMap[x][y]=liquid;
+    if(inRangeCoords(x+1,y)) currentMap[x+1][y] = liquid;
+    move = [lastMove, 0, -1, -1, +1, +1][r(6)];
+    lastMove = move;
+    x += move;
+    y++;
+    if(inRangeCoords(x,y)){
+     if(currentMap[x][y]==liquid) break;
+    }
+   }
+  break;
+
+  case 1: //down
+   y = r(mapWidth);
+   while(inRangeCoords(x,y)){
+    currentMap[x][y] = liquid;
+    if(inRangeCoords(x,y+1)) currentMap[x][y+1] = liquid;
+    move = [lastMove, 0, -1, -1, +1, +1][r(6)];
+    lastMove = move;
+    y += move;
+    x++;
+    if(inRangeCoords(x,y)){
+     if(currentMap[x][y]==liquid) break;
+    }
+   }
+  break;
+ }
+}
+
+function addLake(){
+ var stepsTaken = 0;
+ var stepsFailed = 0;
+ var currStep = {x:r(mapWidth),y:r(mapWidth)};
+
+ var liquid = emptyBlock; // Just to make sure we don't accidentaly make undefined lake.
+ if(r(visited)>20) liquid = tileLava;
+ else {
+  switch(r(6)){
+   default: liquid = tileWater; break;
+   case 0: liquid = ','; break;
+   case 1: liquid = tileGrassTall; break;
+   case 2: liquid = tileBramble; break;
+  }
+ }
+
+ while(stepsTaken<500 && stepsFailed<500){
+  currentMap[currStep.x][currStep.y] = liquid;
+
+  var nextStep = {x: currStep.x + r(3)-1, y: currStep.y + r(3)-1};
+  if(inRange(nextStep)){
+   currStep = nextStep;
+   stepsTaken += 1;
+  } else stepsFailed += 1;
+ }
+}
+
+function addBoss(){
+ var bossSpace = [];
+ // I had it much more nicely and cleanly done, but it was buggy and broken. Now it's ugly and working. :(
+
+ // Create boss arena:
+ for(var k=-5; k < 6; k++){
+  for(var l=-5; l < 6; l++){
+   if(k==0 && l==0) currentMap[userPos.x][userPos.y] = '.';
+   else if(k==-5 || k==5 || l==-5 || l==5 || (userPos.x+k)==0 || (userPos.x+k)==(mapWidth-1) ||
+           (userPos.y+l)==0 || (userPos.y+l)==(mapWidth-1)) currentMap[userPos.x+k][userPos.y+l] = tileLava;
+   else if(currentMap[userPos.x+k][userPos.y+l]==wallBlock) currentMap[userPos.x+k][userPos.y+l] = ',';
+
+   if(checkEmpty(userPos.x+k,userPos.y+l)) bossSpace.push([k,l]);
+  }
+ }
+ msg += "The whole area shudders and cracks as ancient mechanisms are brought to life with the stolen energy. ";
+ // Spawn boss:
+ if(bossSpace.length>0){
+  var place = bossSpace[r(bossSpace.length)];
+  mobBoss.x = userPos.x+place[0];
+  mobBoss.y = userPos.y+place[1];
+  currCre.push(mobBoss);
+  msg += "The ground splits with the sound of whirling clockworks and a horrifying creature bearing the mockery of your own face emerges. "+mobBoss.name+" snarles at you. ";
+ } else msg += "But something goes wrong and the mechanisms halt with horrid screeching. ";
+}
+
+function addStructure(){
+ var toAdd = [];
+ var currentLine = "";
+
+ //The winning place:
+ if((r(visited)>20) && (r(distanceToOrigin())>=10) && (r(kills)>20)){
+  toAdd = ["77===77WWWWWWWWWWWWWWWWWWW77===77",
+      "7.....7WWWWWWWWWWWWWWWWWWW7.....7",
+      "=.....777777777777777777777.....=",
+      "=......^.................^......=",
+      "=.....777777777787777777777.....=",
+      "7.....7WWWWWWWW7.7WWWWWWWW7.....7",
+      "777.777WWWWWW7778777WWWWWW777.777",
+      "WW7.7WWWWWWWW7555557WWWWWWWW7.7",
+      "WW7.7WWWWWWWW=55555=WWWWWWWW7.7",
+      "WW7.7WWWWWWWW=55255=WWWWWWWW7.7",
+      "WW7.7WWWWWWWW=55555=WWWWWWWW7 .",
+      "WW7^7WWWWWWWW7555557WWWWWWWW7^7",
+      "WW7.7WWWWWWWW77===77WWWWWWWW7...",
+      "WW7.7WWWWWWWWWWWWWWWWWWWWWWW7..W.",
+      "WW7.7WWWWWWWWWWWWWWWWWWWWWWW7W..",
+      "WW7.7WWWWWWWWWWWWWWWWWWWWWWW7..",
+      "777.77  WWWWWWWWWWWWWWWWWW777.777",
+      "7....W.WWWWWWWWWWWWWWWWWWW7.....7",
+      ". ...W.77777777777777777777.....=",
+      " .. ............................=",
+      "7... .777777777777777777777.....=",
+      "7......  WWWWWWWWWWWWWWWWW7.....7",
+      "77 . 77   WWWWWWWWWWWWWWWW77===77"];
+ }
+ else switch(r(100)) {
+  default:
+   toAdd = [["WWWWWWWWWWWWWW","WWWWWW..WWWWWW"][r(2)],
+       "W............W",
+       "W............W",
+      ['W','.'][r(2)]+"............"+['W','.'][r(2)],
+       "W............W",
+       "W............W",
+      ["WWWWWWWWWWWWWW","WWWWWW..WWWWWW"][r(2)],
+     ];
+   break;
+
+  case 1:
+   toAdd = ["333333333333333333333333333333"];
+   break;
+
+  case 2:
+   toAdd = ["W",
+      "W",
+      "W",
+      "W",
+      "W",
+      "W",
+      "8",
+      "W",
+      "W",
+      "W",
+      "W",
+      "W",
+      "W",
+      "8",
+      "W",
+      "W",
+      "W",
+      "W",
+      "W",
+      "W"];
+   break;
+
+  case 3:
+   toAdd = [" ~~",
+      "~~~~",
+      " ~~"];
+   break;
+
+  case 4:
+   toAdd = [" ~~~~",
+      "~~~~~~",
+      "~~~~~~",
+      " ~~~~"];
+   break;
+
+  case 5:
+   toAdd = [" ~~~~~~",
+      "~~~~~~~~",
+      "~~~~~~~~",
+      "~~~~~~~~",
+      " ~~~~~~"];
+   break;
+
+  case 6:
+   toAdd = ["WWWWWWWWWWWWWW",
+      ".........WW..W",
+      "WWWWWWW..WW..W",
+      "W$$^..W......"+['W','.'][r(2)],
+      "W$$W..WWWWW..W",
+      "WWWW.........W",
+      "W..WWW..WWWWWW"];
+   break;
+
+  case 7:
+   toAdd = ["WWWWWW..WWWWWW",
+      "WWWWWW..WWWWWW",
+      "W....W..W....W",
+      ".....8..8.....",
+      "W....W..W....W",
+      "WWWWWW..WWWWWW",
+      "WWWWWW..WWWWWW"];
+
+     break;
+
+  case 8:
+   toAdd = ["WWWWWWWWWWWWWW",
+      "W....^...^..1W",
+      "WW..WWWWWWWWWW",
+     ['W','.'][r(2)]+"............"+['W','.'][r(2)],
+      "WW.WWW..WWW.WW",
+      "W...W....W...W",
+      "WWWWWWWWWWWWWW"];
+
+     break;
+
+  case 9:
+   toAdd = ["WWWWWW..WWWWWW",
+      "WW...W..W....W",
+      "WW......W/...W",
+      "WW...W..WWWW.W",
+      "WWW3WW.....W.W",
+      "W----W..W....W",
+      "WWWWWW..WWWWWW"];
+
+     break;
+
+  case 10:
+   toAdd = ["WWWWWW..WWWWWW",
+      "W.1.WW..WW.9.W",
+      "W...8....8...W",
+      "WWWWWW..WWWWWW",
+      "W...8....8...W",
+      "W.5.WW..WW..]W",
+      "WWWWWW..WWWWWW"];
+
+     break;
+
+  case 11:
+   toAdd = ["WWWWWW..WWWWWW",
+      "W............W",
+      "W..WW....WW..W",
+      "..............",
+      "W..WW....WW..W",
+      "W............W",
+      "WWWWWW..WWWWWW"];
+
+     break;
+
+  case 12:
+   toAdd = ["WWWWWWWWWWWWWW",
+      "W............W",
+      "W...WWWWWW...W",
+      "^...W..1.W...^",
+      "W...W3WWWW...W",
+      "W............W",
+      "WWWWWWWWWWWWWW"];
+   break;
+
+  case 13:
+   toAdd = ["WWWWWWWWWWWWWW",
+      "W???W???WWW.1W",
+      "WW.WWW.WWWW..W",
+      "........WWW3WW",
+      "WWWWWW..WWW..W",
+      "W........3...W",
+      "W...WW..WWWWWW"];
+
+     break;
+
+  case 14:
+   toAdd = ["..WWWW...WWW..",
+      ".WWWWWW...WWW.",
+      "WWWWWWWW...WWW",
+      ".....WWWW.....",
+      "WWW...WWWWWWWW",
+      ".WWW...WWWWWW.",
+      "..WWW...WWWW.."];
+
+     break;
+
+  case 15:
+   toAdd = ["WWWWWW..WWW.WW",
+      "W...1W..WW...W",
+      "WW33WW..WWW.WW",
+      ".............W",
+      "WW33WW..WW._.W",
+      "W1...W..WW...W",
+      "WWWWWW..WWWWWW"];
+
+     break;
+
+  case 16:
+   toAdd = ["WW.WWWW.WWWWWW",
+      "W...W0..W1...W",
+      "WW.WWWWWWWW787",
+      "..............",
+      "W.WWWW??WWWW.W",
+      "W/W........W..",
+      "WWW.WW..WW.WWW"];
+     break;
+
+  case 17:
+    // I actually fixed the strange bugs that crop up when generating this room,
+    // but then it seemed so... boring. So for this room only, please don't fix the bugs. :D
+    toAdd = ["&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;",
+      "&#9608;...^....................................&#9608;",
+      "&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;",
+      "&#9608;..&#9608;......^...........................&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;^.&#9608;",
+      "&#9608;..&#9608;..&#9608;........^...................&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;..&#9608;............^.........&#9608;..&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;^.&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;???&#9608;...$$...&#9608;...&#9608;..&#9608;..&#9608;.^&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;..&#9608;.0&#9608;???&#9608;..$55$..&#9608;.9.&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;???&#9608;...$$...&#9608;...&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;.^&#9608;......................&#9608;^.&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;..&#9608;............................&#9608;/.&#9608;..&#9608;",
+      "&#9608;0.&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;",
+      "&#9608;..&#9608;............^.....................&#9608;..&#9608;",
+      "&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;",
+      "&#9608;............................^...........&#9608;",
+      "&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;"];
+
+      var randTerrain = [' ','.',',','^','?','$','~','0','/','7','W','=','_',';','!'];
+      for (var i = 0; i < toAdd.length; i++) {
+       toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),['.','^'][r(2)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
+       toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
+
+       if(!r(4)) toAdd[i] = toAdd[i].replace("9","-");
+       else toAdd[i] = toAdd[i].replace("9","1");
+
+       toAdd[i] = toAdd[i].replace("&",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace("#",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace("6",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace("8",randTerrain[r(randTerrain.length)]);
+      }
+    break;
+
+   case 18:
+    toAdd = ["WWWWWWW...WWWWWWW",
+      "W~~~~~~~.~~~~~~~W",
+      "W~~~~~~~.~~~~~~~W",
+      "W~~~~~~~.~~~~~~~W",
+      "W~~~~~~...~~~~~~W",
+      "W~~~~.......~~~~W",
+      "W~~~~.......~~~~W",
+      "W~~~W.......W~~~W",
+      "W~~~.........~~~W",
+      "W~~~W.......W~~~W",
+      "W~~~~.......~~~~W",
+      "W~~~~.......~~~~W",
+      "W~~~~~~...~~~~~~W",
+      "W~~~~~~~.~~~~~~~W",
+      "W~~~~~~~.~~~~~~~W",
+      "W~~~~~~~.~~~~~~~W",
+      "WWWWWWW...WWWWWWW"];
+    break;
+
+   case 19:
+    toAdd = ["WWWW.WWWW",
+      "W$.^.^.$W",
+      "WWWW.WWWW",
+      "W$.^.^.$W",
+      "WWWW.WWWW",
+      "W$.^.^.$W",
+      "WWWW.WWWW"];
+    break;
+
+   case 20:
+    toAdd = ["WWWW.WW",
+      "W.....W",
+      "..333.W",
+      "W.313.W",
+      "W.333..",
+      "W.....W",
+      "WW.WWWW"];
+    break;
+
+   case 21:
+    toAdd = ["7777WW.WWW",
+      "71.7.....W",
+      "7..8.....W",
+      "7777..._.W",
+      "W........W",
+      "W.WWWWWWWW",
+      "W.........",
+      "WWWWWWWWWW"];
+     break;
+
+   case 22:
+    toAdd = ["WWW.WWW",
+      "7778777",
+      "7$...$7",
+      "7$.$.$7",
+      "7$.5.$7",
+      "7$.$.$7",
+      "7$...$7",
+      "7778777",
+      "WWW.WWW"];
+     break;
+
+   case 23:
+    toAdd = ["WWW.WWW",
+      "WW...WW",
+      "W.777.W",
+      "..717..",
+      "W.787.W",
+      "WW...WW",
+      "WWW.WWW"];
+  break;
+
+   case 24:
+    toAdd = ["WWW.WWW",
+      "WW...WW",
+      "W.....W",
+      "..._...",
+      "W.....W",
+      "WW...WW",
+      "WWW.WWW"];
+ break;
+
+   case 25:
+    toAdd = ["WWW.WWW",
+      "WW...WW",
+      "W.^...W",
+      "...^...",
+      "W...^.W",
+      "WW...WW",
+      "WWW.WWW"];
+   break;
+
+   case 26:
+    toAdd = ["WWWWWWWWWW",
+      "W...W..$.W",
+      "....W....W",
+      "W...W^^W.W",
+      "W...W^^W.W",
+      "....W..W.W",
+      "W...8.1W.W",
+      "WW.WWWWW.W"];
+   break;
+
+   case 27:
+    toAdd = ["W.WWWWWWWW",
+      "W..3.....W",
+      "W..3......",
+      "W..3.....W",
+      "W..3.....W",
+      "W..WWWW..W",
+      "W..../W...",
+      "W..WWWWWWW"];
+   break;
+
+   case 28:
+    toAdd = ["WWWW..WWWW",
+      "W........W",
+      "W.778777.W",
+      "W.3....3.W",
+      "..3.$].3..",
+      "..3.$$.3..",
+      "W.3....3.W",
+      "W.733337.W",
+      "W........W",
+      "WWWW..WWWW"];
+   break;
+
+   case 29:
+    toAdd = ["WWWW..WWWW",
+      "W........W",
+      "W.WW^^WW.W",
+      "..W????W..",
+      "..W????W..",
+      "W.WWWWWW.W",
+      "W........W",
+      "WWWW..WWWW"];
+   break;
+
+   case 30:
+    toAdd = ["WWWWW.WW",
+      "W13....W",
+      "W.3....W",
+      "W.3.....",
+      "W8WWWWWW",
+      "......0W",
+      "WWWWW.WW"];
+   break;
+
+   case 31:
+    toAdd = ["",
+      "WWWWW.WWWWW",
+      "W.........W",
+      "W..W...W..W",
+      "W.WWW8WWW.W",
+      "W..W...W..W",
+      "...8.9.8...",
+      "W..W...W..W",
+      "W.WWW8WWW.W",
+      "W..W...W..W",
+      "W.........W",
+      "WWWWW.WWWWW"];
+   break;
+
+   case 32:
+    toAdd = ["WWWW.WWWW",
+      "W.......W",
+      "W.WWWWW.W",
+      "W.W$$$W.W",
+      "W.W$$$W.W",
+      "W.W$$$W.W",
+      "W.WW8WW.W",
+      ".........",
+      "WWWWWWWWW"];
+   break;
+
+   case 33:
+    toAdd = ["WWWW.WWWW",
+      "W.......W",
+      "W.W...W.W",
+      "W.......W",
+      "W.W...W.W",
+      "W.......W",
+      "W.W...W.W",
+      "W.......W",
+      "W.W...W.W",
+      "W.......W",
+      "WWWW.WWWW"];
+   break;
+
+   case 34:
+    toAdd = ["WWWW.WWWW",
+      "W.......W",
+      "W.WW.WW.W",
+      "W.WW.WW.W",
+      ".........",
+      "W.WW.WW.W",
+      "W.WW.WW.W",
+      "W.......W",
+      "WWWW.WWWW"];
+   break;
+
+   case 35:
+    toAdd = ["WWWWW.WWWWW",
+      "W.........W",
+      "W..W...W..W",
+      "W.WWW.WWW.W",
+      "W..W...W..W",
+      "...........",
+      "W..W...W..W",
+      "W.WWW.WWW.W",
+      "W..W...W..W",
+      "W.........W",
+      "WWWWW.WWWWW"];
+   break;
+
+   case 36:
+    toAdd = ["WWW.WWWWW",
+      "W........",
+      "W.W.W.W.W",
+      "........W",
+      "WWWWW.WWW"];
+   break;
+
+   case 37:
+    toAdd = ["WWW.WWW.WWW",
+      "W.........W",
+      "W.W.W.W.W.W",
+      "...........",
+      "W.W.W.W.W.W",
+      "W.........W",
+      "W.W.W.W.W.W",
+      "...........",
+      "W.W.W.W.W.W",
+      "W.........W",
+      "WWW.WWW.WWW"];
+   break;
+
+   case 38:
+    toAdd = ["WWW.WWW.WWW",
+      "W.........W",
+      "W.W.W.W.W.W",
+      "...........",
+      "W.W.....W.W",
+      "W.........W",
+      "W.W.....W.W",
+      "...........",
+      "W.W.W.W.W.W",
+      "W.........W",
+      "WWW.WWW.WWW"];
+   break;
+
+   case 39:
+    toAdd = ["WWW.WWW.WWW",
+      "W.........W",
+      "W.W.W.W.W.W",
+      "...........",
+      "W.W.~~~.W.W",
+      "W...~~~...W",
+      "W.W.~~~.W.W",
+      "...........",
+      "W.W.W.W.W.W",
+      "W.........W",
+      "WWW.WWW.WWW"];
+   break;
+
+   case 40:
+    toAdd = ["WWWW.WWWW",
+      "WWW=.=WWW",
+      "WWW=.=WWW",
+      "W===.===W",
+      ".........",
+      "W===.===W",
+      "WWW=.=WWW",
+      "WWW=.=WWW",
+      "WWWW.WWWW"];
+   break;
+
+   case 41:
+    toAdd = ["7777777777",
+      "71$71$71$7",
+      "7$$7$$7$$7",
+      "7787787787",
+      "..........",
+      "7777777777"];
+   break;
+
+   case 42:
+    toAdd = ["WWWWW.WWWWW",
+      "W.........W",
+      "W.W3W3W3W.W",
+      "W.3,,,,,3.W",
+      "W.W,,,,,W.W",
+      "..3,,1,,8.W",
+      "W.W,,,,,W.W",
+      "W.3,,,,,3.W",
+      "W.W3W3W3W.W",
+      "W.........W",
+      "WWWWW.WWWWW"];
+   break;
+
+   case 43:
+    toAdd = ["W..WWWWWWW",
+      "W........W",
+      "W........W",
+      "WWWW8WW..W",
+      "W.....WW..",
+      ".......WWW",
+      "W........W",
+      "WWWWWWWW.W"];
+   break;
+
+   case 44:
+    toAdd = ["WW.WWWWWWW",
+      "W...W....W",
+      "W...?.....",
+      "W?WWWW?WWW",
+      "W..W.....W",
+      "W..?.....W",
+      "...W.....W",
+      "WWWWWW.WWW"];
+   break;
+
+   case 45:
+    toAdd = ["WWWWWWWWW.WWWWWWWW",
+      "WWWWW.........WWWW",
+      "WWWWW.........WWWW",
+      "W...W...333...W..W",
+      "W...W...313......W",
+      "........313...W...",
+      "W...W...333...W..W",
+      "W...W.........WWWW",
+      "WWWWW.........WWWW",
+      "WW0....77877.../WW",
+      "WWWWWW77...77WWWWW"];
+   break;
+
+   case 46:
+    toAdd = ["WWWW.WWWW",
+      "W..?....W",
+      "W.WWWWW.W",
+      "W.W$W$W?W",
+      "..8$W$8..",
+      "W?W$W$W.W",
+      "W.WWWWW.W",
+      "W....?..W",
+      "WWWW.WWWW"];
+   break;
+
+   case 47:
+    toAdd = ["WWWWWW",
+      "W.....",
+      "W.WWWW",
+      "W....W",
+      "WWWW.W",
+      ".....W",
+      "WWWWWW"];
+   break;
+
+   case 48:
+    toAdd = ["WWWWWWWW.W",
+      ".........W",
+      "W.777777.W",
+      "W87$$$$7=W",
+      "W.7$$$$7.W",
+      "W.7????7.W",
+      "W........W",
+      "WWWWWWWWWW"];
+   break;
+
+   case 49:
+    toAdd = ["WWWWW",
+      "W$$$W",
+      "W$$$W",
+      "W$$$W",
+      "WW8WW"];
+   break;
+
+   case 50:
+    toAdd = ["WWWWW.W",
+      "....W.W",
+      "WWW.W.W",
+      "W..?..W",
+      "W.W.WWW",
+      "W.W....",
+      "W.WWWWW"];
+   break;
+
+   case 51:
+    toAdd = ["W.W.W",
+      "W.W.W",
+      "W...W",
+      "WW.WW",
+      "WW.WW",
+      "WW.WW"];
+   break;
+
+   case 52:
+    toAdd = ["W.W.W",
+      "W.W.W",
+      "W...W",
+      "WW.WW",
+      "...WW",
+      "WWWWW"];
+   break;
+
+   case 53:
+    toAdd = ["WWW7WWW",
+      "WW.7.WW",
+      "W..7..W",
+      "...8...",
+      "W..7..W",
+      "WW.7.WW",
+      "WWW7WWW"];
+   break;
+
+   case 54:
+    toAdd = ["WWW.WWW",
+      "WW...WW",
+      "W..7..W",
+      "..777..",
+      "W..7..W",
+      "WW...WW",
+      "WWW.WWW"];
+   break;
+
+   case 55:
+    toAdd = ["WWW.WWW.WWW",
+      "W.........W",
+      "W.W.W.W.W.W",
+      "...........",
+      "W.W.===.W.W",
+      "W...=1=...W",
+      "W.W.===.W.W",
+      "...........",
+      "W.W.W.W.W.W",
+      "W.........W",
+      "WWW.WWW.WWW"];
+   break;
+
+   case 56:
+    toAdd = ["WWW.WWW",
+      "WW...WW",
+      "W..3..W",
+      "..313..",
+      "W..3..W",
+      "WW...WW",
+      "WWW.WWW"];
+   break;
+
+   case 57:
+    toAdd = ["WWWWWWWWWWWWW",
+      "W...........W",
+      "W.?.?.?.?.?.W",
+      ".............",
+      "W.?.?.?.?.?.W",
+      "W...........W",
+      "WWW^WWWWWWWWW"];
+   break;
+
+   case 58:
+    toAdd = ["777777777",
+      "7$.$.$.$7",
+      "7...]...8",
+      "7$.$.$.$7",
+      "777777777"];
+   break;
+
+  case 59:
+   toAdd = ["WWWW.WW",
+      "W=.=.=W",
+      "......W",
+      "W=.=.=W",
+      "W......",
+      "W=.=.=W",
+      "WW.WWWW"];
+   break;
+
+  case 60:
+   toAdd = [" ===============",
+      "==.............==",
+      "=.......1.......=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=...............=",
+      "=.......1.......=",
+      "==.............==",
+      " ==============="];
+   break;
+
+  case 61:
+   toAdd = ["...............",
+      ".3...3...3...3.",
+      "...............",
+      "...3...3...3...",
+      "...............",
+      ".3...3...3...3.",
+      "...............",
+      "...3.......3...",
+      "...............",
+      ".3...3...3...3.",
+      "...............",
+      "...3...3...3...",
+      "...............",
+      ".3...3...3...3.",
+      "..............."];
+   break;
+
+  case 62:
+   toAdd = ["...3...3...3...",
+      ".3.3.3.3.3.3.3.",
+      ".......3.......",
+      ".33333.3.33333.",
+      ".......3.......",
+      ".3.3.3.3.3.3.3.",
+      "...3.......3...",
+      "33.3.33333.3.33",
+      "...3.......3...",
+      ".3.3.3.3.3.3.3.",
+      ".......3.......",
+      ".33333.3.33333.",
+      ".......3.......",
+      ".3.3.3.3.3.3.3.",
+      "...3...3...3..."];
+   break;
+
+  case 63:
+   toAdd = ["=================================================================",
+      "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
+      "=================================================================",
+      "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=1=$=$=$=$=$=$=$=$=$=$=$=",
+      "=================================================================",
+      "=$=$=$=$=$=$=$=$=$=$=$=1=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
+      "=================================================================",
+      "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
+      "================================================================="];
+   break;
+
+  case 64:
+   toAdd = ["WWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWW",
+      "WWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWW",
+      "WWWW...........WWWWWWW...........WWWWWWW...........WWWWWWW...........WWWW",
+      "WWW.............WWWWW.............WWWWW.............WWWWW.............WWW",
+      "WW...............WWW...............WWW...............WWW...............WW",
+      "WW...............WWW...............WWW...............WWW...............WW",
+      "..................W.................W.................W..................",
+      "W........$.................$.................$.................$........W",
+      "W.......................................................................W",
+      ".......$.=.................=.................=.................=.$.......",
+      "W.......................................................................W",
+      "W........$.................$.................$.................$........W",
+      "..................W.................W.................W..................",
+      "WW...............WWW...............WWW...............WWW...............WW",
+      "WW...............WWW...............WWW...............WWW...............WW",
+      "WWW.............WWWWW.............WWWWW.............WWWWW.............WWW",
+      "WWWW...........WWWWWWW...........WWWWWWW...........WWWWWWW...........WWWW",
+      "WWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWW",
+      "WWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWW"];
+   break;
+
+  case 65:
+   toAdd = ["WW.WWWWWWWWW.WW",
+      "W...WWWWWWW...W",
+      "..W.........W..",
+      "W...WW333WW...W",
+      "WW.WW33333WW.WW",
+      "WW.WW77877WW.WW",
+      "WW.WW7$$$7WW.WW",
+      "WW.WW7$1$7WW.WW",
+      "WW.WW7$$$7WW.WW",
+      "WW.WW77877WW.WW",
+      "WW.WW33333WW.WW",
+      "W...WW333WW...W",
+      "..W.........W..",
+      "W...WWWWWWW...W",
+      "WW.WWWWWWWWW.WW"];
+   break;
+
+  case 66:
+   toAdd = ["WW..WW",
+      "W....W",
+      "..WW..",
+      "..WW..",
+      "W....W",
+      "WW..WW"];
+   break;
+
+  case 67:
+   toAdd = ["WW...WW",
+      "W.....W",
+      "..WWW..",
+      "..WWW..",
+      "..WWW..",
+      "W.....W",
+      "WW...WW"];
+   break;
+
+  case 68:
+   toAdd = ["WWWWWW..WW",
+      "....WW..WW",
+      "....WW..WW",
+      "WW........",
+      "WW........",
+      "WW..WWWWWW",
+      "WW..WWWWWW",
+      "WW..WWWWWW"];
+   break;
+
+  case 69:
+   toAdd = ["WWWW..WWWW",
+      "WWWW..WWWW",
+      "WWWW..WWWW",
+      "..........",
+      "..........",
+      "WWWW..WWWW",
+      "WWWW..WWWW",
+      "WWWW..WWWW"];
+   break;
+
+  case 70:
+   toAdd = ["WWWW.WWWW",
+      "W13W.W31W",
+      "W33...33W",
+      "WW.....WW",
+      ".........",
+      "WW.....WW",
+      "W33...33W",
+      "W13W.W31W",
+      "WWWW.WWWW"];
+   break;
+
+  case 71:
+   toAdd = ["WWWWW.WWWWW",
+      "WWWW...WWWW",
+      "WWW.....WWW",
+      "WW.......WW",
+      "W...W.W...W",
+      ".....].....",
+      "W...W.W...W",
+      "WW.......WW",
+      "WWW.....WWW",
+      "WWWW...WWWW",
+      "WWWWW.WWWWW"];
+   break;
+
+  case 72:
+   toAdd = ["WWWWW.WWWWW",
+      "W.........W",
+      "W.W.W.W.W.W",
+      "W.........W",
+      "...........",
+      "W.........W",
+      "W.W.W.W.W.W",
+      "W.........W",
+      "WWWWW.WWWWW"];
+   break;
+
+  case 73:
+   toAdd = ["WWWWWW..WW",
+      "W...W....W",
+      "....W....W",
+      "W...3....W",
+      "W...W....W",
+      "W...W....W",
+      "W...W....W",
+      "WW.WWW..WW"];
+   break;
+
+  case 74:
+   toAdd = ["WWWWW",
+      "..0..",
+      "WW.WW",
+      "WW.WW"];
+   break;
+
+  case 75:
+   toAdd = ["WWWWWW",
+      ".3...W",
+      "777877",
+      "7$$$$7",
+      "7$$$$7",
+      "7$$$$7",
+      "7$$$$7",
+      "778777",
+      "W...3.",
+      "WWWWWW"];
+   break;
+
+  case 76:
+   toAdd = ["/W/",
+      "WWW",
+      "/W/"];
+   break;
+
+  case 77:
+   toAdd = ["WWWWW...W",
+      "....W....",
+      "....W....",
+      "....8....",
+      "....W....",
+      "....W....",
+      "W...WWWWW"];
+   break;
+
+  case 78:
+   toAdd = ["WWWWWWWWWWW",
+      "W.........W",
+      "W.$......$W",
+      "W......7777",
+      "W^.$.$.===7",
+      ".^======1=8",
+      "W^.....===7",
+      "W..$.$.7777",
+      "W.......$.W",
+      "W...$.....W",
+      "WWWWWWWWWWW"];
+   break;
+
+  case 79:
+   toAdd = ["WWWWWWWWWWWW",
+      "WWWWWWWWWWWW",
+      "WWW,,,,,,WWW",
+      "WWW,,WWW,,WW",
+      ".,,,WWWW,,WW",
+      ".,,WW],,,,WW",
+      ".,,WW,,,,,WW",
+      ".,,,W,,,,WWW",
+      "WW,,WWW,,WWW",
+      "WWW,,,,,,WWW",
+      "WWWWW,,WWWWW",
+      "WWWWWWWWWWWW"];
+   break;
+
+  case 80:
+   toAdd = ["WW.W",
+      "W..W",
+      "W..W",
+      "W..W",
+      "....",
+      "W..W",
+      "W..W",
+      "W..W",
+      "W.WW"];
+   break;
+
+  case 81:
+   toAdd = ["WWWWWW.WW",
+      "W/......W",
+      "W.......W",
+      "W.WWWWW.W",
+      "W.W,,,W..",
+      "W.W,1,W.W",
+      "..W,,,W.W",
+      "W.WWWWW.W",
+      "W.......W",
+      "WWW..WWWW"];
+   break;
+
+  case 82:
+   toAdd = [",,,,,  ,",
+      ",,~~~,,,",
+      ",,~~~,,,",
+      ",,~~~~,,",
+      ",,~~~~,,",
+      ",,,~,,,W",
+      "  ,,,,,,"];
+   break;
+
+  case 83:
+   toAdd = ["WW.WWWWWW",
+      "WW...W...",
+      "WW.W/W.WW",
+      "WW.WWW.WW",
+      "WW...3.WW",
+      "...WWW.WW",
+      "WWWWWW.WW"];
+   break;
+
+  case 84:
+   toAdd = ["WWW",
+      "W$W",
+      "W^W"];
+   break;
+
+  case 85:
+   toAdd = ["WWWWWW",
+      "W....^",
+      "W/.$.W",
+      "WWWWWW"];
+   break;
+
+  case 86:
+   toAdd = [",,,,==,,",
+      "==,,,==,",
+      "==,,,,=,",
+      "====,,==",
+      "====,,,=",
+      ",,===,,,",
+      ",,,===,,"];
+   break;
+
+  case 87:
+   toAdd = ["  =====",
+      " ======",
+      "========",
+      "========",
+      "==  ======",
+      "===   ====",
+      "=====  ===",
+      " ===== ",
+      "   === ",
+      "     ="];
+   break;
+
+  case 88:
+   toAdd = ["W=====WWW",
+      "W=======W",
+      "W===1===W",
+      "W===^===W",
+      "W===^====",
+      "====^===="];
+   break;
+
+   case 89:
+    toAdd = ["   ~~~",
+      " ~~~~~~",
+      " ~~??~~",
+      "~~~??~~",
+      " ~~~~~~",
+      " ~~~~~"];
+   break;
+
+   case 90:
+    toAdd = ["WWWWWWW...WWWWWWW",
+      "W=======.=======W",
+      "W=======.=======W",
+      "W=======.=======W",
+      "W======...======W",
+      "W====.......====W",
+      "W====.......====W",
+      "W===W.......W===W",
+      "W===.........===W",
+      "W===W.......W===W",
+      "W====.......====W",
+      "W====.......====W",
+      "W======...======W",
+      "W=======.=======W",
+      "W=======.=======W",
+      "W=======.=======W",
+      "WWWWWWW...WWWWWWW"];
+    break;
+
+   case 91:
+    toAdd = ["WWW=WWW",
+      "WW.=.WW",
+      "W..=..W",
+      "...=...",
+      "W..=..W",
+      "WW.=.WW",
+      "WWW=WWW"];
+   break;
+
+   case 92:
+    toAdd = ["WWW.WWW",
+      "WW...WW",
+      "W..=..W",
+      "..===..",
+      "W..=..W",
+      "WW...WW",
+      "WWW.WWW"];
+   break;
+
+   case 93:
+    toAdd = ["3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3",
+      "3.3"];
+   break;
+
+   case 94:
+    toAdd = ["33333333333333333333",
+      "....................",
+      "33333333333333333333"];
+   break;
+
+
+   case 95:
+    toAdd = ["WWWWWWWWWWWWW",
+      "W...........W",
+      "W.=.=.=.=.=.W",
+      ".............",
+      "W.=.=.=.=.=.W",
+      "W...........W",
+      "WWW3WWWWWWWWW"];
+   break;
+ }
+
+ var x = r(mapWidth);
+ var y = r(mapWidth);
+
+ var randDanger = ['^',tileLava,wallBlock][r(3)]; // Defined here to make it consistent for each room.
+
+ // Mirror and flip:
+ var mirrorRoom = r(2);
+ if(r(2)) toAdd = toAdd.reverse();
+
+ for (var i = 0; i < toAdd.length; i++) {
+  currentLine = toAdd[i];
+  currentLine = currentLine.split('');
+  if(mirrorRoom) currentLine.reverse();
+
+  for (var j = 0; j < currentLine.length; j++) {
+   if(inRangeCoords(x+i,y+j)) {
+    switch(currentLine[j]){
+    default:
+     currentMap[x+i][y+j] = currentLine[j];
+     break;
+    case "W":
+     currentMap[x+i][y+j] = wallBlock;
+     break;
+    case "~":
+     currentMap[x+i][y+j] = tileWater;
+     break;
+    case "=":
+     currentMap[x+i][y+j] = tileLava;
+     break;
+    case "-":
+     currentMap[x+i][y+j] = tileKey;
+     break;
+    case "]": // enchanted armor
+     currentMap[x+i][y+j] = tileArmor;
+     break;
+    case ";": // tall grass
+     currentMap[x+i][y+j] = tileGrassTall;
+     break;
+    case "!": // thorny bramble
+     currentMap[x+i][y+j] = tileBramble;
+     break;
+    case "1": // random treasure
+     currentMap[x+i][y+j] = [tileTreasure,tileStaff,tileArmor][r(3)];
+     break;
+    case "2": // the End
+     currentMap[x+i][y+j] = tileMacGuffin;
+     break;
+    case "3": // random danger
+     currentMap[x+i][y+j] = randDanger;
+     break;
+    //case "4":
+    case "5": // treasure pile
+     currentMap[x+i][y+j] = tileTreasure;
+     break;
+    //case "6":
+    case "7": // golden wall
+     currentMap[x+i][y+j] = tileGoldWall;
+     break;
+    case "8": // locked door
+     currentMap[x+i][y+j] = tileDoor;
+     break;
+    case "9": // magic staff
+     currentMap[x+i][y+j] = tileStaff;
+     break;
+    // 0 already used as teleporter
+    case " ": // default empty terrain
+     if(r(20)) currentMap[x+i][y+j] = emptyBlock;
+     else currentMap[x+i][y+j] = terrain[r(terrain)];
+     break;
+    }
+   }
+  }
+ }
+}
+
+function newMap(x,y){
+ //upon exiting the map, save it, if the new map is empty, generate it, then load whatever is there
+ currentMap.clone2d(worldMap[worldPos.x][worldPos.y]);
+ worldPos.x += x;
+ worldPos.y += y;
+ if(worldMap[worldPos.x]==null) {
+  worldMap[worldPos.x] = [];
+  worldName[worldPos.x] = [];
+ }
+ if(worldMap[worldPos.x][worldPos.y]==null){
+  worldMap[worldPos.x][worldPos.y] = [];
+  worldName[worldPos.x][worldPos.y] = newWorldName();
+  generateMap();
+  fixEntry(x,y,false);
+ } else {
+  worldMap[worldPos.x][worldPos.y].clone2d(currentMap);
+  fixEntry(x,y,true);
+ }
+ currentMap.clone2d(worldMap[worldPos.x][worldPos.y]);
+
+ // Spawn enemies:
+ currCre = []; // Get rid of all creatures from old map. We don't save them, instead spawn new ones if the player returns.
+ var cQ = r(visited); // How many to spawn.
+ // More powerful enemies are towards the start of creatureList, so spawn more powerful enemies in later areas.
+ var cHere = r(Math.max(creatureList.length-distanceToOrigin(),creatureList.length/2));
+ for (var i = 0; i < cQ; i++) {
+  currCre[i] = cloneCreature(creatureList[cHere]);
+  if(!r(10)) cHere = r(creatureList.length); // Change to any enemy.
+  do {
+   currCre[i].x = r(mapWidth);
+   currCre[i].y = r(mapWidth);
+  } while(impassable.includes(currentMap[currCre[i].x][currCre[i].y]));
+ }
+}
+
+function fixEntry(a,b, showBlue){
+ if(currentMap[userPos.x][userPos.y]==wallBlock){
+  currentMap[userPos.x][userPos.y] = emptyBlock;
+  var escapePath = {x:userPos.x+a,y:userPos.y+b};
+  while(!checkEmpty(escapePath.x,escapePath.y)){
+   if(showBlue) currentMap[escapePath.x][escapePath.y] = tileSecretPath;
+   else currentMap[escapePath.x][escapePath.y] = emptyBlock;
+   switch(r(3)){
+    default:
+     escapePath.x += a;
+     escapePath.y += b;
+    break;
+
+    case 0: //go left/right;
+     if(a==0) escapePath.x += [-1,1][r(2)];
+     if(b==0) escapePath.y += [-1,1][r(2)];
+   }
+   if(!inRange(escapePath)) break;
+  }
+ }
+}
+
+function addUser(){
+ userPos.x = r(mapWidth);
+ userPos.y = r(mapWidth);
+
+ while(!checkEmpty(userPos.x,userPos.y)){
+  userPos.x = r(mapWidth);
+  userPos.y = r(mapWidth);
+ }
+
+ userName = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+newName()+"</t>";
+}
+
+function teleportUser(){
+ msg += "You teleport. ";
+ do{
+  userPos.x = r(mapWidth);
+  userPos.y = r(mapWidth);
+ }while(!checkEmpty(userPos.x,userPos.y));
+}
+
+function useStaff(){
+ if(staff==0){
+  msg += "You need to find a magical staff, first. ";
+  return;
+ }
+ if(score<=10){
+    msg += "You are too weak to use this magic. ";
+    return;
+ }
+ score -= 10;
+ msg += "You channel the magical energies. ";
+
+ switch(staff){
+  default:
+   msg += "Nothing happens. ";
+   break;
+
+  case 1: //teleport
+   teleportUser();
+   break;
+
+  case 2: //time stop
+   timestop += 10;
+   msg += "Everything around you grinds to a halt. ";
+   break;
+
+  case 3: //secret paths
+   var digPath = [{x:userPos.x,y:userPos.y},{x:userPos.x+1,y:userPos.y},{x:userPos.x-1,y:userPos.y},{x:userPos.x,y:userPos.y+1},{x:userPos.x,y:userPos.y-1}];
+   for(var i = 0; i < digPath.length; i++){
+    if(inRange(digPath[i])){
+      if(currentMap[digPath[i].x][digPath[i].y]==wallBlock)
+        currentMap[digPath[i].x][digPath[i].y] = tileSecretPath;
+    }
+   }
+   msg += "New paths open for you. ";
+   break;
+
+  case 4: //life
+   cureAll();
+   break;
+
+  case 5: //vorpal
+   msg += "Snicker-snack! A whirlwind of sharpness surrounds you. ";
+   for(var i = 0; i < currCre.length; i++){
+    if(distanceBetween(userPos,currCre[i])<=2) killCreature(i);
+   }
+   break;
+
+  case 6: //leaping
+   leap = true;
+   msg += "Leap in which direction? ";
+   break;
+
+  case 7: //orbs
+   orb = true;
+   msg += "Where would you like to direct them? ";
+   break;
+ }
+ //TODO: Somehow take a turn?
+ displayMap();
+}
+
+function cureAll(){
+ var cured = false;
+
+ if(aflame>0){
+  aflame = 0;
+  cured = true;
+ }
+ if(blinded>0){
+  blinded = 0;
+  cured = true;
+ }
+ if(poisoned>0){
+  poisoned = 0;
+  cured = true;
+ }
+
+ if(cured) msg += "Your afflictions are lifted. ";
+ return cured;
+}
+
+function checkEmpty(x,y){
+ for (var i = 0; i < currCre.length; i++) {
+  if(currCre[i].x==x && currCre[i].y==y) return false;
+ }
+ return !impassable.includes(currentMap[x][y]);
+}
+
+function playerTakeDamage(dmg,i=9999){
+ if(dmg<=0) return;
+ if(ward>0){
+  msg += "Your warding absorbs the blow. ";
+  ward--;
+  return;
+ }
+ score -= Math.max(1, dmg-armor);
+
+ // Proc glyphs:
+ if(!r(3)){
+  if(glyph==4) teleportUser(); //displacement
+  if((glyph==5) && (i != 9999)){ //retribution
+   msg += "Your "+getArmorName()+" guides your hand to vengeance. ";
+   damageCreature(i);
+  }
+  if(glyph==6){ //invulnerability
+   msg += "Your "+getArmorName()+" glows with protective aura. ";
+   ward++;
+  }
+  if(glyph==7){ //phasing
+   msg += "Your "+getArmorName()+" envelops you in shadows. ";
+   phased += 10+r(20);
+  }
+ }
+}
+
+function tryPlayerMove(x,y){
+ for (var i = 0; i < currCre.length; i++) {
+  if(currCre[i].x==x && currCre[i].y==y){
+   damageCreature(i);
+   // We are blocked from moving, anyway.
+   return false;
+  }
+ }
+
+ // Check if player has keys for opening doors:
+ if(currentMap[x][y]==tileDoor && keys > 0) return true;
+
+ // Handle phasing, otherwise check impassable terrain.
+ if(phased>0) return true;
+ return !impassable.includes(currentMap[x][y]);
+}
+
+function damageCreature(i){
+ msg += "You strike "+currCre[i].icon+". "; // TODO proper name
+ // Attempt to lowercase the monster, if already lowercase, kill it instead. Vorpal staff always kills.
+ var injured = currCre[i].icon.replaceAt(25, currCre[i].icon.charAt(25).toLowerCase());
+ if(currCre[i].icon != injured && staff != 5){
+  currCre[i].icon = injured;
+  if(!r(5) || (glyph==3)){
+   currCre[i].flags.push("flee");
+   msg += currCre[i].icon+" panics. "; // TODO proper name
+  }
+ } else killCreature(i);
+}
+
+function killCreature(i){
+ if(currCre[i].flags.includes("boss") && !r(2)){
+  msg += currCre[i].icon+" dodges your attack. ";
+  return;
+ }
+
+ msg += currCre[i].icon+" dies. "; // TODO proper name
+ onDeath(i);
+ currCre = currCre.removeElement(currCre[i]);
+ kills += 1;
+}
+
+function inRange(area){
+ return (area.x>-1 && area.x<mapWidth && area.y>-1 && area.y<mapWidth);
+}
+
+function inRangeCoords(x,y){
+ return (x>-1 && x<mapWidth && y>-1 && y<mapWidth);
+}
+
+function distanceToOrigin(){
+ return Math.ceil(Math.sqrt(Math.pow(worldPos.x,2)+Math.pow(worldPos.y,2)));
+}
+
+function distanceBetween(mob1, mob2){
+ return Math.ceil(Math.sqrt(Math.pow(mob1.x-mob2.x,2)+Math.pow(mob1.y-mob2.y,2)));
+}
+
+function semiModulo(a,b){
+ if(a<0) return b-1;
+ else if(a>=b) return 0;
+ else return a;
+}
+
+// Main loop
+function moveUser(x,y){
+ if(haveWon){
+  msg = "You win! Your final score is "+getFinalScore()+".<br />Press 'F5' to play again.";
+  displayMap();
+  return;
+ }
+ // Clear messages for next turn:
+ msg = "";
+
+ // Hunger and status effects:
+ score--;
+ if(poisoned>0){
+  score--;
+  poisoned--;
+ }
+ if(aflame>0){
+  if(glyph == 1){
+   score++;
+   if(!r(5)) msg += ["Your inner flame burns bright! ","The flames refresh you. "][r(2)];
+  }else{
+   if(!r(2)) score -= r(aflame);
+   if(!r(2)) msg += "You burn! ";
+  }
+  aflame--;
+ }
+ if(blinded>0) blinded--;
+ if(phased>0) phased--;
+
+ // Handle death:
+ if(score<=0){
+  if(staff == 4){
+   score = 50;
+   cureAll();
+   msg += "Your Staff"+staves[staff]+" shatters in a wave of life-giving energy. You feel reinvigorated. ";
+   staff = 0;
+  }else{
+   msg += "You fade away... Good luck next life! ";
+   displayMap();
+   return;
+  }
+ }
+
+ // Handle conjuration staff:
+ if(orb){
+  if((x != 0 || y != 0) && inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
+   msg += "You conjure an orb of prismatic energy. ";
+   // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
+   currCre.push({icon:"<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>*</t>",
+                 name:"Prismatic Orb",
+                 attack:"kamikazes",
+                 quickness:10,
+                 x:userPos.x+x,
+                 y:userPos.y+y,
+                 flags:["explode", {x:x,y:y}],
+                 behaviour:function(){
+                  var i = currCre.indexOf(this);
+                  if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
+                   doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                  } else {
+                   msg += currCre[i].icon+" explodes. ";
+                   onExplosion(i);
+                  }
+                  return true;
+                }});
+  } else msg += "The conjuration fizzles. ";
+
+  orb = false;
+ } else {
+  // Handle soaring leap staff:
+  if(leap){
+   // Move player in direction until blocked.
+   var leaped = 0;
+   while(inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
+    userPos.x += x;
+    userPos.y += y;
+    leaped += 1;
+   }
+
+   if(leaped>1) msg += "You leap! ";
+   else if(leaped==1) msg += "You jump. ";
+   else msg += "You balk at the leap. ";
+
+   leap = false;
+  } // Fallthrough to normal movement, so that the player can enter new map/attack with a leap.
+
+  // Normal movement.
+  // If at edge of map, enter new map; otherwise try moving, attacking any monsters in the way.
+  userPos.x += x;
+  userPos.y += y;
+  if(!inRange(userPos)){
+   userPos.y = semiModulo(userPos.y,mapWidth);
+   userPos.x = semiModulo(userPos.x,mapWidth);
+   newMap(x,y);
+  } else if(!tryPlayerMove(userPos.x,userPos.y)){
+   userPos.x -= x;
+   userPos.y -= y;
+  }
+ }
+
+ // Handle enchanted armor.
+ if(glyph==2 && currentMap[userPos.x][userPos.y]==emptyBlock && !r(20)){
+  // Armor of cleansing water sometimes creates puddles of water.
+  msg += "Your "+getArmorName()+" makes it rain. ";
+  currentMap[userPos.x][userPos.y]=tileWater;
+ }
+ if(glyph==4 && x==0 && y==0 && !r(10)) teleportUser(); //displacement
+ if(glyph==7 && !r(100)){ //phasing
+   msg += "Your "+getArmorName()+" envelops you in shadows. ";
+   phased += 10+r(20);
+ }
+
+ // Handle special terrain underfoot.
+ switch(currentMap[userPos.x][userPos.y]){
+  case '$': //small treasure
+   currentMap[userPos.x][userPos.y]=['.',',',emptyBlock][r(3)];
+   score += 20;
+   msg += "You collect the memento. ";
+   break;
+
+  case tileTreasure: //big treasure
+   currentMap[userPos.x][userPos.y]=['.',',',emptyBlock][r(3)];
+   score += 200;
+   msg += "You loot the memory trove. ";
+   break;
+
+  case '^': //trap
+   msg += "You step on a pressure plate. ";
+   if(timestop>0) break;
+   switch(r(6)){
+    case 0:
+     if(r(visited)>10){
+      aflame += r(30)+r(30);
+      msg += "A gout of hellfire sets you ablaze. ";
+     }
+     else{
+      poisoned += r(30)+visited;
+      msg += "A poisoned dart pricks you. ";
+     }
+     break;
+
+    case 1:
+     msg += "You hear the grinding of ancient mechanisms. ";
+     if(r(2)) currentMap[userPos.x][userPos.y]=wallBlock;
+     else {
+      var q = r(10)+1;
+      var intoWhat = [wallBlock,'^'][r(2)];
+      while(q--){
+       currentMap[r(mapWidth)][r(mapWidth)]=intoWhat;
+      }
+     }
+     break;
+
+    case 2:
+     // Msg handled by the function.
+     teleportUser();
+     break;
+
+    case 3:
+     msg += "Something stinky and sticky covers your face. ";
+     blinded += r(10)+1;
+     break;
+
+    default:
+     playerTakeDamage(r(10)+visited);
+     msg += "A quarrel shoots out and hits you. ";
+     break;
+   }
+   break;
+
+  case '?': //random fun
+   currentMap[userPos.x][userPos.y]=['$','^',','][r(3)];
+   if(!r(100)) currentMap[userPos.x][userPos.y]=['0','_','/',tileKey,']'][r(5)];
+   msg += "You investigate the mysterious pile. ";
+   break;
+
+  case '/': //lever
+   if(timestop>0) break;
+   msg += "The lever clicks as you turn it. ";
+   if(score>1000 && !r(4) && userPos.x>4 && userPos.x<(mapWidth-6) && userPos.y>4 && userPos.y<(mapWidth-6)){
+    msg += "Suddenly, you feel a mysterious force tear a piece of your soul away. ";
+    score = parseInt(score/2);
+    addBoss();
+    break;
+   }
+   currentMap[userPos.x][userPos.y]='\\';
+   var q = r(10)+1;
+   var testX = 0;
+   var testY = 0;
+   while(q){
+    testX = userPos.x+r(10)-5;
+    testY = userPos.y+r(10)-5;
+    if(inRangeCoords(testX,testY)){
+     if(currentMap[testX][testY]==wallBlock){
+      q--;
+      currentMap[testX][testY] = tileSecretPath;
+     }
+    }
+   }
+   break;
+
+  case '0': //teleporter
+   if(timestop>0) break;
+   msg += "You step into the portal. ";
+   teleportUser();
+   break;
+
+  case tileKey: //key
+   msg += "You collect the key. ";
+   currentMap[userPos.x][userPos.y]=['.',',',emptyBlock][r(3)];
+   keys += 1;
+   break;
+
+  case tileDoor:
+   msg += "You unlock and open the door. ";
+   currentMap[userPos.x][userPos.y]='.';
+   keys -= 1;
+   break;
+
+  case tileStaff: //magic staff
+   currentMap[userPos.x][userPos.y]='.';
+   staff = r(staves.length);
+   msg += "You find a Staff"+staves[staff]+" and equip it. ";
+   break;
+
+  //armor enchanted/normal
+  case tileArmor:
+   glyph = r(glyphs.length);
+   //fallthrough
+  case "]":
+   currentMap[userPos.x][userPos.y]='.';
+   armor = Math.max(r(distanceToOrigin()), parseInt(distanceToOrigin()/2));
+   msg += "You find a "+getArmorName()+" and equip it. ";
+   break;
+
+  case tileWater:
+   if(glyph == 2){ //cleansing
+    if(cureAll()) msg += "Your armour glows with soft blue light. ";
+   }
+   else if(aflame>0){
+    aflame = 0;
+    msg += "You no longer burn. ";
+   }
+   break;
+
+  case tileLava:
+   aflame += r(30);
+   break;
+
+  case ',': //rubble
+   if(!r(2)){
+    var stumbleStep = {x: userPos.x + r(3)-1, y: userPos.y + r(3)-1};
+    if(inRange(stumbleStep) && checkEmpty(stumbleStep.x,stumbleStep.y)){
+     userPos.x = stumbleStep.x;
+     userPos.y = stumbleStep.y;
+     msg += "You stumble on the rubble. ";
+    }
+   }
+   break;
+
+  case tileGrassTall:
+   msg += "You trample the grass. ";
+   currentMap[userPos.x][userPos.y]=tileGrassShort;
+   break;
+
+  case tileBramble:
+   msg += "You tear through the bramble. ";
+   playerTakeDamage(r(4)+1);
+   currentMap[userPos.x][userPos.y]=tileGrassShort;
+   break;
+
+  case "_":
+   msg += "You kneel at the altar. ";
+
+   // Cures afflictions, but if you have none, you instead get a ranom boon.
+   if(!cureAll()){
+    switch(r(4)){
+     default:
+      // Enchants armor, otherwise try give a different boon.
+      if(glyph==0){
+       msg += "Your "+armors[armor]+" glows bright purple for a second. ";
+       glyph = 1+r(glyphs.length-1);
+       break;
+      }
+      //fallthrough
+
+     case 0:
+      ward += 1;
+      msg += "You are surrounded by a golden shimmer. ";
+      break;
+
+     case 1:
+      phased += 50+r(100);
+      msg += "You are surrounded by an ethereal glow. ";
+      break;
+
+     case 2:
+      timestop += 20+r(40);
+      msg += "Everything seems to slow down to a halt. ";
+      break;
+    }
+   }
+   currentMap[userPos.x][userPos.y]=emptyBlock;
+   break;
+
+  case tileMacGuffin:
+   var winStuff = ["Absolution","Reconciliation","Inner Peace"];
+   msg += "You have found <t style='color:#FF1493'>"+winStuff[r(winStuff.length)]+"</t>! ";
+   haveWon = true;
+   break;
+
+  default:
+   break;
+ }
+
+ if(timestop>0){
+  timestop--;
+ }else moveCreatures();
+
+ displayMap();
+}
+
+function tryMove(x,y,i){
+ if(userPos.x == x && userPos.y == y){
+  msg += currCre[i].icon+" "+currCre[i].attack+" you. ";
+  playerTakeDamage(r(10)+visited,i);
+
+  // Special attacks
+  for(var j = 0; j < currCre[i].flags.length; j++){
+   switch(currCre[i].flags[j]){
+    case "agony":
+     msg += "Horrible agony tears at the very core of your being. ";
+     score = parseInt(score/2);
+     break;
+
+    case "flame":
+     msg += currCre[i].icon+" burns you. ";
+     aflame += r(visited)+r(visited);
+     break;
+
+    case "venom":
+     msg += "You feel a little ill. ";
+     poisoned += r(distanceToOrigin()*2);
+     break;
+
+    case "blind":
+     msg += "Your eyes! You cannot see! ";
+     blinded += r(30);
+     break;
+
+    case "regen":
+     var healed = currCre[i].icon.replaceAt(25, currCre[i].icon.charAt(25).toUpperCase());
+     if(currCre[i].icon != healed){
+      msg += currCre[i].icon+" drains your life force and heals. ";
+      currCre[i].icon = healed;
+     }
+     break;
+
+    case "trapper":
+     if(currentMap[userPos.x][userPos.y]==emptyBlock){
+      msg += currCre[i].icon+" vomits a strange mechanism under your feet. ";
+      currentMap[userPos.x][userPos.y] = '^';
+     }
+     break;
+
+    case "teleother":
+     teleportUser();
+     break;
+
+    case "knockback":
+     var dx = userPos.x - currCre[i].x;
+     var dy = userPos.y - currCre[i].y;
+     if(inRangeCoords(userPos.x+dx,userPos.y+dy) && checkEmpty(userPos.x+dx,userPos.y+dy)){
+      userPos.x += dx;
+      userPos.y += dy;
+      msg += "You are knocked back. ";
+     }
+     break;
+
+    case "steal":
+     if(!r(2)) break; // This is so evil it shouldn't proc always.
+     if(keys>0){
+      msg += currCre[i].icon+" steals a key from you. ";
+      keys--;
+      break;
+     }
+     if(staff>0){
+      msg += currCre[i].icon+" steals your Staff"+staves[staff]+"! ";
+      staff=0;
+      break;
+     }
+     break;
+
+    case "disenchant":
+     if(!r(2)) break; // This is so evil it shouldn't proc always.
+     if(glyph>0){
+      msg += currCre[i].icon+"'s touch drains the magic from your armour! ";
+      glyph=0;
+      break;
+     }
+     if(armor>0){
+      msg += currCre[i].icon+"'s touch polymorphs your armour into a weaker form! ";
+      armor -= 1;
+     }
+     break;
+
+    case "explode":
+     msg += currCre[i].icon+" explodes. ";
+     onExplosion(i);
+     break;
+   }
+  }
+
+  return true; // Won't move, but will stop the mobs turn.
+ }
+ return (inRangeCoords(x,y) && checkEmpty(x,y));
+}
+
+function doMove(x,y,i){
+ if(userPos.x == x && userPos.y == y) return;
+ // Not blocked by player, move.
+ currCre[i].x = x;
+ currCre[i].y = y;
+}
+
+function onDeath(i){
+ for(var j = 0; j < currCre[i].flags.length; j++){
+  switch(currCre[i].flags[j]){
+   case "lavapool":
+    for(var k=-1; k < 2; k++){
+     for(var l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)) currentMap[currCre[i].x+k][currCre[i].y+l] = tileLava;
+     }
+    }
+    msg += "Horrible heat spreads from "+currCre[i].icon+". ";
+    break;
+
+   case "boss":
+    // Spawn MacGuffin when the boss dies.
+    currentMap[currCre[i].x][currCre[i].y] = tileMacGuffin;
+    break;
+
+   case "summon":
+    var m;
+    for(var k=-1; k < 2; k++){
+     for(var l=-1; l < 2; l++){
+      if(checkEmpty(userPos.x+k,userPos.y+l) && inRangeCoords(userPos.x+k,userPos.y+l) && (k!=0 || l!=0)){
+       m = r(currCre.length);
+       currCre[m].x = userPos.x+k;
+       currCre[m].y = userPos.y+l;
+      }
+     }
+    }
+    msg += "With its dying breath, "+currCre[i].icon+" speak a Word of Summoning. Monsters appear around you. ";
+    break;
+
+   //TODO
+  }
+ }
+}
+
+function onExplosion(i){
+ for(var k=-1; k < 2; k++){
+  for(var l=-1; l < 2; l++){
+   if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)){
+    if(currentMap[currCre[i].x+k][currCre[i].y+l]==wallBlock) currentMap[currCre[i].x+k][currCre[i].y+l] = ',';
+    if(userPos.x == currCre[i].x+k && userPos.y == currCre[i].y+l){
+     msg += "You are pummeled by the explosion. ";
+     playerTakeDamage(10+r(30));
+    }
+   }
+  }
+ }
+ for(var m = 0; m < currCre.length; m++){
+  if(distanceBetween(currCre[i],currCre[m])<=2){
+   msg += currCre[m].icon+" is torn apart. "; // TODO proper name
+   onDeath(m);
+   currCre = currCre.removeElement(currCre[m]);
+   //m--; // To not jump over some creature.
+  }
+ }
+}
+
+function moveCreatures(){
+ for (var k = 0; k < currCre.length; k++) {
+  // Check for special action:
+  if(currCre[k].behaviour()) continue;
+  // Hasted creatures will sometimes move twice.
+  //if(currCre[k].flags.includes("haste") && !r(4)) k--;
+
+  if(r(currCre[k].quickness)>0){
+   // Get direction to player normalized to <-1,1>.
+   var dist = distanceBetween(userPos,currCre[k]);
+   var nextStep;
+
+   // Pursue the player if close enough.
+   if(dist <= 8){
+    var dx = Math.round((userPos.x - currCre[k].x)/dist);
+    var dy = Math.round((userPos.y - currCre[k].y)/dist);
+
+    if(currCre[k].flags.includes("flee")){
+     dx = -dx;
+     dy = -dy;
+    }
+
+    nextStep = [{x: currCre[k].x+dx, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+dy}];
+    if(currCre[k].flags.includes("diagonal")){
+     nextStep.push({x: currCre[k].x+dx, y: currCre[k].y+dy});
+     nextStep.shuffle();
+    }
+
+    // Move in one of possible directions, if blocked try the other:
+    var tryStep;
+    if(!r(2)) tryStep = nextStep.pop();
+    else tryStep = nextStep.shift();
+    if((tryStep.x != currCre[k].x || tryStep.y != currCre[k].y) && tryMove(tryStep.x,tryStep.y,k)){
+     doMove(tryStep.x,tryStep.y,k);
+     continue;
+    }
+    if((tryStep.x != currCre[k].x || tryStep.y != currCre[k].y) && tryMove(nextStep[0].x,nextStep[0].y,k)){
+     doMove(nextStep[0].x,nextStep[0].y,k);
+     continue;
+    }
+   }
+
+   // Move randomly otherwise.
+   nextStep = [{x: currCre[k].x+1, y: currCre[k].y},{x: currCre[k].x-1, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+1},{x: currCre[k].x, y: currCre[k].y-1}];
+   if(currCre[k].flags.includes("diagonal")) nextStep.push({x: currCre[k].x+1, y: currCre[k].y+1},{x: currCre[k].x+1, y: currCre[k].y-1},{x: currCre[k].x-1, y: currCre[k].y+1},{x: currCre[k].x-1, y: currCre[k].y-1});
+   var j = r(nextStep.length);
+   if(tryMove(nextStep[j].x,nextStep[j].y,k)){
+     doMove(nextStep[j].x,nextStep[j].y,k);
+     continue;
+   }
+  }
+ }
+}
+
+function getFinalScore(){
+ var winner = score + visited + kills + (keys * 10) + armor;
+ if(staff!=0) winner *= 1.1;
+ if(glyph!=0) winner *= 1.1;
+ return parseInt(winner);
+}
+
+function displayMap(){
+ var displayString = "";
+ var outputMap = [];
+
+ // Clone the map for output, then add monster symbols to it:
+ currentMap.clone2d(outputMap);
+ for (var i = 0; i < currCre.length; i++) {
+  outputMap[currCre[i].x][currCre[i].y]=currCre[i].icon;
+ }
+ // If blind, only display the player:
+ if(blinded>0){
+  for (var i = 0; i < mapWidth; i++) {
+   for (var j = 0; j < mapWidth; j++) {
+    outputMap[i][j] = emptyBlock;
+   }
+  }
+ }
+ // Display the player:
+ outputMap[userPos.x][userPos.y] = getUserChar();
+
+ for (var i = 0; i < mapWidth; i++) {
+  displayString += outputMap[i].join("")+"<br />";
+ }
+
+ // Prepare the status lines and messages:
+ var names = userName + " - " + getWorldName();
+ var attributes = "Self: " + String(score) + " - Visited: " + String(visited) + " - Keys: " + String(keys) + " - Kills: " + String(kills);
+ var equipped = "Wielded: Staff" + staves[staff] + " - Worn: " + getArmorName() + " [Def "+String(armor)+"]";
+ var states = ((aflame>0) ? "<t style='color:#FF4500'>Aflame</t> " : "") +
+              ((blinded>0) ? "<t style='background-color:#000000; color:#FFFFFF;'>Blind</t> " : "") + // white on black
+              ((phased>0) ? "<t style='color:#4B0082'>Phasing</t> " : "") +
+              ((poisoned>0) ? "<t style='color:#90EE90'>Poisoned</t> " : "") +
+              ((timestop>0) ? "<t style='color:#FF00FF'>Time Stop</t> " : "") +
+              ((ward>0) ? "<t style='color:#DAA520'>Ward</t> " : "");
+ if(states.length>0) states += "<br />";
+
+ // Print everything on screen:
+ document.getElementById("mapText").innerHTML = displayString;
+ document.getElementById("statusLine").innerHTML = names+"<br />"+attributes+"<br />"+equipped+"<br />"+states+msg;
+}
+
+// Player commands:
+document.onkeydown = function(e) {
+    switch (e.keyCode) {
+        case 65: //A
+        case 72: //H
+        case 100://4
+        case 37: //left
+            moveUser(0,-1);
+            break;
+        case 87: //W
+        case 75: //K
+        case 104://8
+        case 38: //up
+            moveUser(-1,0);
+            break;
+        case 68: //D
+        case 76: //L
+        case 102://6
+        case 39: //right
+            moveUser(0,1);
+            break;
+        case 83: //S
+        case 74: //J
+        case 98: //2
+        case 40: //down
+            moveUser(1,0);
+            break;
+        case 190://.
+        case 101://5
+        case 32: //space
+         moveUser(0,0);
+         break;
+        case 88: //X
+        case 96: //0
+         useStaff();
+         break;
+        case 188://?
+         // Open a help window.
+         alert("Wanderer\n\nUse arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\nUse 'X' or '0' to invoke the powers of your magic staff.\nGather the '$' memories of your life, or you may fade away before you reach your closure.");
+         break;
+    }
+};
+
+Array.prototype.clone2d = function(target) {
+ for (var i = 0; i < this.length; i++) {
+  target[i] = this[i].slice(0);
+ }
+};
+
+Array.prototype.shuffle = function() {
+  var temp, loc;
+  for (var i = this.length-1; i>0; i--) {
+    loc = r(i+1);
+    temp = this[i];
+    this[i] = this[loc];
+    this[loc] = temp;
+  }
+};
+
+String.prototype.replaceAt=function(index, replacement) {
+    return this.substr(0, index) + replacement+ this.substr(index + replacement.length);
+};
+
+Array.prototype.sampleRec = function () {
+ var output = this[Math.floor(Math.random() * this.length)];
+ if(Array.isArray(output)) return output.sampleRec();
+ else return output;
+};
+
+Array.prototype.removeElement = function(element) {
+ return this.filter(function(ele){ return ele != element; });
+};
+
+function cloneCreature(creature){
+ var clone = {icon:"",name:"",attack:undefined,quickness:0,x:0,y:0,flags:[],behaviour:function(){return false;}};
+ clone.icon = creature.icon;
+ clone.name = creature.name;
+ clone.attack = creature.attack;
+ clone.quickness = creature.quickness;
+ clone.flags = creature.flags;
+ clone.behaviour = creature.behaviour;
+
+ return clone;
+}
+
+function initialise(){
+ // Init creatures:
+ for (; creatureChar.length>0; ) {
+  var base = {icon:"",name:"",attack:undefined,quickness:0,x:0,y:0,flags:[],behaviour:function(){return false;}};
+  base.icon = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+creatureChar.pop()+"</t>";
+  base.name = ""; //TODO
+  base.attack = attackVerbs[r(attackVerbs.length)];
+  base.quickness = r(4)+2;
+  base.flags = getMobFlags();
+  base.behaviour = getMobBehaviour();
+  creatureList.push(base);
+  impassable.push(base.icon);
+ }
+
+ // Init map:
+ worldMap[0] = [];
+ worldMap[0][0] = [];
+ worldName[0] = [];
+ worldName[0][0] = newWorldName();
+ generateMap();
+
+ var welcome = ["May you find that which you seek.","Strike down anyone who stands in your path.","Have you lost your way?","Their blood shall purify you.","Your journey's end awaits in the distance.","Nourish your self or fade to oblivion."];
+
+ // Init game:
+ addUser();
+ staff = 1+r(staves.length-1); // Start with a random staff.
+ newMap(0,0);
+ msg += "Welcome, Wanderer. "+welcome.sampleRec()+"<br />Press '?' for help. ";
+ displayMap();
+}
+
+initialise();
+
+</script>
+</html>
