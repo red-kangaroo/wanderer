@@ -73,7 +73,7 @@ var impassable = [wallBlock,"<t style='color:#FF0000'>&</t>",tileGoldWall,tileDo
 
 var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".split('');
 var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
-                     name:"Wall Demon",
+                     name:"<t style='color:#FF0000'>Demon of Isolation</t>",
                      attack:"slams",
                      quickness:2,
                      x:0,y:0,
@@ -103,7 +103,7 @@ var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                   currCre.push(creatureList[r(creatureList.length/2)]);
                   currCre[currCre.length-1].x = j;
                   currCre[currCre.length-1].y = k;
-                  msg += this.icon+" speaks a Word of Summoning. "+currCre[currCre.length-1].icon+" appears out of thin air. ";
+                  msg += this.name+" speaks a Word of Summoning. "+currCre[currCre.length-1].name+" appears out of thin air. ";
                   return true;
                  }
                 }
@@ -115,19 +115,19 @@ var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                    this.x = r(mapWidth);
                    this.y = r(mapWidth);
                   }while(!checkEmpty(this.x,this.y));
-                  msg += this.icon+" teleports away. ";
+                  msg += this.name+" teleports away. ";
                   return true;
                  }
                  else if(distanceBetween(userPos,currCre[i])>=2 && !r(3)){
                   this.flags = this.flags.removeElement("flee");
-                  msg += this.icon+" calms down. ";
+                  msg += this.name+" calms down. ";
                   return true;
                  }
                 }
 
                 // Special attacks:
                 if(distanceBetween(userPos,currCre[i])<2){
-                 msg += this.icon+" "+this.attack+" you. "; // TODO: proper name
+                 msg += this.name+" "+this.attack+" you. ";
                  playerTakeDamage(r(20)+visited,i);
 
                  switch(r(15)){
@@ -173,7 +173,7 @@ var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                   currentMap[this.x][this.y] = '^';
                   this.x = j;
                   this.y = k;
-                  msg += this.icon+" disappears and suddenly reappears near you. ";
+                  msg += this.name+" disappears and suddenly reappears near you. ";
                  }
                 }
                 return false;
@@ -193,7 +193,7 @@ function getMobBehaviour(){
       this.x = r(mapWidth);
       this.y = r(mapWidth);
      }while(!checkEmpty(this.x,this.y));
-     msg += this.icon+" teleports. "; // TODO: proper name
+     msg += this.name+" teleports. ";
      return true;
     }
     return false;
@@ -203,7 +203,7 @@ function getMobBehaviour(){
    return function(){
     var i = currCre.indexOf(this);
     if(distanceBetween(userPos,currCre[i])<2){
-     msg += currCre[i].icon+" "+currCre[i].attack+" you. "; // TODO: proper name
+     msg += currCre[i].name+" "+currCre[i].attack+" you. ";
      playerTakeDamage(r(10)+visited,i);
     }
     return false;
@@ -1979,25 +1979,25 @@ function tryPlayerMove(x,y){
 }
 
 function damageCreature(i){
- msg += "You strike "+currCre[i].icon+". "; // TODO proper name
+ msg += "You strike "+currCre[i].name+". ";
  // Attempt to lowercase the monster, if already lowercase, kill it instead. Vorpal staff always kills.
  var injured = currCre[i].icon.replaceAt(25, currCre[i].icon.charAt(25).toLowerCase());
  if(currCre[i].icon != injured && staff != 5){
   currCre[i].icon = injured;
   if(!r(5) || (glyph==3)){
    currCre[i].flags.push("flee");
-   msg += currCre[i].icon+" panics. "; // TODO proper name
+   msg += currCre[i].name+" panics. ";
   }
  } else killCreature(i);
 }
 
 function killCreature(i){
  if(currCre[i].flags.includes("boss") && !r(2)){
-  msg += currCre[i].icon+" dodges your attack. ";
+  msg += currCre[i].name+" dodges your attack. ";
   return;
  }
 
- msg += currCre[i].icon+" dies. "; // TODO proper name
+ msg += currCre[i].name+" dies. ";
  onDeath(i);
  currCre = currCre.removeElement(currCre[i]);
  kills += 1;
@@ -2074,7 +2074,7 @@ function moveUser(x,y){
    msg += "You conjure an orb of prismatic energy. ";
    // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
    currCre.push({icon:"<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>*</t>",
-                 name:"Prismatic Orb",
+                 name:"<t style='color:#"+this.icon.substr(17,6)+"'>Prismatic Orb</t>",
                  attack:"kamikazes",
                  quickness:10,
                  x:userPos.x+x,
@@ -2085,7 +2085,7 @@ function moveUser(x,y){
                   if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
                    doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
                   } else {
-                   msg += currCre[i].icon+" explodes. ";
+                   msg += currCre[i].name+" explodes. ";
                    onExplosion(i);
                   }
                   return true;
@@ -2301,7 +2301,7 @@ function moveUser(x,y){
 
    // Cures afflictions, but if you have none, you instead get a ranom boon.
    if(!cureAll()){
-    switch(r(4)){
+    switch(r(5)){
      default:
       // Enchants armor, otherwise try give a different boon.
       if(glyph==0){
@@ -2322,8 +2322,14 @@ function moveUser(x,y){
       break;
 
      case 2:
-      timestop += 20+r(40);
+      timestop += 40+r(60);
       msg += "Everything seems to slow down to a halt. ";
+      break;
+
+     case 3:
+      msg += "Your "+armors[armor]+" is engulfed in bright blue flames. ";
+      armor++;
+      msg += "The flames subside, revealing a brand new "+armors[armor]+". ";
       break;
     }
    }
@@ -2349,7 +2355,7 @@ function moveUser(x,y){
 
 function tryMove(x,y,i){
  if(userPos.x == x && userPos.y == y){
-  msg += currCre[i].icon+" "+currCre[i].attack+" you. ";
+  msg += currCre[i].name+" "+currCre[i].attack+" you. ";
   playerTakeDamage(r(10)+visited,i);
 
   // Special attacks
@@ -2361,7 +2367,7 @@ function tryMove(x,y,i){
      break;
 
     case "flame":
-     msg += currCre[i].icon+" burns you. ";
+     msg += currCre[i].name+" burns you. ";
      aflame += r(visited)+r(visited);
      break;
 
@@ -2378,14 +2384,14 @@ function tryMove(x,y,i){
     case "regen":
      var healed = currCre[i].icon.replaceAt(25, currCre[i].icon.charAt(25).toUpperCase());
      if(currCre[i].icon != healed){
-      msg += currCre[i].icon+" drains your life force and heals. ";
+      msg += currCre[i].name+" drains your life force and heals. ";
       currCre[i].icon = healed;
      }
      break;
 
     case "trapper":
      if(currentMap[userPos.x][userPos.y]==emptyBlock){
-      msg += currCre[i].icon+" vomits a strange mechanism under your feet. ";
+      msg += currCre[i].name+" vomits a strange mechanism under your feet. ";
       currentMap[userPos.x][userPos.y] = '^';
      }
      break;
@@ -2407,12 +2413,12 @@ function tryMove(x,y,i){
     case "steal":
      if(!r(2)) break; // This is so evil it shouldn't proc always.
      if(keys>0){
-      msg += currCre[i].icon+" steals a key from you. ";
+      msg += currCre[i].name+" steals a key from you. ";
       keys--;
       break;
      }
      if(staff>0){
-      msg += currCre[i].icon+" steals your Staff"+staves[staff]+"! ";
+      msg += currCre[i].name+" steals your Staff"+staves[staff]+"! ";
       staff=0;
       break;
      }
@@ -2421,18 +2427,18 @@ function tryMove(x,y,i){
     case "disenchant":
      if(!r(2)) break; // This is so evil it shouldn't proc always.
      if(glyph>0){
-      msg += currCre[i].icon+"'s touch drains the magic from your armour! ";
+      msg += currCre[i].name+"'s touch drains the magic from your armour! ";
       glyph=0;
       break;
      }
      if(armor>0){
-      msg += currCre[i].icon+"'s touch polymorphs your armour into a weaker form! ";
+      msg += currCre[i].name+"'s touch polymorphs your armour into a weaker form! ";
       armor -= 1;
      }
      break;
 
     case "explode":
-     msg += currCre[i].icon+" explodes. ";
+     msg += currCre[i].name+" explodes. ";
      onExplosion(i);
      break;
    }
@@ -2459,7 +2465,7 @@ function onDeath(i){
       if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)) currentMap[currCre[i].x+k][currCre[i].y+l] = tileLava;
      }
     }
-    msg += "Horrible heat spreads from "+currCre[i].icon+". ";
+    msg += "Horrible heat spreads from "+currCre[i].name+". ";
     break;
 
    case "boss":
@@ -2478,7 +2484,7 @@ function onDeath(i){
       }
      }
     }
-    msg += "With its dying breath, "+currCre[i].icon+" speak a Word of Summoning. Monsters appear around you. ";
+    msg += "With its dying breath, "+currCre[i].name+" speak a Word of Summoning. Monsters appear around you. ";
     break;
 
    //TODO
@@ -2500,7 +2506,7 @@ function onExplosion(i){
  }
  for(var m = 0; m < currCre.length; m++){
   if(distanceBetween(currCre[i],currCre[m])<=2){
-   msg += currCre[m].icon+" is torn apart. "; // TODO proper name
+   msg += currCre[m].name+" is torn apart. ";
    onDeath(m);
    currCre = currCre.removeElement(currCre[m]);
    //m--; // To not jump over some creature.
@@ -2700,13 +2706,13 @@ function initialise(){
  for (; creatureChar.length>0; ) {
   var base = {icon:"",name:"",attack:undefined,quickness:0,x:0,y:0,flags:[],behaviour:function(){return false;}};
   base.icon = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+creatureChar.pop()+"</t>";
-  base.name = ""; //TODO
+  base.name = this.icon; //TODO proper name
   base.attack = attackVerbs[r(attackVerbs.length)];
   base.quickness = r(4)+2;
   base.flags = getMobFlags();
   base.behaviour = getMobBehaviour();
   creatureList.push(base);
-  impassable.push(base.icon);
+  impassable.push(base.icon); // Is this even neccessary?
  }
 
  // Init map:

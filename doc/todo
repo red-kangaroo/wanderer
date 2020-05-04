@@ -1,6 +1,8 @@
 $5^?/0-89];_!
 
-
+readme
+* story/very short lore?
+* picture
 
 * when copying tiles for display, set boss floor and spawn extra monsters each turn on boss floor??
 * sign ! with random hint/lore; maybe only on starting map?
@@ -8,7 +10,7 @@ $5^?/0-89];_!
 * rooms should spawn with monsters
 
 * traps
-   summon adjacent monsters
+   summon adjacent monsters // monsters to adjacent (maybe lever?)
    area teleport (random already visited, or anywhere?)
 * staffs
    xx
@@ -21,6 +23,8 @@ $5^?/0-89];_!
 * new generators
    r(1000)<visited: map is maze level
    r(100) <disttoorigin: map is dark level (add simple FOV)
+
+* sometimes levels don't use emptyBlock, but tileGrassShort or tileSand?
 
 
 Mobs
