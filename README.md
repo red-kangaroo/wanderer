@@ -3,14 +3,22 @@
 # Wanderer
 </div>
 <br/>
-<br/>
+![Screenshot](doc/w1.png)
 <br/>
 A small roguelike game written in JavaScript.
+
+### How to play
+
+Download the `src/Wanderer.html` file and open it in your web browser of choice.
+You might wish to press `F11` to enter a full-screen mode if the game doesn't
+otherwise fit on your screen.
+
+Have fun!
 
 ### Controls
 
 ```
-Move around with
+Move around with:
                  W
  arrow keys    A   D
                  S
@@ -26,4 +34,10 @@ Use 'X' or '0' to invoke the powers of your magic staff, if you have one.
 Press '?' in game for more help.
 ```
 
-Have fun!
+### Screenshots
+
+![Screenshot](doc/w2.png)
+
+![Screenshot](doc/w3.png)
+
+![Screenshot](doc/w4.png)

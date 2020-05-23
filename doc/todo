@@ -1,21 +1,20 @@
-$5^?/0-89];_!
+Wander/Wonder
+$5^?/0-89];_
+=!#s
 
 readme
 * story/very short lore?
-* picture
+
+* GitHub page where it can be played?
+* maybe once on GitHub page, add short description and link to the right of the game
 
 * when copying tiles for display, set boss floor and spawn extra monsters each turn on boss floor??
-* sign ! with random hint/lore; maybe only on starting map?
-* shops that take energy for payment
-* rooms should spawn with monsters
+* spawn extra monsters on .
 
 * traps
-   summon adjacent monsters // monsters to adjacent (maybe lever?)
+   summon adjacent monsters // extant monsters to adjacent (maybe lever?)
    area teleport (random already visited, or anywhere?)
-* staffs
-   xx
 * armor
-  * terror also gives immunity to player-side panic, once that status effect is implemented
   explosions (destroy adjacent mobs and terrain, but grants no kills)
   time mastery (randomly/on damage time stop)
   sunlight (once darkness is in, increases sight radius)
@@ -24,16 +23,15 @@ readme
    r(1000)<visited: map is maze level
    r(100) <disttoorigin: map is dark level (add simple FOV)
 
-* sometimes levels don't use emptyBlock, but tileGrassShort or tileSand?
+* maybe more decorations based on name?
+   forest display wall as 48|
+   deserts with sand?
+* vaults:
+   https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
 
 
 Mobs
 ====
-* assign random name on init
-
-* onDeath:
-timestop/score++/other boons
-
 * flags:
 phasing
 invulnerable
@@ -45,3 +43,16 @@ teleport to player
 dig
 explode when adjacent
 summon
+when near, create area of bad terrain around player
+when near, create bad terrain in * pattern around self (2-3 sq long?)
+
+=====================================
+
+* random MacGuffin??
+Amulet of Yendor
+Orb of Zot
+Eye of Larn
+Ring of Ananias
+
+* random win texts:
+You might never be the same again, but xx
