@@ -1,10 +1,10 @@
 <div align="center">
 
 # Wanderer
-</div>
-<br/>
+
 ![Screenshot](doc/w1.png)
-<br/>
+</div>
+
 A small roguelike game written in JavaScript.
 
 ### How to play
@@ -35,9 +35,12 @@ Press '?' in game for more help.
 ```
 
 ### Screenshots
+<div align="center">
 
 ![Screenshot](doc/w2.png)
 
 ![Screenshot](doc/w3.png)
 
 ![Screenshot](doc/w4.png)
+
+</div>
