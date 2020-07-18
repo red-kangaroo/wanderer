@@ -9,7 +9,7 @@ A small roguelike game written in JavaScript.
 
 ### How to play
 
-Download the `src/Wanderer.html` file and open it in your web browser of choice.
+Playable in browser [here](https://red-kangaroo.github.io/wanderer/ "Wanderer").
 You might wish to press `F11` to enter a full-screen mode if the game doesn't
 otherwise fit on your screen.
 
