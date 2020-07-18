@@ -103,7 +103,7 @@ var allFlags = ["diagonal","venom","flame","agony","regen","blind","trapper","te
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
-               name:"<t style='color:#8B008B'>Reflection of Self</t>",
+               name:"<t style='color:#8B008B'>Reflection of True Self</t>",
                attack: attackVerbs[r(attackVerbs.length)],
                quickness:100,
                x:0,y:0,
@@ -200,34 +200,35 @@ var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                }
               };
 var mobNames = {
-  'a': [],
-  'b': [],
-  'c': [],
-  'd': [],
-  'e': [],
-  'f': [],
-  'g': [],
-  'h': [],
-  'i': [],
-  'j': [],
-  'k': [],
-  'l': [],
-  'm': [],
-  'n': [],
-  'o': [],
-  'p': [],
-  'q': [],
-  'r': [],
-  's': [],
-  't': [],
-  'u': [],
-  'v': [],
-  'w': [],
-  'x': [],
-  'y': [],
-  'z': []
+  'a': ["Abortion","Abuse","Accusation","Addiction","Adversity","Aggression","Agony","Alienation","Anger","Anguish","Animosity","Annoyance","Anxiety","Apathy","Arrogance","Avarice"],
+  'b': ["Bedlam","Betrayal","Bias","Bigotry","Bitterness","Blame","Blasphemy","Blemish","Boredom","Bravado","Browbeat"],
+  'c': ["Carelessness","Clumsiness","Complacency","Compulsion","Conceit","Condescension","Contempt","Cowardice","Criticism","Cruelty","Cynicism","Chagrin"],
+  'd': ["Debasement","Debauchery","Deceit","Deception","Dejection","Delirium","Delusion","Denial","Depression","Derision","Despair","Despise","Detriment","Deviation","Dilemma","Disappointment","Discomfort","Disdain","Disgrace","Disgust","Disillusionment","Dismay","Distraction","Distress","Doubts","Dread"],
+  'e': ["Egomania","Egotism","Embarrassment","Emptiness","Enervation","Envy","Evil","Exasperation","Exclusion"],
+  'f': ["Failure","Fallacy","Falsehood","Fanaticism","Farce","Fatigue","Fault","Fear","Ferocity","Filth","Flaw","Foul","Fraud","Fright","Frustration","Furor","Fussy","Futility"],
+  'g': ["Gall","Garish","Gawk","Glum","Greed","Grief","Gripe","Grotesque","Grouch","Grudge","Guilt"],
+  'h': ["Hallucination","Hatred","Havoc","Heartbreak","Hedonism","Helplessness","Hesitation","Hopelessness","Hostility","Hubris","Humiliation","Hypocrisy","Hysteria"],
+  'i': ["Idiocy","Ignorance","Illusion","Immorality","Impatience","Impediment","Imperfection","Imprudence","Impudence","Inadequacy","Incest","Incivility","Incomprehension","Indecency","Indecision","Indifference","Indoctrination","Infamy","Inferiority","Infidelity","Infuriation","Injustice","Insanity","Insult","Intoxication","Irrationality","Irresponsibility","Irritation","Isolation"],
+  'j': ["Jealousy","Jeer","Jeopardy","Jerk","Jitter"],
+  'k': ["Killjoy","Kook","Krazyness"],
+  'l': ["Lambast","Lament","Languish","Languor","Lapse","Leer","Lechery","Lethargy","Lewdness","Liability","Limitation","Loathing","Loneliness","Loss","Loveless","Lovelorn","Lunacy"],
+  'm': ["Madness","Malaise","Malcontent","Malevolence","Malice","Malignant","Mania","Manipulation","Martyrdom","Mediocrity","Melancholy","Menace","Mendacity","Mercilessness","Misconception","Misery","Misfortune","Misgiving","Mishap","Mischief","Mistake","Mistrust","Mockery","Molestation","Morbidity","Mordant","Moribund","Mourning","Mystification"],
+  'n': ["Nagging","Naivety","Nasty","Negativity","Negligence","Nepotism","Nervosity","Neurosis","Niggle","Nightmare","Nuisance","Numbness"],
+  'o': ["Obesity","Obscenity","Obsession","Obstinacy","Obstruction","Obtrusivity","Oddity","Opposition","Oppression","Ordeal","Ostracism","Outcry","Outlaw","Outrage"],
+  'p': ["Pain","Paltry","Pander","Panic","Paranoia","Pariahhood","Paucity","Pauper","Peeve","Peril","Perplexion","Persecution","Perversion","Pessimism","Pestilence","Phobia","Pique","Pity","Plight","Ploy","Pointlessness","Pomp","Pout","Poverty","Prattle","Predicament","Prejudice","Presumption","Pretension","Prick","Procrastination","Profanity","Provocation","Pugnacity"],
+  'q': ["Quack","Qualm","Quandry","Quarrel","Quibble"],
+  'r': ["Racism","Rage","Rancour","Rankle","Ranting","Rape","Rashness","Raving","Rebuff","Recalcitrance","Recklessness","Recourse","Refusal","Regress","Regret","Rejection","Relapse","Reluctance","Remorse","Renunciation","Reprehension","Repression","Reproach","Reproval","Repudiation","Repulsion","Resentment","Resignation","Restlessness","Restriction","Revenge","Revulsion","Ridicule","Rigidity","Rivalry","Rudeness","Ruthlessness"],
+  's': ["Sadness","Sarcasm","Sass","Satire","Savagery","Scam","Scandal","Scarcity","Scathing","Scoff","Scold","Scorn","Scourge","Scowl","Scum","Selfishness","Senility","Servitude","Sham","Shame","Shock","Shortage","Shrew","Shunning","Sickness","Sin","Scepticism","Slander","Slaughter","Sleaze","Slog","Sloppiness","Sloth","Slump","Slur","Smugness","Snag","Snark","Sneer","Snobbery","Snub","Sob","Solitude","Sorrow","Spite","Spook","Spurn","Squabble","Squander","Stagnation","Stammer","Stigma","Stooge","Stress","Strife","Struggle","Stupidity","Stupor","Stutter","Subjugation","Submission","Subservience","Subversion","Sucker","Suffering","Sulk","Sully","Superstition","Suspicion","Swagger"],
+  't': ["Taboo","Taint","Tantrum","Tarnish","Taunt","Tawdry","Tease","Tedium","Temper","Temptation","Tension","Terror","Tetchy","Timidity","Toil","Torment","Torture","Tout","Toxicity","Tragedy","Tramp","Transgression","Trauma","Travesty","Treachery","Treason","Trickery","Trouble","Truant","Turmoil","Tyranny"],
+  'u': ["Ugliness","Uncaring","Uncertainty","Uncleanness","Underestimation","Unease","Unfortune","Unhappiness","Unimportance","Unrest","Upheaval","Uproar","Upset","Usurpation"],
+  'v': ["Vagrancy","Vainglory","Vanity","Vehemence","Vengeance","Vexation","Vice","Viciousness","Vile","Villainy","Vindictiveness","Violation","Volatility","Vulgarity","Vulnerability"],
+  'w': ["Wail","Wanton","Wariness","Wastefulness","Weakness","Weariness","Whining","Wickedness","Wilt","Wily","Wimp","Woe","Worry","Worst","Wrath","Wreak","Wretch","Wrong"],
+  'x': ["Xenophobia"],
+  'y': ["Yuck"],
+  'z': ["Zeal"],
 };
-var mobSelves = [];
+var mobSelves = ["Self-Abnegation","Self-Absorption","Self-Abuse","Self-Aggrandizement","Self-Censorship","Self-Complacency","Self-Conceit","Self-Congratulation","Self-Contempt","Self-Contradiction","Self-Criticism","Self-Deceit","Self-Defeat","Self-Defilement","Self-Delusion","Self-Denial","Self-Deprecation","Self-Discrimination","Self-Disgust","Self-Doubt","Self-Flattery","Self-Gratification","Self-Guilt","Self-Harm","Self-Hatred","Self-Importance","Self-Incrimination","Self-Indulgence","Self-Justification","Self-Loathing","Self-Love","Self-Obsession","Self-Pity","Self-Praise","Self-Recrimination","Self-Reproach","Self-Sabotage","Self-Sacrifice","Self-Satisfaction"];
+var mobDemons = ["Hag","Troll","Imp","Phantom","Phantasm","Sprite","Spirit","Angel","Archon","Devil","Fiend"];
 var msg = "";
 
 function getMobBehaviour(){
@@ -299,17 +300,18 @@ function getMobFlags(){
 }
 
 function getMobName(letter){
-  return letter;
-  // TODO
   letter = letter.toLowerCase();
 
-  if(letter.match(/[a-z]/i))
-    return mobNames[letter].sampleRec();
-  else if(letter == '@')
+  if(letter.match(/[a-z]/i)){
+    if(r(mobNames[letter].length+1))
+      return mobNames[letter].sampleRec();
+    else
+      return newSillyName(letter);
+  } else if(letter == '@')
     return mobSelves.sampleRec();
-  else{
+  else {
     var demonName = "abcdefghijklmnopqrstuvwxyz".split('');
-    return "Demon of " + mobNames[demonName.sampleRec()].sampleRec();
+    return mobDemons.sampleRec() + " of " + mobNames[demonName.sampleRec()].sampleRec();
   }
 }
 
@@ -394,12 +396,12 @@ function newName(){
  }
 }
 
-var aland = ["Abandoned","Aberrant","Abhorrent","Abominable","Abyssal","Accidental","Accursed","Acidous","Acrid","Actinic","Aerial","Afflicted","Akratic","Alien","Alpha","Amaranthine","Amethyst","Anarchic","Ancient","Angel","Angelic","Animalistic","Animistic","Antediluvian","Arcane","Archaic","Arctic","Argent","Arid","Artful","Ascendant","Ashen","Astral","Awoken","Axiomatic","Azure","Baleful","Banished","Barbaric","Barren","Bawdy","Beastly","Beautiful","Belligerent","Bewitched","Bizarre","Black","Blessed","Blighted","Blind","Blissful","Bloody","Blue","Boiling","Bone","Bountiful","Brave New","Brazen","Broken","Brooding","Brown","Brutal","Buried","Burning","Burnt","Calm","Cancerous","Cannibal","Capitalist","Capricious","Captivating","Carnal","Carrion","Cataclysmic","Caustic","Cavernous","Celestial","Central","Ceramic","Cerulean","Chained","Chaotic","Chthonic","Clockwise","Clockwork","Cobalt","Cold","Colourless","Communist","Conquering","Contaminated","Corpse","Corrupt","Coruscant","Cracked","Cratered","Creepy","Crenellated","Crimson","Crooked","Crown","Cruel","Cursed","Damned","Dancing","Dangerous","Dank","Dead","Deadly","Deathless","Deathly","Decaying","Deep","Deeper","Deepest","Defiant","Deformed","Demon","Demonic","Dendroid","Depraved","Deranged","Desecrated","Deserted","Desolate","Despoiled","Destroyed","Devil","Diabolic","Diamond","Dire","Diseased","Divine","Dolm","Doomed","Draconic","Dragon","Dreadful","Dreaming","Dreary","Drowned","Dry","Dusty","Dwarven","Dying","Earthen","Eastern","Ebon","Eldritch","Electric","Elven","Emerald","Empty","Empyrean","Enchanted","Enclosed","Enigmatic","Enlightened","Epic","Errant","Eternal","Ethereal","Evening","Exalted","Experimental","Extradimansional","Fading","Failed","Fair","Fairy","Fallen","False","Familiar","Fancy","Far","Faraway","Fearful","Fearless","Fearsome","Feral","Ferric","Fertile","Fetid","Fey","Fiery","Filthy","Final","Flaming","Flawed","Flayed","Floating","Flowing","Forbidden","Forgotten","Forlorn","Forsaken","Forsworn","Foul","Fractal","Fractured","Fragrant","Frail","Freakish","Frenetic","Friendly","Frigid","Frosty","Frozen","Fuligin","Fungal","Gargantuan","Gay","Ghastly","Ghostly","Ghoulish","Giant","Ginger","Glacial","Gloomy","Glowing","Gnomish","Golden","Good","Grand","Grandiose","Gray","Great","Greater","Green","Grim","Gruesome","Guarded","Hallowed","Hanging","Harsh","Haunted","Heavenly","Hellish","Hidden","Higher","Hoary","Hollow","Holy","Homeward","Hostile","Hot","Hungry","Hypergreen","Icy","Igneous","Ill-Fated","Illustrated","Immaculate","Immortal","Imperial","Inbred","Indigo","Industrial","Infected","Infernal","Infrared","Inhuman","Insidious","Irradiated","Jagged","Jale","Joyous","Knotted","Kraken","Lachrymose","Last","Legendary","Leper","Lesser","Leviathan","Lifeless","Little","Long","Lost","Low","Lower","Lunar","Lush","Luxurious","Macabre","Mad","Magenta","Magical","Magnificent","Majestic","Marginal","Marked","Masked","Mechanical","Mercantile","Mercurial","Metablue","Midsummer","Mighty","Miraculous","Mirror","Mirthful","Miserable","Misty","Molten","Monster","Monstrous","Morning","Mouldy","Mournful","Mutant","Mysterious","Mystic","Narrow","Nascent","Negative","Nether","Ninth","Noble","Nocturnal","Nomadic","Northern","Noxious","Nuclear","Occidental","Occult","Octarine","Ogrish","Old","Omega","Orange","Orcish","Organic","Oriental","Ornery","Orthodox","Other","Overgrown","Pale","Pallid","Penitent","Peregrine","Perilous","Petrified","Phallic","Phasic","Phoenix","Pink","Pious","Plagued","Pleasant","Poisoned","Potent","Praised","Prehistoric","Primitive","Primordial","Prismatic","Pristine","Profane","Promiscuous","Pure","Purple","Putrescent","Putrid","Quiet","Radiant","Rambunctious","Rampant","Rapt","Ravaged","Ravenous","Ravished","Red","Reforged","Regal","Resplendent","Revenant","Rich","Rising","Rocky","Rotting","Royal","Ruby","Ruined","Runic","Sacred","Sanguine","Savage","Scarlet","Scarred","Scorched","Screaming","Sealed","Searing","Secret","Sentient","Serene","Serpent","Serpentine","Seventh","Shadowed","Shattered","Shifting","Shrouded","Sidereal","Silent","Sinful","Singing","Sinking","Sinuous","Skeleton","Skull","Sleeping","Snowy","Solar","Southern","Spectral","Spirit","Steampunk","Stinking","Strange","Succulent","Sunken","Supernatural","Supreme","Tattered","Tepid","Terrestrial","Third","Thirteenth","Titanic","Torturous","Toxic","Tranquil","Transdimensional","Tribal","Trollish","Troubled","Turbulent","Twin","Twisted","Ugly","Ulfire","Ultraviolet","Unabashed","Unborn","Unchained","Uncharted","Unconquered","Undying","Unholy","Unicorn","Unknown","Unmapped","Unnamed","Unnatural","Unstable","Untamed","Upper","Vampire","Veiled","Vermillion","Very Small","Vibrant","Vicious","Vile","Violet","Virgin","Viridian","Volcanic","Voltaic","Wandering","War-Torn","Warded","Warm","Warped","Wasting","Watery","Wayward","Wealthy","Weeping","Weird","Western","Whispering","White","Wicked","Wild","Winded","Windy","Witching","Withered","Wooded","Worm","Worthless","Wraith","Wretched","Wyrm","Xanthous","Yawning","Yellow","Zombie","Dormant"];
-var pland = ["Adamant","Adventure","Alabaster","Amber","Apocalypse","Ash","Asphalt","Autumn","Bark","Beer","Blood","Brass","Briar","Brimstone","Bronze","Chaos","Chrome","Cinder","Cinnamon","Clay","Coal","Concrete","Copper","Coral","Crystal","Dark","Dawn","Deer","Dusk","East","Ember","Evil","Flame","Flint","Fog","Fossil","Glass","God","Gold","Grass","Honey","Ice","Iron","Ivory","Jade","Lichen","Magic","Malachite","Mandrake","Marble","Mead","Meat","Metal","Midnight","Milk","Mithril","Moss","Mourning","Mud","Mystery","Nephrite","Night","Nightmare","Noon","North","Obsidian","Onyx","Ooze","Opal","Pepper","Plastic","Platinum","Porcelain","Prism","Quicksilver","Rainbow","Rime","Rust","Saffron","Salt","Sand","Sap","Seaweed","Shadow","Sheep","Silk","Silver","Skin","Sky","Slime","Sludge","Snow","Soap","South","Spring","Steam","Steel","Stone","Sugar","Sulphur","Summer","Sweat","Throne","Trash","Treasure","Undead","Verdigris","Vinegar","West","Wine","Winter"];
-var nland = ["Plane","Plain","Plains","Place","Hell","Heaven","Haven","Paradise","Manse","Demesne","Domain","Glade","Meadow","Clearing","Vale","Valley","Gorge","Oubliette","Dungeon","Deeps","Depths","Tunnels","Mine","Mines","Realm","Reich","Empire","City","Ruins","Halls","Abyss","Paths","Crossroads","Bulwark","Rampart","Nexus","Reach","Reaches","Territory","Land","Cave","Caves","Cavern","Caverns","Desert","Sea","March","Borderlands","Graveyard","Vineyard","Kingdom","County","Barony","Shire","Wood","Woods","Laboratory","Forest","Jungle","Towers","Field","Fields","Palace","Temple","Coast","Fjord","Garden","Chasm","Hive","Grounds","Castle","Fort","Fortress","Nest","World","Mountain","Hills","Hillocks","Highlands","Prairie","Wasteland","Monastery","Cathedral","Court","Cliffs","Factory","Wild","Wilds","Wilderness","Marsh","Marshland","Swamp","Bog","Quagmire","Moor","Dale","Pastures","Steppe","Grassland","Caliphate","Sultanate","Emirate","Province","Country","Earldom","Fiefdom","Dunes","Tundra","Taiga","Beach","Warrens","Burrow","Den","Lair","Refuge","Retreat","Sanctuary","Sanctum","Oasis","Savanna","Badlands","Plateau","Wastes","Borough","Canton","District","Prefecture","Region","State","Town","Parish","Colony","Hamlet","Precinct","Protectorate","Exarchate","Necropolis","Stronghold","Cloister","Academy","Gulch","Grotto","Trenches","Channels","Canyon","Ravine","Fissures","Glen","Pass","Dell","Chambers","Hollow","Underworld","Underground","Expanse","Pit","Pits","Fen","Wetland","Edge","Citadel","Bastion","Keep","Barrows","Catacombs","Crypt","Vault","Sepulcher","Tomb","Mausoleum","Holdings","Estate","Freehold","Volcano","Camp","Shrine","Labyrinth","Maze","Sewers","Desolation","Road","Prison","Gaol","Crater","Caldera","Dimension","Springs","Battlefield","Pyramid","Rift","Library","Utopia","Dystopia","League","Outlands","Cove","Eyrie","Lowlands","Ossuary","Ziggurat","Cemetery"];
-var lland = ["Abortion","Adversity","Agony","Air","Alchemy","Alcohol","Angels","Anger","Anguish","Annihilation","Anomalies","Answers","Anxiety","Apes","Apotheosis","Apparitions","Architecture","Arson","Art","Artifice","Ascension","Ashes","Aspirations","Avarice","Baboons","Bandits","Banners","Baubles","Bears","Beasts","Bee-Eaters","Bees","Beggars","Bells","Berries","Berserks","Birds","Blades","Bliss","Blizzards","Bloodlust","Bloodshed","Boars","Bodies","Bogeymen","Bondage","Bones","Books","Boulders","Brambles","Bravery","Bread","Buffalos","Butterflies","Cacophony","Cactae","Cakes","Camels","Cancer","Candy","Carnage","Catastrophes","Cats","Cattle","Cauldron","Celebration","Centaurs","Chains","Chants","Charity","Chastity","Cheese","Chickens","Chimneys","Chocolate","Claws","Clergy","Clocks","Clones","Clowns","Colossi","Compassion","Conquest","Contempt","Crabs","Crates","Crime","Crime","Crocodiles","Crows","Crucible","Crucifixion","Curses","Darkness","Daughters","Death","Decay","Deception","Deicide","Delight","Delirium","Delusion","Dementia","Demise","Demons","Depression","Desires","Despair","Desperation","Destiny","Destruction","Devolution","Dew","Diligence","Dinosaurs","Disasters","Discord","Domes","Doom","Dragons","Dread","Drizzle","Drugs","Ducks","Dust","Duty","Dwarves","Earth","Earthquake","Echoes","Ectoplasm","Elephants","Elves","Endings","Ennui","Envy","Essence","Eternity","Etiquette","Eunuchs","Exorcism","Explosions","Eyes","Fables","Fae","Failure","Fairies","Faith","Famine","Fangs","Fata Morgana","Fate","Fathers","Fear","Feasts","Feathers","Festivities","Fire","Fish","Flesh","Flotsam","Flowers","Forges","Forgiveness","Fortune","Freaks","Freedom","Fright","Frogs","Fruit","Funerals","Fungi","Furniture","Gambling","Garbage","Gardens","Gates","Gems","Genesis","Ghosts","Ghouls","Giants","Glory","Gluttony","Goblins","Golems","Gossip","Grace","Grandfathers","Grandmothers","Grapes","Gratitude","Graves","Greed","Growth","Hallucinations","Hammers","Harmony","Hatred","Haunts","Hazards","Healing","Hearts","Hellfire","Heresy","Heroes","Heroics","Herrings","Honour","Hope","Horrors","Horses","Hymns","Idols","Illusions","Imagination","Imps","Incest","Ink","Insanity","Insects","Intimacy","Invaders","Jaywalking","Jesters","Jewels","Journeys","Joy","Keys","Knights","Knives","Koans","Kobolds","Kung Fu","Lakes","Lamentation","Lamentations","Lances","Lava","Leeches","Legends","Lemmings","Liars","Liberty","Lice","Lies","Life","Light","Lightning","Limbs","Lions","Lizard Kings","Lizards","Locks","Loot","Lords","Lore","Loss","Love","Lovers","Lust","Madness","Magma","Magpies","Maids","Mana","Masochism","Mathematics","Melancholy","Memories","Mercury","Mercy","Mermaids","Mice","Might","Mildew","Mirrors","Mirth","Misery","Misfortune","Mist","Mockery","Monkeys","Monsters","Monuments","Moon","Mothers","Mucus","Murder","Muses","Mushrooms","Music","Mutants","Myths","Narwhals","Nature","Nausea","Needles","Nobility","Noise","Nymphs","Obelisks","Obliteration","Oblivion","Occultism","Octopi","Olm","Orcs","Ordeals","Outlaws","Owls","Oysters","Pacifism","Pacts","Pain","Panthers","Parrots","Passion","Patience","Peace","Peacocks","Pearls","Penance","Penguins","Perdition","Peril","Perversion","Pestilence","Phantoms","Philosophy","Pigeons","Pillars","Pirates","Pitchforks","Plague","Plants","Plenty","Poetry","Power","Powers","Predators","Pride","Promises","Prophecy","Prosperity","Protection","Providence","Puissance","Punishment","Purity","Pus","Putrescence","Pygmies","Pyres","Questions","Quests","Raiders","Rain","Rats","Ravens","Reason","Rebels","Rebirth","Reflections","Regret","Reincarnation","Remorse","Responsibility","Rest","Revelations","Rhythm","Riches","Rituals","Rivers","Roses","Rot","Sacrifice","Sadism","Saliva","Scorn","Scrap","Screams","Secrets","Serenity","Serpents","Servitude","Sex","Shame","Sharks","Shields","Ships","Sickness","Silence","Simulacra","Sin","Sins","Skulduggery","Skulls","Slaughter","Slavery","Sleep","Sloth","Slumber","Smoke","Snakes","Soldiers","Sons","Soot","Sorcerers","Sorcery","Sorrow","Souls","Spears","Spices","Spiders","Spirals","Spires","Spirits","Spoons","Squids","Stars","Statues","Staves","Storms","Strength","Strife","Succour","Suffering","Sun","Sunlight","Swans","Sweat","Swords","Sympathy","Taboos","Tea","Tears","Teatime","Teeth","Temperance","Temptation","Tentacles","Terror","Thieves","Thorns","Thoughts","Thunder","Tides","Tigers","Timber","Time","Titans","Tongues","Torment","Tornados","Torture","Tragedy","Traitors","Traps","Travels","Travesty","Treason","Trees","Trials","Trombones","Trouble","Trust","Truth","Tumult","Turnips","Turtles","Twilight","Underwear","Unicorns","Unrest","Urns","Valour","Vengeance","Vermin","Voices","Void","Vultures","Wands","War","Warlocks","Warmth","Wasps","Water","Wealth","Weapons","Weed","Werewolves","Whales","Whispers","Whores","Winds","Wisdom","Wizards","Woe","Wolves","Women","Wonder","Wood","Worms","Wrath","Wyrms","Wyverns"];
-var tland = ["Aegis","Amazon","Angel","Archangel","Archon","Army","Avatar","Behemoth","Bull","Butcher","Cadaver","Cenobite","Champion","Child","Chimera","Clan","Council","Daeva","Damned","Dead","Demigod","Demon","Devil","Druid","Eater","Eidolon","Emperor","Executioner","Fiend","Genie","God","Heir","Herald","Hermit","Hero","Hierophant","Horror","Imp","Juggernaut","King","Knave","Knight","Lady","Lich","Lord","Lotus","Mage","Master","Messenger","Mistress","Monk","Monolith","Mummy","Necromancer","Oracle","Orb","Paladin","Paragon","Parasite","Prince","Princess","Queen","Reaper","Saint","Scoundrel","Scourge","Seer","Sentinel","Seraph","Shaman","Sorcerer","Sorceress","Stag","Star","Starspawn","Syndicate","Tormentor","Trickster","Tyrant","Warlock","Warlord","Witch","Wizard","Worm","Wyrm","Bastard","Heroine"];
-var rland = ["Arcadia","Yendor","Mordor","Valhalla","Jotunheim","Helheim","Nirvana","Matrix","Zion","Eden","the Promised Land","Wonderland","Avalon","Azeroth","Barsoom","Bas-Lag","Camelot","the Dreamlands","Limbo","Purgatory","Netherworld","Faeria","Hyperborea","Hyrule","Neverwhere","Midgard","the Moominland","Narnia","Oz","Pern","Pangaea","the Wyld","Xanth","Asgard","Atlantis","Cimmeria","Lemuria","Mu","Albion","Tartarus","Lordran","Quendor","Alfheim","Annwn","Brahmapura","El Dorado","Irkalla","Mictlan","Muspelheim","Niflheim","Pandaemonium","Sierra de la Plata","Shambala","Shangri-La","Sodom","Themiscyra","Thule","Xibalba","Xanadu","Arendelle","Illyria","Qwghlm","Sokovia","Ur","Cocytus","Dis","Stygia","Bytopia","Elysium","Carceri","Gehennom","Acheron","Infernum","the Upside Down","Lankhmar","Ankh-Morpork","Caipi-Taal"];
+var aland = ["Abandoned","Aberrant","Abhorrent","Abominable","Abyssal","Accidental","Accursed","Acidous","Acrid","Actinic","Aerial","Afflicted","Akratic","Alien","Alpha","Amaranthine","Amethyst","Anarchic","Ancient","Angel","Angelic","Animalistic","Animistic","Antediluvian","Arcane","Arctic","Argent","Archaic","Arid","Artful","Ascendant","Ashen","Astral","Awoken","Axiomatic","Azure","Baleful","Banished","Barbaric","Barren","Bawdy","Beastly","Beautiful","Belligerent","Bewitched","Bizarre","Black","Blessed","Blighted","Blind","Blissful","Bloody","Blue","Boiling","Bone","Bountiful","Brave New","Brazen","Broken","Brooding","Brown","Brutal","Buried","Burning","Burnt","Calm","Cancerous","Cannibal","Capitalist","Capricious","Captivating","Carnal","Carrion","Cataclysmic","Caustic","Cavernous","Celestial","Central","Ceramic","Cerulean","Clockwise","Clockwork","Cobalt","Cold","Colourless","Communist","Conquering","Contaminated","Corpse","Corrupt","Coruscant","Cracked","Cratered","Creepy","Crenellated","Crimson","Crooked","Crown","Cruel","Cursed","Damned","Dancing","Dangerous","Dank","Dead","Deadly","Deathless","Deathly","Decaying","Deep","Deeper","Deepest","Defiant","Deformed","Demon","Demonic","Dendroid","Depraved","Deranged","Desecrated","Deserted","Desolate","Despoiled","Destroyed","Devil","Diabolic","Diamond","Dire","Diseased","Divine","Dolm","Doomed","Dormant","Draconic","Dragon","Dreadful","Dreaming","Dreary","Drowned","Dry","Dryad","Dusty","Dwarven","Dying","Earthen","Eastern","Ebon","Eldritch","Electric","Elven","Emerald","Empty","Empyrean","Enclosed","Enchanted","Enigmatic","Enlightened","Ephemeral","Epic","Errant","Eternal","Ethereal","Evening","Exalted","Experimental","Extradimansional","Fading","Failed","Fair","Fairy","Fallen","False","False’","Familiar","Fancy","Far","Faraway","Fearful","Fearless","Fearsome","Feral","Ferric","Fertile","Fetid","Fey","Fiery","Filthy","Final","Flaming","Flawed","Flayed","Floating","Flowing","Forbidden","Forgotten","Forlorn","Forsaken","Forsworn","Foul","Fractal","Fractured","Fragrant","Frail","Freakish","Frenetic","Friendly","Frigid","Frosty","Frozen","Fuligin","Fungal","Gargantuan","Gay","Ghastly","Ghostly","Ghoulish","Giant","Ginger","Glacial","Gloomy","Glowing","Gnomish","Goblin","Golden","Good","Grand","Grandiose","Gray","Great","Greater","Green","Grim","Gruesome","Guarded","Hallowed","Hanging","Harsh","Haunted","Heavenly","Hellish","Hidden","Higher","Hoary","Hollow","Holy","Homeward","Hostile","Hot","Hungry","Hypergreen","Chained","Chaotic","Chthonic","Icy","Igneous","Ill-Fated","Illustrated","Immaculate","Immortal","Imperial","Inbred","Indigo","Industrial","Infected","Infernal","Infrared","Inhuman","Insidious","Irradiated","Jagged","Jale","Joyous","Knotted","Kobold","Kraken","Lachrymose","Last","Legendary","Leper","Lesser","Leviathan","Lifeless","Little","Long","Lost","Low","Lower","Lunar","Lush","Luxurious","Macabre","Mad","Magenta","Magical","Magnificent","Machine","Majestic","Marginal","Marked","Masked","Mechanical","Mercantile","Mercurial","Metablue","Midsummer","Mighty","Miraculous","Mirror","Mirthful","Miserable","Misty","Molten","Monster","Monstrous","Morning","Mouldy","Mournful","Mutant","Mysterious","Mystic","Narrow","Nascent","Negative","Nether","Ninth","Noble","Nocturnal","Nomadic","Northern","Noxious","Nuclear","Occidental","Occult","Octarine","Ogrish","Old","Omega","Orange","Orcish","Organic","Oriental","Ornery","Orthodox","Other","Overgrown","Pale","Pallid","Penitent","Peregrine","Perilous","Petrified","Phallic","Phasic","Phoenix","Pink","Pious","Plagued","Pleasant","Poisoned","Potent","Praised","Prehistoric","Primitive","Primordial","Prismatic","Pristine","Profane","Promiscuous","Pure","Purple","Putrescent","Putrid","Quiet","Radiant","Rambunctious","Rampant","Rapt","Ravaged","Ravenous","Ravished","Red","Reforged","Regal","Resplendent","Revenant","Rich","Rising","Rocky","Rotting","Royal","Ruby","Ruined","Runic","Sacred","Sanguine","Savage","Scandalous","Scarlet","Scarred","Scorched","Screaming","Sealed","Searing","Secret","Sentient","Serene","Serpent","Serpentine","Seventh","Shadowed","Shattered","Shifting","Shrouded","Sidereal","Silent","Sinful","Singing","Sinking","Sinuous","Skeletal","Skeleton","Skull","Sleeping","Snowy","Solar","Southern","Spectral","Spirit","Steampunk","Sterile","Stinking","Strange","Succulent","Sunken","Supernatural","Supreme","Tattered","Tepid","Terrestrial","Third","Thirteenth","Titanic","Torturous","Toxic","Tranquil","Transdimensional","Tribal","Trollish","Troubled","Turbulent","Twin","Twisted","Ugly","Ulfire","Ultraviolet","Unabashed","Unborn","Unconquered","Undying","Unholy","Unchained","Uncharted","Unicorn","Unknown","Unmapped","Unnamed","Unnatural","Unstable","Untamed","Upper","Vampire","Veiled","Vermillion","Very Small","Vibrant","Vicious","Vile","Villainous","Violet","Virgin","Viridian","Volcanic","Voltaic","Wandering","Warded","Warm","Warped","War-Torn","Wasting","Watery","Wayward","Wealthy","Weeping","Weird","Western","Whispering","White","Wicked","Wild","Winded","Windy","Withered","Witching","Wooded","Worm","Worthless","Wraith","Wretched","Wyrm","Xanthous","Xeric","Yawning","Yellow","Zombie"];
+var pland = ["Adamant","Adventure","Alabaster","Amber","Apocalypse","Ash","Asphalt","Autumn","Bark","Beer","Blood","Brass","Briar","Brimstone","Bronze","Cinder","Cinnamon","Clay","Coal","Concrete","Copper","Coral","Crystal","Dark","Dawn","Deer","Dusk","East","Ember","Evil","Flame","Flint","Fog","Fossil","Glass","God","Gold","Gossamer","Grass","Honey","Chaos","Chrome","Ice","Iron","Ivory","Jade","Lichen","Magic","Malachite","Mandrake","Marble","Mead","Meat","Metal","Midnight","Milk","Mithril","Moss","Mourning","Mud","Mystery","Nephrite","Night","Nightmare","Noon","North","Obsidian","Onyx","Ooze","Opal","Pepper","Plastic","Platinum","Porcelain","Prism","Quicksilver","Rainbow","Rime","Rust","Saffron","Salt","Sand","Sap","Seaweed","Shadow","Sheep","Silk","Silver","Skin","Sky","Slime","Sludge","Snow","Soap","South","Spring","Steam","Steel","Stone","Sugar","Sulphur","Summer","Sweat","Throne","Trash","Treasure","Undead","Verdigris","Vinegar","Wax","West","Wine","Winter"];
+var nland = ["Abyss","Academy","Badlands","Barony","Barrows","Bastion","Battlefield","Beach","Bog","Borderlands","Borough","Bulwark","Burrow","Caldera","Caliphate","Camp","Canton","Canyon","Castle","Catacombs","Cathedral","Cave","Cavern","Caverns","Caves","Cemetery","Citadel","City","Clearing","Cliffs","Cloister","Coast","Colony","Country","County","Court","Cove","Crater","Crossroads","Crypt","Dale","Deeps","Dell","Demesne","Den","Depths","Desert","Desolation","Dimension","District","Domain","Dunes","Dungeon","Dystopia","Earldom","Edge","Emirate","Empire","Estate","Exarchate","Expanse","Eyrie","Factory","Fen","Fiefdom","Field","Fields","Fissures","Fjord","Forest","Fort","Fortress","Freehold","Gaol","Garden","Glade","Glen","Gorge","Grassland","Graveyard","Grotto","Grounds","Gulch","Halls","Hamlet","Haven","Heaven","Hell","Highlands","Hillocks","Hills","Hive","Holdings","Hollow","Chambers","Channels","Chasm","Jungle","Keep","Kingdom","Laboratory","Labyrinth","Lair","Land","League","Library","Lowlands","Manse","March","Marsh","Marshland","Mausoleum","Maze","Meadow","Mine","Mines","Monastery","Moor","Mountain","Necropolis","Nest","Nexus","Oasis","Ossuary","Oubliette","Outlands","Palace","Paradise","Parish","Pass","Pastures","Paths","Pit","Pits","Place","Plain","Plains","Plane","Plateau","Prairie","Precinct","Prefecture","Prison","Protectorate","Province","Pyramid","Quagmire","Rampart","Ravine","Reach","Reaches","Realm","Refuge","Region","Reich","Retreat","Rift","Road","Ruins","Sanctuary","Sanctum","Savanna","Sea","Sepulcher","Sewers","Shire","Shrine","Springs","State","Steppe","Stronghold","Sultanate","Swamp","Taiga","Temple","Territory","Tomb","Towers","Town","Trenches","Tundra","Tunnels","Underground","Underworld","Utopia","Vale","Valley","Vault","Vineyard","Volcano","Warrens","Wasteland","Wastes","Wetland","Wild","Wilderness","Wilds","Wood","Woods","World","Ziggurat"];
+var lland = ["Abortion","Adversity","Afflictions","Agony","Air","Alcohol","Alchemy","Angels","Anger","Anguish","Annihilation","Anomalies","Answers","Anxiety","Apes","Apotheosis","Apparitions","Architecture","Arson","Art","Artifice","Ascension","Ashes","Aspirations","Avarice","Baboons","Bandits","Banners","Baubles","Bears","Beasts","Bee-Eaters","Bees","Beggars","Bells","Berries","Berserks","Birds","Blades","Bliss","Blizzards","Bloodlust","Bloodshed","Boars","Bodies","Bogeymen","Bondage","Bones","Books","Boulders","Brambles","Bravery","Bread","Buffalos","Butterflies","Cacophony","Cactae","Cakes","Camels","Cancer","Candles","Candy","Carnage","Catastrophes","Cats","Cattle","Cauldron","Celebration","Centaurs","Claws","Clergy","Clocks","Clones","Clowns","Colossi","Compassion","Conquest","Contempt","Crabs","Crates","Crime","Crocodiles","Crows","Crucible","Crucifixion","Curses","Darkness","Daughters","Death","Decay","Deception","Deicide","Delight","Delirium","Delusion","Dementia","Demise","Demons","Depression","Desires","Despair","Desperation","Destiny","Destruction","Devolution","Dew","Diligence","Dinosaurs","Disasters","Discord","Diseases","Domes","Doom","Dragons","Dread","Drizzle","Drugs","Ducks","Duck-Sized Horses","Dust","Duty","Dwarves","Earth","Earthquake","Ectoplasm","Echoes","Elephants","Elves","Endings","Ennui","Envy","Essence","Eternity","Etiquette","Eunuchs","Exorcism","Explosions","Eyes","Fables","Fae","Failure","Fairies","Faith","Famine","Fangs","Fata Morgana","Fate","Fathers","Fear","Feasts","Feathers","Festivities","Fire","Fish","Flesh","Flotsam","Flowers","Forges","Forgiveness","Fortune","Freaks","Freedom","Fright","Frogs","Fruit","Funerals","Fungi","Furniture","Gambling","Garbage","Gardens","Gates","Gems","Genesis","Ghosts","Ghouls","Giants","Glory","Gluttony","Goblins","Golems","Gossip","Grace","Grandfathers","Grandmothers","Grapes","Gratitude","Graves","Greed","Growth","Hallucinations","Hammers","Harmony","Hatred","Haunts","Hazards","Healing","Hearts","Hellfire","Heresy","Heroes","Heroics","Herrings","Honour","Hope","Horrors","Horses","Horse-Sized Ducks","Hymns","Chains","Chants","Charity","Chastity","Cheese","Chickens","Chimneys","Chocolate","Idols","Ills","Illusions","Imagination","Imps","Incest","Ink","Insanity","Insects","Intimacy","Invaders","Jaywalking","Jesters","Jewels","Journeys","Joy","Keys","Knights","Knives","Koans","Kobolds","Kung Fu","Lakes","Lamentation","Lamentations","Lances","Lava","Leeches","Legends","Lemmings","Liars","Liberty","Lice","Lies","Life","Light","Lightning","Limbs","Lions","Lizard Kings","Lizards","Locks","Loot","Lords","Lore","Loss","Love","Lovers","Lust","Madness","Magma","Magpies","Maids","Maladies","Mana","Masochism","Mathematics","Melancholy","Memories","Mercury","Mercy","Mermaids","Mice","Might","Mildew","Mirrors","Mirth","Misery","Misfortune","Mist","Mockery","Monkeys","Monsters","Monuments","Moon","Mothers","Mucus","Murder","Muses","Mushrooms","Music","Mutants","Myths","Narwhals","Nature","Nausea","Needles","Nobility","Noise","Nymphs","Obelisks","Obliteration","Oblivion","Occultism","Octopi","Ogres","Olm","Orcs","Ordeals","Outlaws","Owls","Oysters","Pacifism","Pacts","Pain","Panthers","Parrots","Passion","Patience","Peace","Peacocks","Pearls","Penance","Penguins","Perdition","Peril","Perversion","Pestilence","Phantoms","Philosophy","Pigeons","Pillars","Pirates","Pitchforks","Plague","Plants","Plenty","Poetry","Power","Powers","Predators","Pretence","Pride","Promises","Prophecy","Prosperity","Protection","Providence","Puissance","Punishment","Purity","Pus","Putrescence","Pygmies","Pyres","Questions","Quests","Raiders","Rain","Rats","Ravens","Reason","Rebels","Rebirth","Reflections","Regret","Reincarnation","Remorse","Responsibility","Rest","Revelations","Rhythm","Riches","Rituals","Rivers","Roses","Rot","Sacrifice","Sadism","Saliva","Scorn","Scrap","Screams","Secrets","Serenity","Serpents","Servitude","Sex","Shame","Sharks","Shields","Ships","Sickness","Silence","Simulacra","Sin","Sins","Skulduggery","Skulls","Slaughter","Slavery","Sleep","Sloth","Slumber","Smoke","Snakes","Soldiers","Sons","Soot","Sorcerers","Sorcery","Sorrow","Souls","Spears","Spices","Spiders","Spirals","Spires","Spirits","Spoons","Squids","Stars","Statues","Staves","Storms","Strength","Strife","Succour","Suffering","Sun","Sunlight","Swans","Sweat","Swords","Sympathy","Taboos","Tea","Tears","Teatime","Teeth","Temperance","Temptation","Tentacles","Terror","Thieves","Thorns","Thoughts","Thunder","Tides","Tigers","Timber","Time","Titans","Tongues","Torment","Tornados","Torture","Tragedy","Traitors","Traps","Travels","Travesty","Treason","Trees","Trials","Trombones","Trouble","Trust","Truth","Tumult","Turnips","Turtles","Twilight","Underwear","Unicorns","Unrest","Urns","Valour","Vengeance","Vermin","Voices","Void","Vultures","Wands","War","Warlocks","Warmth","Wasps","Water","Wealth","Weapons","Weed","Werewolves","Whales","Whispers","Whores","Winds","Wisdom","Wizards","Woe","Wolves","Women","Wonder","Wood","Worms","Wrath","Wyrms","Wyverns"];
+var tland = ["Aegis","Amazon","Angel","Archangel","Archmage","Archon","Army","Avatar","Baron","Bastard","Behemoth","Bull","Butcher","Cadaver","Cenobite","Clan","Council","Count","Countess","Daeva","Damned","Dead","Demigod","Demon","Devil","Druid","Eater","Eidolon","Emperor","Executioner","Fiend","Genie","God","Goddes","Heir","Herald","Hermit","Hero","Heroine","Hierophant","Horror","Champion","Child","Chimera","Imp","Juggernaut","King","Knave","Knight","Lady","Lich","Lord","Lotus","Mage","Magus","Master","Messenger","Mistress","Monk","Monolith","Mummy","Necromancer","Oracle","Orb","Paladin","Paragon","Parasite","Prince","Princess","Queen","Reaper","Saint","Scoundrel","Scourge","Seer","Sentinel","Seraph","Shaman","Sorcerer","Sorceress","Stag","Star","Starspawn","Syndicate","Tormentor","Trickster","Tyrant","Warlock","Warlord","Widow","Witch","Wizard","Worm","Wraith","Wyrm"];
+var rland = ["Acheron","Albion","Alfheim","Ankh-Morpork","Annwn","Arcadia","Arendelle","Asgard","Atlantis","Avalon","Axis Mundi","Azeroth","Barsoom","Bas-Lag","Brahmapura","Bytopia","Caipi-Taal","Camelot","Carceri","Centerra","Cimmeria","Cockaigne","Cocytus","Dis","Eden","El Dorado","Elysium","Faeria","Gehennom","Helheim","Hy-Brasil","Hyperborea","Hyrule","Illyria","Infernum","Irkalla","Jotunheim","Lankhmar","Lemuria","Limbo","Lordran","Matrix","Mictlan","Midgard","Mordor","Mu","Muspelheim","Narnia","Netherworld","Neverwhere","Niflheim","Nirvana","Oz","Pandaemonium","Pangaea","Pern","Purgatory","Quendor","Qwghlm","Shambala","Shangri-La","Sierra de la Plata","Sodom","Sokovia","Stygia","Tartarus","the Dreamlands","the Moominland","the Promised Land","the Upside Down","the Wyld","Themiscyra","Thule","Ur","Valhalla","Wonderland","Xanadu","Xanth","Xibalba","Yendor","Zion"];
 
 function newWorldName(){
  var wName = "";
@@ -699,39 +701,39 @@ function addStructure(){
    break;
 
   case 2:
-   toAdd = ["W",
-      "W",
-      "W",
-      "W",
-      "W",
-      "W",
-      "8",
-      "W",
-      "W",
-      "W",
-      "W",
-      "W",
-      "W",
-      "8",
-      "W",
-      "W",
-      "W",
-      "W",
-      "W",
-      "W"];
+   toAdd = [" W ",
+      " W ",
+      " W ",
+      " W ",
+      " W ",
+      " W ",
+      ".8.",
+      " W ",
+      " W ",
+      " W ",
+      " W ",
+      " W ",
+      " W ",
+      ".8.",
+      " W ",
+      " W ",
+      " W ",
+      " W ",
+      " W ",
+      " W "];
    break;
 
   case 3:
-   toAdd = [" ~~ ",
-      "~~~~",
-      " ~~ "];
+   toAdd = [" 66 ",
+      "6666",
+      " 66 "];
    break;
 
   case 4:
-   toAdd = [" ~~~~ ",
-      "~~~~~~",
-      "~~~~~~",
-      " ~~~~ "];
+   toAdd = [" 6666 ",
+      "666666",
+      "666666",
+      " 6666 "];
    break;
 
   case 5:
@@ -753,14 +755,13 @@ function addStructure(){
    break;
 
   case 7:
-   toAdd = ["WWWWWW..WWWWWW",
-      "WWWWWW..WWWWWW",
-      "W....W..W....W",
-      ".....8..8.....",
-      "W....W..W....W",
-      "WWWWWW..WWWWWW",
-      "WWWWWW..WWWWWW"];
-
+   toAdd = ["WWWWWWW..WWWWWWW",
+      "WW...WW..WW...WW",
+      "W.....W..W.....W",
+      ".../..8..8..0...",
+      "W.....W..W.....W",
+      "WW...WW..WW...WW",
+      "WWWWWWW..WWWWWWW"];
      break;
 
   case 8:
@@ -771,7 +772,6 @@ function addStructure(){
       "WW.WWW..WWW.WW",
       "W...W....W...W",
       "WWWWWWWWWWWWWW"];
-
      break;
 
   case 9:
@@ -780,9 +780,8 @@ function addStructure(){
       "WW......W/...W",
       "WW...W..WWWW.W",
       "WWW3WW.....W.W",
-      "W----W..W....W",
+      "W----W..W..4.W",
       "WWWWWW..WWWWWW"];
-
      break;
 
   case 10:
@@ -793,25 +792,23 @@ function addStructure(){
       "W...8....8...W",
       "W.5.WW..WW..]W",
       "WWWWWW..WWWWWW"];
-
      break;
 
   case 11:
    toAdd = ["WWWWWW..WWWWWW",
       "W............W",
       "W..WW....WW..W",
-      "..............",
+      "......66......",
       "W..WW....WW..W",
       "W............W",
       "WWWWWW..WWWWWW"];
-
      break;
 
   case 12:
    toAdd = ["WWWWWWWWWWWWWW",
       "W............W",
       "W...WWWWWW...W",
-      "^...W..1.W...^",
+      "^...W..10W...^",
       "W...W3WWWW...W",
       "W............W",
       "WWWWWWWWWWWWWW"];
@@ -824,19 +821,17 @@ function addStructure(){
       "........WWW3WW",
       "WWWWWW..WWW..W",
       "W........4...W",
-      "W...WW..WWWWWW"];
-
+      "W444WW..WWWWWW"];
      break;
 
   case 14:
    toAdd = ["..WWWW...WWW..",
       ".WWWWWW...WWW.",
-      "WWWWWWWW...WWW",
-      ".....WWWW.....",
-      "WWW...WWWWWWWW",
+      "WWWWWW33...WWW",
+      ".....3333.....",
+      "WWW...33WWWWWW",
       ".WWW...WWWWWW.",
       "..WWW...WWWW.."];
-
      break;
 
   case 15:
@@ -847,7 +842,6 @@ function addStructure(){
       "WW33WW..WW._.W",
       "W1...W..WW...W",
       "WWWWWW..WWWWWW"];
-
      break;
 
   case 16:
@@ -887,35 +881,34 @@ function addStructure(){
 
       var randTerrain = [' ','.',',','^','?','$','~','0','/','7','W','=','_',';','!','#','s','4','3'];
       for (var i = 0; i < toAdd.length; i++) {
-       toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),['.','^'][r(2)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
+       toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),randTerrain[r(randTerrain.length)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
        toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
 
        if(!r(4)) toAdd[i] = toAdd[i].replace("9","-");
        else toAdd[i] = toAdd[i].replace("9","1");
 
        toAdd[i] = toAdd[i].replace("&",randTerrain[r(randTerrain.length)]);
-       toAdd[i] = toAdd[i].replace("6",randTerrain[r(randTerrain.length)]);
        toAdd[i] = toAdd[i].replace("8",randTerrain[r(randTerrain.length)]);
       }
     break;
 
    case 18:
     toAdd = ["WWWWWWW...WWWWWWW",
-      "W~~~~~~~.~~~~~~~W",
-      "W~~~~~~~.~~~~~~~W",
-      "W~~~~~~~.~~~~~~~W",
-      "W~~~~~~...~~~~~~W",
-      "W~~~~.......~~~~W",
-      "W~~~~.......~~~~W",
-      "W~~~W.......W~~~W",
-      "W~~~.........~~~W",
-      "W~~~W.......W~~~W",
-      "W~~~~.......~~~~W",
-      "W~~~~.......~~~~W",
-      "W~~~~~~...~~~~~~W",
-      "W~~~~~~~.~~~~~~~W",
-      "W~~~~~~~.~~~~~~~W",
-      "W~~~~~~~.~~~~~~~W",
+      "W6666666.6666666W",
+      "W6666666.6666666W",
+      "W6666666.6666666W",
+      "W666666...666666W",
+      "W6666.......6666W",
+      "W6666.......6666W",
+      "W666W.......W666W",
+      "W666.........666W",
+      "W666W.......W666W",
+      "W6666.......6666W",
+      "W6666.......6666W",
+      "W666666...666666W",
+      "W6666666.6666666W",
+      "W6666666.6666666W",
+      "W6666666.6666666W",
       "WWWWWWW...WWWWWWW"];
     break;
 
@@ -948,7 +941,7 @@ function addStructure(){
       "W.WWWWWWWW",
       "W.........",
       "WWWWWWWWWW"];
-     break;
+    break;
 
    case 22:
     toAdd = ["WWW.WWW",
@@ -960,7 +953,7 @@ function addStructure(){
       "7$...$7",
       "7778777",
       "WWW.WWW"];
-     break;
+    break;
 
    case 23:
     toAdd = ["WWW.WWW",
@@ -970,7 +963,7 @@ function addStructure(){
       "W.787.W",
       "WW...WW",
       "WWW.WWW"];
-  break;
+    break;
 
    case 24:
     toAdd = ["WWW.WWW",
@@ -980,7 +973,7 @@ function addStructure(){
       "W.....W",
       "WW...WW",
       "WWW.WWW"];
- break;
+    break;
 
    case 25:
     toAdd = ["WWW.WWW",
@@ -1001,7 +994,7 @@ function addStructure(){
       "....W..W.W",
       "W...8.1W.W",
       "WW.WWWWW.W"];
-   break;
+    break;
 
    case 27:
     toAdd = ["W.WWWWWWWW",
@@ -1012,7 +1005,7 @@ function addStructure(){
       "W..WWWW..W",
       "W..../W...",
       "W..WWWWWWW"];
-   break;
+    break;
 
    case 28:
     toAdd = ["WWWW..WWWW",
@@ -1025,7 +1018,7 @@ function addStructure(){
       "W.733337.W",
       "W........W",
       "WWWW..WWWW"];
-   break;
+    break;
 
    case 29:
     toAdd = ["WWWW..WWWW",
@@ -1036,7 +1029,7 @@ function addStructure(){
       "W.WWWWWW.W",
       "W........W",
       "WWWW..WWWW"];
-   break;
+    break;
 
    case 30:
     toAdd = ["WWWWW.WW",
@@ -1046,7 +1039,7 @@ function addStructure(){
       "W8WWWWWW",
       "......0W",
       "WWWWW.WW"];
-   break;
+    break;
 
    case 31:
     toAdd = ["",
@@ -1061,7 +1054,7 @@ function addStructure(){
       "W..W...W..W",
       "W.........W",
       "WWWWW.WWWWW"];
-   break;
+    break;
 
    case 32:
     toAdd = ["WWWW.WWWW",
@@ -1073,7 +1066,7 @@ function addStructure(){
       "W.WW8WW.W",
       ".........",
       "WWWWWWWWW"];
-   break;
+    break;
 
    case 33:
     toAdd = ["WWWW.WWWW",
@@ -1087,7 +1080,7 @@ function addStructure(){
       "W.W...W.W",
       "W.......W",
       "WWWW.WWWW"];
-   break;
+    break;
 
    case 34:
     toAdd = ["WWWW.WWWW",
@@ -1099,7 +1092,7 @@ function addStructure(){
       "W.WW.WW.W",
       "W.......W",
       "WWWW.WWWW"];
-   break;
+    break;
 
    case 35:
     toAdd = ["WWWWW.WWWWW",
@@ -1156,9 +1149,9 @@ function addStructure(){
       "W.........W",
       "W.W.W.W.W.W",
       "...........",
-      "W.W.~~~.W.W",
-      "W...~~~...W",
-      "W.W.~~~.W.W",
+      "W.W.666.W.W",
+      "W...666...W",
+      "W.W.666.W.W",
       "...........",
       "W.W.W.W.W.W",
       "W.........W",
@@ -1962,6 +1955,7 @@ function addStructure(){
  // Defined here to make it consistent for each room.
  var randDanger = ['^',tileLava,wallBlock][r(3)];
  var randAnnoy = [',',tileBramble,tileSludge,tileDark][r(4)];
+ var randLiquid = [tileLava,tileSludge,tileWater][r(3)];
 
  // Mirror and flip:
  var mirrorRoom = r(2);
@@ -2020,7 +2014,9 @@ function addStructure(){
     case "5": // treasure pile
      currentMap[x+i][y+j] = tileTreasure;
      break;
-    //case "6":
+    case "6":
+     currentMap[x+i][y+j] = randLiquid;
+     break;
     case "7": // golden wall
      currentMap[x+i][y+j] = tileGoldWall;
      break;
@@ -2205,6 +2201,39 @@ function cureAll(){
  return cured;
 }
 
+function newSillyName(letter=''){
+  // Length of the name to generate:
+  var l = 2+(r(9)+r(9))/2;
+
+  var vowels = ["a","e","i","o","u","y","r","l","ae"];
+  var alphabet = ["a","b","c","ch","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","th","u","v","w","x","y","z"];
+  var next = r(2);
+  var name = letter;
+
+  // If we received the first letter, check if it's a vowel.
+  if(vowels.indexOf(letter) >= 0)
+    next = 0;
+
+  for(var i=0; i<l; i++){
+    // Alternate between vowels and all of alphabet to get roughly pronouncable name.
+    if((next % 2 == 0) && r(10))
+      name += vowels.sampleRec();
+    else
+      name += alphabet.sampleRec();
+
+    // And add some apostrophes or dashes to the mix:
+    if(i<l-2 && !r(20)){
+      if(!r(2)) name += "'";
+      else name += "-";
+    }
+
+    next++;
+  }
+
+  // Return name with capitalized first letter:
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 function checkEmpty(x,y){
  for (var i = 0; i < currCre.length; i++) {
   if(currCre[i].x==x && currCre[i].y==y) return false;
@@ -2219,7 +2248,11 @@ function playerTakeDamage(dmg,i=9999){
   ward--;
   return;
  }
- score -= Math.max(1, dmg-armor);
+ if(phased>0){ // double armour when phased
+   score -= Math.max(1, dmg-(armor*2));
+ } else {
+   score -= Math.max(1, dmg-armor);
+ }
 
  // Proc glyphs:
  if(!r(3)){
@@ -2547,17 +2580,20 @@ function moveUser(x,y){
    msg += "You find a Staff"+staves[staff]+" and equip it. It "+staffDesc[staff]+". ";
    break;
 
-  //armor enchanted/normal
+  //armor enchanted
   case tileArmor:
+   currentMap[userPos.x][userPos.y]='.';
+   armor = Math.max(r(distanceToOrigin()), parseInt(distanceToOrigin()/2));
    glyph = r(glyphs.length);
-   //fallthrough
+   msg += "You find a "+getArmorName()+" and equip it. It "+glyphDesc[glyph]+". ";
+   break;
+
+  //armor normal
   case "]":
    currentMap[userPos.x][userPos.y]='.';
    armor = Math.max(r(distanceToOrigin()), parseInt(distanceToOrigin()/2));
+   glyph = 0;
    msg += "You find a "+getArmorName()+" and equip it. ";
-
-   if(glyph)
-     msg += "It "+glyphDesc[glyph]+". ";
    break;
 
   case tileWater:
@@ -2937,9 +2973,19 @@ function displayMap(){
   displayString += outputMap[i].join("")+"<br />";
  }
 
+ // Highlight Self levels:
+ var currentSelf;
+ if(score < 50){
+   currentSelf = "<t style='background-color:#FF0000;'>"+String(score)+"</t>";
+ //} else if(score > 1000){
+ //  currentSelf = "<t color:#8B008B;'>"+String(score)+"</t>";
+ } else {
+   currentSelf = String(score);
+ }
+
  // Prepare the status lines and messages:
  var names = userName + " - " + getWorldName();
- var attributes = "Self: " + String(score) + " - Visited: " + String(visited) + " - Keys: " + String(keys) + " - Kills: " + String(kills);
+ var attributes = "Self: " + currentSelf + " - Visited: " + String(visited) + " - Keys: " + String(keys) + " - Kills: " + String(kills);
  var equipped = "Weapon: Staff" + staves[staff] + "<br />Armour: " + getArmorName() + " - Defense: "+String(armor);
  var states = ((aflame>0) ? "<t style='color:#FF4500'>Aflame</t> " : "") +
               ((blinded>0) ? "<t style='background-color:#000000; color:#FFFFFF;'>Blind</t> " : "") + // white on black
@@ -3073,6 +3119,12 @@ function initialise(){
  newMap(0,0);
  msg += "Welcome, Wanderer. "+welcome.sampleRec()+"<br />Press '?' for help. ";
  displayMap();
+
+ //DEBUG:
+ //visited = 10;
+ //armor = r(10);
+ //glyph = r(5);
+ //kills = r(20);
 }
 
 initialise();
