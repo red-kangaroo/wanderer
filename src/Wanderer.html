@@ -2432,14 +2432,16 @@ function moveUser(x,y){
   if((x != 0 || y != 0) && inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
    msg += "You conjure an orb of prismatic energy. ";
    // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
-   currCre.push({icon:"<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>*</t>",
-                 name:"<t style='color:#"+this.icon.substr(17,6)+"'>Prismatic Orb</t>",
+   var mobOrb = {icon:"<t style='color:#800080'>*</t>",
+                 name:"<t style='color:#800080'>Prismatic Orb</t>",
                  attack:"kamikazes",
                  quickness:10,
-                 x:userPos.x+x,
-                 y:userPos.y+y,
+                 x:0, y:0,
                  flags:["explode", {x:x,y:y}],
-                 behaviour:function(){
+                 behaviour: function(){
+                  // Change colour randomly:
+                  this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
+                  // Move in one direction, then explode:
                   var i = currCre.indexOf(this);
                   if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
                    doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
@@ -2448,7 +2450,11 @@ function moveUser(x,y){
                    onExplosion(i);
                   }
                   return true;
-                }});
+                 }
+                };
+   currCre.push(mobOrb);
+   currCre[currCre.length-1].x = userPos.x+x;
+   currCre[currCre.length-1].y = userPos.y+y;
   } else msg += "The conjuration fizzles. ";
 
   orb = false;
