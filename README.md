@@ -5,13 +5,13 @@
 ![Screenshot](doc/w1.png)
 </div>
 
+_There are so many worlds to explore, but only so much of you left..._
+
 A small roguelike game written in JavaScript.
 
 ### How to play
 
 Playable in browser [here](https://red-kangaroo.github.io/wanderer/ "Wanderer").
-You might wish to press `F11` to enter a full-screen mode if the game doesn't
-otherwise fit on your screen.
 
 Have fun!
 
@@ -31,7 +31,11 @@ Use Space, '.' or '5' to wait a turn.
 
 Use 'X' or '0' to invoke the powers of your magic staff, if you have one.
 
-Press '?' in game for more help.
+Use 'F11' for fullscreen mode.
+
+Use 'Ctrl +' and 'Ctrl -' to adjust the size to your liking.
+
+Press '?' in-game for more help.
 ```
 
 ### Screenshots
