@@ -1,16 +1,59 @@
 <!DOCTYPE html>
 <html class="v2" dir="ltr" lang="en">
-<h3 class='post-title entry-title' itemprop='name'>
-Wanderer v2.0
-</h3>
-<div class='post-header'>
-<div class='post-header-line-1'></div>
+<head>
+  <title>Wanderer</title>
+</head>
+
+<body>
+  <style>
+  body p,
+  input {
+  	font-family:courier, monospace;
+    /* font-size:15px; */
+    line-height: 85%;
+  }
+  code {
+    color: crimson;
+    font-weight: bold;
+    background-color: #f1f1f1;
+    padding: 2px;
+    font-size: 105%;
+  }
+  </style>
+
+<div id="game-window" style="position:relative;">
+  <p id="mapText"></p>
+  <p id="statusLine"></p>
 </div>
-<div class='post-body entry-content' id='post-body-1670331854895453085' itemprop='description articleBody'>
-<p id="mapText" style="font-family:courier; line-height: 85%;"></p>
-<p id="statusLine" style="font-family:courier; line-height: 85%;"></p>
+
+<div id="additional-info" style="position:absolute; top: 0px; right: 5px; max-width: 40%;">
+  <h3>
+    Wanderer v2.1
+  </h3>
+	<p>
+    There are so many worlds to explore, but only so much of you left...
+  </br></br>
+    Welcome, wanderer. You can check out the source code and report issues on
+    <a href="https://github.com/red-kangaroo/wanderer">GitHub</a>, or post
+    a comment on my <a href="https://attnam.blogspot.com/wanderer">blog</a>.
+    Have fun!
+  </br></br>
+    Use <code>F11</code> for fullscreen mode.
+  </br></br>
+    Use <code>Ctrl +</code> and <code>Ctrl -</code> to adjust the size
+    to your liking.
+  </br></br>
+    Press <code>?</code> for game help.
+  </p>
+
+	<!-- <form method="GET">
+	<input type="text" name="name" placeholder="Sunny Honey Bunny">
+	<input type="submit" value="Send">
+	</form> -->
+</div>
 
 <script>
+var VERSION = "v2.1"
 
 // Map gen:
 var mapWidth = 50;
@@ -396,7 +439,7 @@ function newName(){
  }
 }
 
-var aland = ["Abandoned","Aberrant","Abhorrent","Abominable","Abyssal","Accidental","Accursed","Acidous","Acrid","Actinic","Aerial","Afflicted","Akratic","Alien","Alpha","Amaranthine","Amethyst","Anarchic","Ancient","Angel","Angelic","Animalistic","Animistic","Antediluvian","Arcane","Arctic","Argent","Archaic","Arid","Artful","Ascendant","Ashen","Astral","Awoken","Axiomatic","Azure","Baleful","Banished","Barbaric","Barren","Bawdy","Beastly","Beautiful","Belligerent","Bewitched","Bizarre","Black","Blessed","Blighted","Blind","Blissful","Bloody","Blue","Boiling","Bone","Bountiful","Brave New","Brazen","Broken","Brooding","Brown","Brutal","Buried","Burning","Burnt","Calm","Cancerous","Cannibal","Capitalist","Capricious","Captivating","Carnal","Carrion","Cataclysmic","Caustic","Cavernous","Celestial","Central","Ceramic","Cerulean","Clockwise","Clockwork","Cobalt","Cold","Colourless","Communist","Conquering","Contaminated","Corpse","Corrupt","Coruscant","Cracked","Cratered","Creepy","Crenellated","Crimson","Crooked","Crown","Cruel","Cursed","Damned","Dancing","Dangerous","Dank","Dead","Deadly","Deathless","Deathly","Decaying","Deep","Deeper","Deepest","Defiant","Deformed","Demon","Demonic","Dendroid","Depraved","Deranged","Desecrated","Deserted","Desolate","Despoiled","Destroyed","Devil","Diabolic","Diamond","Dire","Diseased","Divine","Dolm","Doomed","Dormant","Draconic","Dragon","Dreadful","Dreaming","Dreary","Drowned","Dry","Dryad","Dusty","Dwarven","Dying","Earthen","Eastern","Ebon","Eldritch","Electric","Elven","Emerald","Empty","Empyrean","Enclosed","Enchanted","Enigmatic","Enlightened","Ephemeral","Epic","Errant","Eternal","Ethereal","Evening","Exalted","Experimental","Extradimansional","Fading","Failed","Fair","Fairy","Fallen","False","False’","Familiar","Fancy","Far","Faraway","Fearful","Fearless","Fearsome","Feral","Ferric","Fertile","Fetid","Fey","Fiery","Filthy","Final","Flaming","Flawed","Flayed","Floating","Flowing","Forbidden","Forgotten","Forlorn","Forsaken","Forsworn","Foul","Fractal","Fractured","Fragrant","Frail","Freakish","Frenetic","Friendly","Frigid","Frosty","Frozen","Fuligin","Fungal","Gargantuan","Gay","Ghastly","Ghostly","Ghoulish","Giant","Ginger","Glacial","Gloomy","Glowing","Gnomish","Goblin","Golden","Good","Grand","Grandiose","Gray","Great","Greater","Green","Grim","Gruesome","Guarded","Hallowed","Hanging","Harsh","Haunted","Heavenly","Hellish","Hidden","Higher","Hoary","Hollow","Holy","Homeward","Hostile","Hot","Hungry","Hypergreen","Chained","Chaotic","Chthonic","Icy","Igneous","Ill-Fated","Illustrated","Immaculate","Immortal","Imperial","Inbred","Indigo","Industrial","Infected","Infernal","Infrared","Inhuman","Insidious","Irradiated","Jagged","Jale","Joyous","Knotted","Kobold","Kraken","Lachrymose","Last","Legendary","Leper","Lesser","Leviathan","Lifeless","Little","Long","Lost","Low","Lower","Lunar","Lush","Luxurious","Macabre","Mad","Magenta","Magical","Magnificent","Machine","Majestic","Marginal","Marked","Masked","Mechanical","Mercantile","Mercurial","Metablue","Midsummer","Mighty","Miraculous","Mirror","Mirthful","Miserable","Misty","Molten","Monster","Monstrous","Morning","Mouldy","Mournful","Mutant","Mysterious","Mystic","Narrow","Nascent","Negative","Nether","Ninth","Noble","Nocturnal","Nomadic","Northern","Noxious","Nuclear","Occidental","Occult","Octarine","Ogrish","Old","Omega","Orange","Orcish","Organic","Oriental","Ornery","Orthodox","Other","Overgrown","Pale","Pallid","Penitent","Peregrine","Perilous","Petrified","Phallic","Phasic","Phoenix","Pink","Pious","Plagued","Pleasant","Poisoned","Potent","Praised","Prehistoric","Primitive","Primordial","Prismatic","Pristine","Profane","Promiscuous","Pure","Purple","Putrescent","Putrid","Quiet","Radiant","Rambunctious","Rampant","Rapt","Ravaged","Ravenous","Ravished","Red","Reforged","Regal","Resplendent","Revenant","Rich","Rising","Rocky","Rotting","Royal","Ruby","Ruined","Runic","Sacred","Sanguine","Savage","Scandalous","Scarlet","Scarred","Scorched","Screaming","Sealed","Searing","Secret","Sentient","Serene","Serpent","Serpentine","Seventh","Shadowed","Shattered","Shifting","Shrouded","Sidereal","Silent","Sinful","Singing","Sinking","Sinuous","Skeletal","Skeleton","Skull","Sleeping","Snowy","Solar","Southern","Spectral","Spirit","Steampunk","Sterile","Stinking","Strange","Succulent","Sunken","Supernatural","Supreme","Tattered","Tepid","Terrestrial","Third","Thirteenth","Titanic","Torturous","Toxic","Tranquil","Transdimensional","Tribal","Trollish","Troubled","Turbulent","Twin","Twisted","Ugly","Ulfire","Ultraviolet","Unabashed","Unborn","Unconquered","Undying","Unholy","Unchained","Uncharted","Unicorn","Unknown","Unmapped","Unnamed","Unnatural","Unstable","Untamed","Upper","Vampire","Veiled","Vermillion","Very Small","Vibrant","Vicious","Vile","Villainous","Violet","Virgin","Viridian","Volcanic","Voltaic","Wandering","Warded","Warm","Warped","War-Torn","Wasting","Watery","Wayward","Wealthy","Weeping","Weird","Western","Whispering","White","Wicked","Wild","Winded","Windy","Withered","Witching","Wooded","Worm","Worthless","Wraith","Wretched","Wyrm","Xanthous","Xeric","Yawning","Yellow","Zombie"];
+var aland = ["Abandoned","Aberrant","Abhorrent","Abominable","Abyssal","Accidental","Accursed","Acidous","Acrid","Actinic","Aerial","Afflicted","Akratic","Alien","Alpha","Amaranthine","Amethyst","Anarchic","Ancient","Angel","Angelic","Animalistic","Animistic","Antediluvian","Arcane","Arctic","Argent","Archaic","Arid","Artful","Ascendant","Ashen","Astral","Awoken","Axiomatic","Azure","Baleful","Banished","Barbaric","Barren","Bawdy","Beastly","Beautiful","Belligerent","Bewitched","Bizarre","Black","Blessed","Blighted","Blind","Blissful","Bloody","Blue","Boiling","Bone","Bountiful","Brave New","Brazen","Broken","Brooding","Brown","Brutal","Buried","Burning","Burnt","Calm","Cancerous","Cannibal","Capitalist","Capricious","Captivating","Carnal","Carrion","Cataclysmic","Caustic","Cavernous","Celestial","Central","Ceramic","Cerulean","Clockwise","Clockwork","Cobalt","Cold","Colourless","Communist","Conquering","Contaminated","Corpse","Corrupt","Coruscant","Cracked","Cratered","Creepy","Crenellated","Crimson","Crooked","Crown","Cruel","Cursed","Damned","Dancing","Dangerous","Dank","Dead","Deadly","Deathless","Deathly","Decaying","Deep","Deeper","Deepest","Defiant","Deformed","Demon","Demonic","Dendroid","Depraved","Deranged","Desecrated","Deserted","Desolate","Despoiled","Destroyed","Devil","Diabolic","Diamond","Dire","Diseased","Divine","Dolm","Doomed","Dormant","Draconic","Dragon","Dreadful","Dreaming","Dreary","Drowned","Dry","Dryad","Dusty","Dwarven","Dying","Earthen","Eastern","Ebon","Eldritch","Electric","Elven","Emerald","Empty","Empyrean","Enclosed","Enchanted","Enigmatic","Enlightened","Ephemeral","Epic","Errant","Eternal","Ethereal","Evening","Exalted","Experimental","Extradimansional","Fading","Failed","Fair","Fairy","Fallen","False","Familiar","Fancy","Far","Faraway","Fearful","Fearless","Fearsome","Feral","Ferric","Fertile","Fetid","Fey","Fiery","Filthy","Final","Flaming","Flawed","Flayed","Floating","Flowing","Forbidden","Forgotten","Forlorn","Forsaken","Forsworn","Foul","Fractal","Fractured","Fragrant","Frail","Freakish","Frenetic","Friendly","Frigid","Frosty","Frozen","Fuligin","Fungal","Gargantuan","Gay","Ghastly","Ghostly","Ghoulish","Giant","Ginger","Glacial","Gloomy","Glowing","Gnomish","Goblin","Golden","Good","Grand","Grandiose","Gray","Great","Greater","Green","Grim","Gruesome","Guarded","Hallowed","Hanging","Harsh","Haunted","Heavenly","Hellish","Hidden","Higher","Hoary","Hollow","Holy","Homeward","Hostile","Hot","Hungry","Hypergreen","Chained","Chaotic","Chthonic","Icy","Igneous","Ill-Fated","Illustrated","Immaculate","Immortal","Imperial","Inbred","Indigo","Industrial","Infected","Infernal","Infrared","Inhuman","Insidious","Irradiated","Jagged","Jale","Joyous","Knotted","Kobold","Kraken","Lachrymose","Last","Legendary","Leper","Lesser","Leviathan","Lifeless","Little","Long","Lost","Low","Lower","Lunar","Lush","Luxurious","Macabre","Mad","Magenta","Magical","Magnificent","Machine","Majestic","Marginal","Marked","Masked","Mechanical","Mercantile","Mercurial","Metablue","Midsummer","Mighty","Miraculous","Mirror","Mirthful","Miserable","Misty","Molten","Monster","Monstrous","Morning","Mouldy","Mournful","Mutant","Mysterious","Mystic","Narrow","Nascent","Negative","Nether","Ninth","Noble","Nocturnal","Nomadic","Northern","Noxious","Nuclear","Occidental","Occult","Octarine","Ogrish","Old","Omega","Orange","Orcish","Organic","Oriental","Ornery","Orthodox","Other","Overgrown","Pale","Pallid","Penitent","Peregrine","Perilous","Petrified","Phallic","Phasic","Phoenix","Pink","Pious","Plagued","Pleasant","Poisoned","Potent","Praised","Prehistoric","Primitive","Primordial","Prismatic","Pristine","Profane","Promiscuous","Pure","Purple","Putrescent","Putrid","Quiet","Radiant","Rambunctious","Rampant","Rapt","Ravaged","Ravenous","Ravished","Red","Reforged","Regal","Resplendent","Revenant","Rich","Rising","Rocky","Rotting","Royal","Ruby","Ruined","Runic","Sacred","Sanguine","Savage","Scandalous","Scarlet","Scarred","Scorched","Screaming","Sealed","Searing","Secret","Sentient","Serene","Serpent","Serpentine","Seventh","Shadowed","Shattered","Shifting","Shrouded","Sidereal","Silent","Sinful","Singing","Sinking","Sinuous","Skeletal","Skeleton","Skull","Sleeping","Snowy","Solar","Southern","Spectral","Spirit","Steampunk","Sterile","Stinking","Strange","Succulent","Sunken","Supernatural","Supreme","Tattered","Tepid","Terrestrial","Third","Thirteenth","Titanic","Torturous","Toxic","Tranquil","Transdimensional","Tribal","Trollish","Troubled","Turbulent","Twin","Twisted","Ugly","Ulfire","Ultraviolet","Unabashed","Unborn","Unconquered","Undying","Unholy","Unchained","Uncharted","Unicorn","Unknown","Unmapped","Unnamed","Unnatural","Unstable","Untamed","Upper","Vampire","Veiled","Vermillion","Very Small","Vibrant","Vicious","Vile","Villainous","Violet","Virgin","Viridian","Volcanic","Voltaic","Wandering","Warded","Warm","Warped","War-Torn","Wasting","Watery","Wayward","Wealthy","Weeping","Weird","Western","Whispering","White","Wicked","Wild","Winded","Windy","Withered","Witching","Wooded","Worm","Worthless","Wraith","Wretched","Wyrm","Xanthous","Xeric","Yawning","Yellow","Zombie"];
 var pland = ["Adamant","Adventure","Alabaster","Amber","Apocalypse","Ash","Asphalt","Autumn","Bark","Beer","Blood","Brass","Briar","Brimstone","Bronze","Cinder","Cinnamon","Clay","Coal","Concrete","Copper","Coral","Crystal","Dark","Dawn","Deer","Dusk","East","Ember","Evil","Flame","Flint","Fog","Fossil","Glass","God","Gold","Gossamer","Grass","Honey","Chaos","Chrome","Ice","Iron","Ivory","Jade","Lichen","Magic","Malachite","Mandrake","Marble","Mead","Meat","Metal","Midnight","Milk","Mithril","Moss","Mourning","Mud","Mystery","Nephrite","Night","Nightmare","Noon","North","Obsidian","Onyx","Ooze","Opal","Pepper","Plastic","Platinum","Porcelain","Prism","Quicksilver","Rainbow","Rime","Rust","Saffron","Salt","Sand","Sap","Seaweed","Shadow","Sheep","Silk","Silver","Skin","Sky","Slime","Sludge","Snow","Soap","South","Spring","Steam","Steel","Stone","Sugar","Sulphur","Summer","Sweat","Throne","Trash","Treasure","Undead","Verdigris","Vinegar","Wax","West","Wine","Winter"];
 var nland = ["Abyss","Academy","Badlands","Barony","Barrows","Bastion","Battlefield","Beach","Bog","Borderlands","Borough","Bulwark","Burrow","Caldera","Caliphate","Camp","Canton","Canyon","Castle","Catacombs","Cathedral","Cave","Cavern","Caverns","Caves","Cemetery","Citadel","City","Clearing","Cliffs","Cloister","Coast","Colony","Country","County","Court","Cove","Crater","Crossroads","Crypt","Dale","Deeps","Dell","Demesne","Den","Depths","Desert","Desolation","Dimension","District","Domain","Dunes","Dungeon","Dystopia","Earldom","Edge","Emirate","Empire","Estate","Exarchate","Expanse","Eyrie","Factory","Fen","Fiefdom","Field","Fields","Fissures","Fjord","Forest","Fort","Fortress","Freehold","Gaol","Garden","Glade","Glen","Gorge","Grassland","Graveyard","Grotto","Grounds","Gulch","Halls","Hamlet","Haven","Heaven","Hell","Highlands","Hillocks","Hills","Hive","Holdings","Hollow","Chambers","Channels","Chasm","Jungle","Keep","Kingdom","Laboratory","Labyrinth","Lair","Land","League","Library","Lowlands","Manse","March","Marsh","Marshland","Mausoleum","Maze","Meadow","Mine","Mines","Monastery","Moor","Mountain","Necropolis","Nest","Nexus","Oasis","Ossuary","Oubliette","Outlands","Palace","Paradise","Parish","Pass","Pastures","Paths","Pit","Pits","Place","Plain","Plains","Plane","Plateau","Prairie","Precinct","Prefecture","Prison","Protectorate","Province","Pyramid","Quagmire","Rampart","Ravine","Reach","Reaches","Realm","Refuge","Region","Reich","Retreat","Rift","Road","Ruins","Sanctuary","Sanctum","Savanna","Sea","Sepulcher","Sewers","Shire","Shrine","Springs","State","Steppe","Stronghold","Sultanate","Swamp","Taiga","Temple","Territory","Tomb","Towers","Town","Trenches","Tundra","Tunnels","Underground","Underworld","Utopia","Vale","Valley","Vault","Vineyard","Volcano","Warrens","Wasteland","Wastes","Wetland","Wild","Wilderness","Wilds","Wood","Woods","World","Ziggurat"];
 var lland = ["Abortion","Adversity","Afflictions","Agony","Air","Alcohol","Alchemy","Angels","Anger","Anguish","Annihilation","Anomalies","Answers","Anxiety","Apes","Apotheosis","Apparitions","Architecture","Arson","Art","Artifice","Ascension","Ashes","Aspirations","Avarice","Baboons","Bandits","Banners","Baubles","Bears","Beasts","Bee-Eaters","Bees","Beggars","Bells","Berries","Berserks","Birds","Blades","Bliss","Blizzards","Bloodlust","Bloodshed","Boars","Bodies","Bogeymen","Bondage","Bones","Books","Boulders","Brambles","Bravery","Bread","Buffalos","Butterflies","Cacophony","Cactae","Cakes","Camels","Cancer","Candles","Candy","Carnage","Catastrophes","Cats","Cattle","Cauldron","Celebration","Centaurs","Claws","Clergy","Clocks","Clones","Clowns","Colossi","Compassion","Conquest","Contempt","Crabs","Crates","Crime","Crocodiles","Crows","Crucible","Crucifixion","Curses","Darkness","Daughters","Death","Decay","Deception","Deicide","Delight","Delirium","Delusion","Dementia","Demise","Demons","Depression","Desires","Despair","Desperation","Destiny","Destruction","Devolution","Dew","Diligence","Dinosaurs","Disasters","Discord","Diseases","Domes","Doom","Dragons","Dread","Drizzle","Drugs","Ducks","Duck-Sized Horses","Dust","Duty","Dwarves","Earth","Earthquake","Ectoplasm","Echoes","Elephants","Elves","Endings","Ennui","Envy","Essence","Eternity","Etiquette","Eunuchs","Exorcism","Explosions","Eyes","Fables","Fae","Failure","Fairies","Faith","Famine","Fangs","Fata Morgana","Fate","Fathers","Fear","Feasts","Feathers","Festivities","Fire","Fish","Flesh","Flotsam","Flowers","Forges","Forgiveness","Fortune","Freaks","Freedom","Fright","Frogs","Fruit","Funerals","Fungi","Furniture","Gambling","Garbage","Gardens","Gates","Gems","Genesis","Ghosts","Ghouls","Giants","Glory","Gluttony","Goblins","Golems","Gossip","Grace","Grandfathers","Grandmothers","Grapes","Gratitude","Graves","Greed","Growth","Hallucinations","Hammers","Harmony","Hatred","Haunts","Hazards","Healing","Hearts","Hellfire","Heresy","Heroes","Heroics","Herrings","Honour","Hope","Horrors","Horses","Horse-Sized Ducks","Hymns","Chains","Chants","Charity","Chastity","Cheese","Chickens","Chimneys","Chocolate","Idols","Ills","Illusions","Imagination","Imps","Incest","Ink","Insanity","Insects","Intimacy","Invaders","Jaywalking","Jesters","Jewels","Journeys","Joy","Keys","Knights","Knives","Koans","Kobolds","Kung Fu","Lakes","Lamentation","Lamentations","Lances","Lava","Leeches","Legends","Lemmings","Liars","Liberty","Lice","Lies","Life","Light","Lightning","Limbs","Lions","Lizard Kings","Lizards","Locks","Loot","Lords","Lore","Loss","Love","Lovers","Lust","Madness","Magma","Magpies","Maids","Maladies","Mana","Masochism","Mathematics","Melancholy","Memories","Mercury","Mercy","Mermaids","Mice","Might","Mildew","Mirrors","Mirth","Misery","Misfortune","Mist","Mockery","Monkeys","Monsters","Monuments","Moon","Mothers","Mucus","Murder","Muses","Mushrooms","Music","Mutants","Myths","Narwhals","Nature","Nausea","Needles","Nobility","Noise","Nymphs","Obelisks","Obliteration","Oblivion","Occultism","Octopi","Ogres","Olm","Orcs","Ordeals","Outlaws","Owls","Oysters","Pacifism","Pacts","Pain","Panthers","Parrots","Passion","Patience","Peace","Peacocks","Pearls","Penance","Penguins","Perdition","Peril","Perversion","Pestilence","Phantoms","Philosophy","Pigeons","Pillars","Pirates","Pitchforks","Plague","Plants","Plenty","Poetry","Power","Powers","Predators","Pretence","Pride","Promises","Prophecy","Prosperity","Protection","Providence","Puissance","Punishment","Purity","Pus","Putrescence","Pygmies","Pyres","Questions","Quests","Raiders","Rain","Rats","Ravens","Reason","Rebels","Rebirth","Reflections","Regret","Reincarnation","Remorse","Responsibility","Rest","Revelations","Rhythm","Riches","Rituals","Rivers","Roses","Rot","Sacrifice","Sadism","Saliva","Scorn","Scrap","Screams","Secrets","Serenity","Serpents","Servitude","Sex","Shame","Sharks","Shields","Ships","Sickness","Silence","Simulacra","Sin","Sins","Skulduggery","Skulls","Slaughter","Slavery","Sleep","Sloth","Slumber","Smoke","Snakes","Soldiers","Sons","Soot","Sorcerers","Sorcery","Sorrow","Souls","Spears","Spices","Spiders","Spirals","Spires","Spirits","Spoons","Squids","Stars","Statues","Staves","Storms","Strength","Strife","Succour","Suffering","Sun","Sunlight","Swans","Sweat","Swords","Sympathy","Taboos","Tea","Tears","Teatime","Teeth","Temperance","Temptation","Tentacles","Terror","Thieves","Thorns","Thoughts","Thunder","Tides","Tigers","Timber","Time","Titans","Tongues","Torment","Tornados","Torture","Tragedy","Traitors","Traps","Travels","Travesty","Treason","Trees","Trials","Trombones","Trouble","Trust","Truth","Tumult","Turnips","Turtles","Twilight","Underwear","Unicorns","Unrest","Urns","Valour","Vengeance","Vermin","Voices","Void","Vultures","Wands","War","Warlocks","Warmth","Wasps","Water","Wealth","Weapons","Weed","Werewolves","Whales","Whispers","Whores","Winds","Wisdom","Wizards","Woe","Wolves","Women","Wonder","Wood","Worms","Wrath","Wyrms","Wyverns"];
@@ -2946,7 +2989,7 @@ function getFinalScore(){
  var winner = (Math.max(score, 0) / 10) + ((visited-1) * 5) + (kills * 5) + (keys * 20) + (armor * 10);
  if(staff!=0) winner *= 1.1;
  if(glyph!=0) winner *= 1.1;
- return parseInt(winner);
+ return "<t style='color:#8B008B; font-weight: bold;'>"+String(parseInt(winner))+"</t>";
 }
 
 function displayMap(){
@@ -2975,10 +3018,12 @@ function displayMap(){
 
  // Highlight Self levels:
  var currentSelf;
- if(score < 50){
-   currentSelf = "<t style='background-color:#FF0000;'>"+String(score)+"</t>";
- //} else if(score > 1000){
- //  currentSelf = "<t color:#8B008B;'>"+String(score)+"</t>";
+ if(score <= 0) {
+   currentSelf = "<t style='background-color:#FF0000; padding: 1px;'>Gone</t>";
+ } else if(score < 50) {
+   currentSelf = "<t style='background-color:#FF0000; padding: 1px;'>"+String(score)+"</t>";
+ } else if(score > 1000){
+  currentSelf = "<t style='color:#8B008B; font-weight: bold;'>"+String(score)+"</t>";
  } else {
    currentSelf = String(score);
  }
@@ -3039,7 +3084,7 @@ document.onkeydown = function(e) {
          break;
         case 188://?
          // Open a help window.
-         alert("Wanderer\n\nUse arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\nUse 'X' or '0' to invoke the powers of your magic staff.\nGather the '$' memories of your life, or you may fade away before you reach your closure.");
+         alert("Wanderer "+VERSION+"\n\nUse arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\nUse 'X' or '0' to invoke the powers of your magic staff.\nGather the '$' memories of your life, or you may fade away before you reach your closure.");
          break;
     }
 };
@@ -3111,7 +3156,8 @@ function initialise(){
                 "Have you lost your way?",
                 "Their blood shall purify you.",
                 "Your journey's end awaits in the distance.",
-                "Nourish your Self or fade to oblivion."];
+                "Nourish your Self or fade to oblivion.",
+                "You might never be the same again..."];
 
  // Init game:
  addUser();
@@ -3121,6 +3167,7 @@ function initialise(){
  displayMap();
 
  //DEBUG:
+ //score = 1100;
  //visited = 10;
  //armor = r(10);
  //glyph = r(5);
@@ -3130,4 +3177,5 @@ function initialise(){
 initialise();
 
 </script>
+</body>
 </html>

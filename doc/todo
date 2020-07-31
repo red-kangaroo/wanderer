@@ -7,8 +7,8 @@ readme
 * preview:
    https://jbt.github.io/markdown-editor/
 
-* GitHub page where it can be played?
-* maybe once on GitHub page, add short description and link to the right of the game
+* fun colors for armor/staff names
+* add <code></code> around instruction messages? (eg. Press '?', etc.)
 
 * when copying tiles for display, set boss floor and spawn extra monsters each turn on boss floor??
 * spawn extra monsters on .
@@ -55,6 +55,3 @@ Amulet of Yendor
 Orb of Zot
 Eye of Larn
 Ring of Ananias
-
-* random win texts:
-You might never be the same again, but xx
