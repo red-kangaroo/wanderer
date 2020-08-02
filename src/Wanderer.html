@@ -35,7 +35,7 @@
   </br></br>
     Welcome, wanderer. You can check out the source code and report issues on
     <a href="https://github.com/red-kangaroo/wanderer">GitHub</a>, or post
-    a comment on my <a href="https://attnam.blogspot.com/wanderer">blog</a>.
+    a comment on my <a href="https://attnam.blogspot.com/2020/08/wanderer.html">blog</a>.
     Have fun!
   </br></br>
     Use <code>F11</code> for fullscreen mode.
@@ -53,7 +53,7 @@
 </div>
 
 <script>
-var VERSION = "v2.1"
+var VERSION = "v2.1";
 
 // Map gen:
 var mapWidth = 50;
@@ -69,6 +69,7 @@ var userName = "Nobody";
 var haveWon = false;
 
 var score = 100; // AKA energy, life, self
+var turn = 0;
 var visited = 0;
 var keys = 0;
 var kills = 0;
@@ -123,14 +124,15 @@ var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
 var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
 var tileTreasure = "<t style='color:#800080'>&#167;</t>";
 var tileBramble = "<t style='color:#32CD32'>!</t>";
+var tileNettles = "<t style='color:#FF0000'>!</t>";
 var tileGrassTall = "<t style='color:#32CD32'>;</t>";
 var tileGrassShort = "<t style='color:#32CD32'>.</t>";
 //var tileMacGuffin = "<t style='color:#FF00FF'>&#9959;</t>"; maybe use as summoning circle?
 var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
 var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
 
-var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,tileBramble];
-var rareTerrain = ['/','0',tileKey,'_',']',tileSludge];
+var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles]];
+var rareTerrain = ['/','0',tileKey,'_',']',[tileSludge,tileDark]];
 var impassable = [wallBlock,tileGoldWall,tileDoor];
 
 var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".split('');
@@ -505,7 +507,8 @@ function getHint(says=""){
              "Was it worth it?",
              "You cannot fix it anymore.",
              "Why did you do it?",
-             "Why them?"];
+             "Why them?",
+             "Find the levers, once you are truly yourself..."];
 
  var compass = ["north","south","east","west"];
  var adj = ["mysterious","strange","rasping","barely audible","faint","familiar","unfamiliar","inhuman"];
@@ -552,12 +555,12 @@ function generateMap(){
    // add terrain
    if (currentMap[i][j]!=wallBlock){
     if (!r(1000) && r(distanceToOrigin())) {
-     currentMap[i][j] = rareTerrain[r(rareTerrain.length)];
+     currentMap[i][j] = rareTerrain.sampleRec();
     }
     //else if(!r(Math.max(30-distanceToOrigin()))) {
     else if(!r(Math.max(Math.abs(25-distanceToOrigin()), 4)) || chanceTerrain) {
      // Terrain chance dependant on distanceToOrigin, first increases, but then decreases as we get too far.
-     currentMap[i][j] = terrain[r(terrain.length)];
+     currentMap[i][j] = terrain.sampleRec();
     }
     else currentMap[i][j] = emptyBlock;
    }
@@ -641,13 +644,14 @@ function addLake(){
  var liquid = emptyBlock; // Just to make sure we don't accidentaly make undefined lake.
  if(r(visited)>20) liquid = tileLava;
  else {
-  switch(r(10)){
+  switch(r(12)){
    default: liquid = tileWater; break;
    case 0: liquid = ','; break;
    case 1: liquid = tileGrassTall; break;
    case 2: liquid = tileBramble; break;
-   case 3: liquid = tileSludge; break;
-   case 4: liquid = tileDark; break;
+   case 3: liquid = tileNettles; break;
+   case 4: liquid = tileSludge; break;
+   case 5: liquid = tileDark; break;
   }
  }
 
@@ -1997,7 +2001,7 @@ function addStructure(){
 
  // Defined here to make it consistent for each room.
  var randDanger = ['^',tileLava,wallBlock][r(3)];
- var randAnnoy = [',',tileBramble,tileSludge,tileDark][r(4)];
+ var randAnnoy = [',',tileBramble,tileSludge,tileDark,tileNettles][r(5)];
  var randLiquid = [tileLava,tileSludge,tileWater][r(3)];
 
  // Mirror and flip:
@@ -2135,6 +2139,8 @@ function fixEntry(a,b, showBlue){
    }
    if(!inRange(escapePath)) break;
   }
+  if(showBlue)
+    msg += "You discover a secret path. ";
  }
 }
 
@@ -2385,8 +2391,9 @@ function semiModulo(a,b){
 
 // Main loop
 function moveUser(x,y){
+ // Do nothing but display win message if the player already won:
  if(haveWon){
-  msg = "<t style='color:#FF1493'>You win!</t><br />Your final score is "+getFinalScore()+". Maybe there is a meaning to everything, after all.<br />Press 'F5' to play again.";
+  msg = "<t style='color:#FF1493'>You win!</t><br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Maybe there is a meaning to everything, after all.<br />Press 'F5' to play again.";
   displayMap();
   return;
  }
@@ -2421,7 +2428,7 @@ function moveUser(x,y){
    msg += "Your Staff"+staves[staff]+" shatters in a wave of life-giving energy. You feel reinvigorated. ";
    staff = 0;
   }else{
-   msg = "You fade away...<br />Your final score is "+getFinalScore()+". Better luck next life!<br />Press 'F5' to play again.";
+   msg = "You fade away...<br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Better luck next life!<br />Press 'F5' to play again.";
    displayMap();
    return;
   }
@@ -2551,6 +2558,15 @@ function moveUser(x,y){
     case 3:
      msg += "Something stinky and sticky covers your face. ";
      blinded += r(10)+1;
+     break;
+
+    case 4:
+     msg += "You are surrounded by noxious gas. ";
+     if(glyph != 3){
+       if(panicked==0)
+         msg += "You panic! ";
+       panicked += 5+r(6)+r(6)+r(6);
+     }
      break;
 
     default:
@@ -2689,8 +2705,18 @@ function moveUser(x,y){
 
   case tileBramble:
    msg += "You tear through the bramble. ";
-   playerTakeDamage(r(4)+1);
+   playerTakeDamage(r(6)+2);
    currentMap[userPos.x][userPos.y]=tileGrassShort;
+   break;
+
+  case tileNettles:
+   msg += "You trample the dread nettles. ";
+   if(glyph != 3){
+     if(panicked==0)
+       msg += "You panic! ";
+     panicked += r(10)+visited;
+   }
+   currentMap[userPos.x][userPos.y]=emptyBlock;
    break;
 
   case "_":
@@ -2750,6 +2776,7 @@ function moveUser(x,y){
  if((msg == "") && !r(100))
    getHint();
 
+ turn++;
  displayMap();
 }
 

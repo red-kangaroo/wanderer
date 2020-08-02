@@ -2,7 +2,7 @@ Wander/Wonder
 $5^?/0-89];_
 =!#s
 
-readme
+README
 * story/very short lore?
 * preview:
    https://jbt.github.io/markdown-editor/
@@ -10,6 +10,10 @@ readme
 * fun colors for armor/staff names
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 
+* online scoreboard
+   https://stackoverflow.com/questions/31655085/database-on-a-personal-github-page
+
+* persistent messages
 * when copying tiles for display, set boss floor and spawn extra monsters each turn on boss floor??
 * spawn extra monsters on .
 
@@ -21,10 +25,14 @@ readme
   time mastery (randomly/on damage time stop)
   sunlight (once darkness is in, increases sight radius)
 
+* orbs: one use step-on features with powerful effects
+  * only in rooms, signs '1' around them explain their effect
+  alternate reality - regens map
+
 * new generators
    r(1000)<visited: map is maze level
    r(100) <disttoorigin: map is dark level (add simple FOV)
-
+* maybe refactor maps into worldData struct with map, name + other future stuff
 * maybe more decorations based on name?
    forest display wall as 48|
    deserts with sand?
