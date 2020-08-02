@@ -76,8 +76,8 @@ var kills = 0;
 
 var staff = 0;
 var staves = [""," of Ethereal Paths"," of Frozen Time"," of Secret Paths"," of Life Triumphant"," of Vorpal Sharpness"," of Soaring Leap"," of Conjuration"];
-var staffDesc = ["lacks any and all magical powers, unfortunately",
-                 "may open ephemeral bridges to faraway distances",
+var staffDesc = ["can support your step and whack your enemies, but lacks any and all magical powers, unfortunately",
+                 "may open ephemeral bridges to faraway locations",
                  "can momentarily remove you from the flow of time, rendering all monsters and mechanisms frozen and unable to affect you",
                  "may reveal concealed corridors and crevices in nearby walls",
                  "can cleanse your body of all ills, or even save your life",
@@ -2577,8 +2577,9 @@ function moveUser(x,y){
    break;
 
   case '?': //random fun
-   currentMap[userPos.x][userPos.y]=['$','^',','][r(3)];
    if(!r(100)) currentMap[userPos.x][userPos.y]=['0','_','/',tileKey,']'][r(5)];
+   else if(!r(100)) currentMap[userPos.x][userPos.y]=[tileArmor,tileStaff][r(2)];
+   else currentMap[userPos.x][userPos.y]=['$','^',','][r(3)];
    msg += "You investigate the mysterious pile. ";
    break;
 
@@ -3052,7 +3053,7 @@ function displayMap(){
  // Highlight Self levels:
  var currentSelf;
  if(score <= 0) {
-   currentSelf = "<t style='background-color:#FF0000; padding: 1px;'>Gone</t>";
+   currentSelf = "<t style='color:#FF0000; font-weight: bold;'>faded</t>";
  } else if(score < 50) {
    currentSelf = "<t style='background-color:#FF0000; padding: 1px;'>"+String(score)+"</t>";
  } else if(score > 1000){
@@ -3116,6 +3117,7 @@ document.onkeydown = function(e) {
          useStaff();
          break;
         case 188://?
+        case 191:// An alternate question mark code, apparently.
          // Open a help window.
          alert("Wanderer "+VERSION+"\n\nUse arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\nUse 'X' or '0' to invoke the powers of your magic staff.\nGather the '$' memories of your life, or you may fade away before you reach your closure.");
          break;
