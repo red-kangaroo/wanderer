@@ -2250,7 +2250,7 @@ function useStaff(){
    msg += "Where would you like to direct them? ";
    break;
  }
- //TODO: Somehow take a turn?
+ // Do not take a turn, or staves of Conjuration and Soaring Leap will be broken.
  displayMap();
 }
 
@@ -2498,7 +2498,11 @@ function moveUser(x,y){
    currCre.push(mobOrb);
    currCre[currCre.length-1].x = userPos.x+x;
    currCre[currCre.length-1].y = userPos.y+y;
-  } else msg += "The conjuration fizzles. ";
+  } else {
+    msg += "The conjuration fizzles. ";
+    // Refund cost of unused magic:
+    score += 10;
+  }
 
   orb = false;
  } else {
@@ -2506,15 +2510,22 @@ function moveUser(x,y){
   if(leap){
    // Move player in direction until blocked.
    var leaped = 0;
-   while(inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
-    userPos.x += x;
-    userPos.y += y;
-    leaped += 1;
+   if(x!=0 || y!=0){
+     // Don't jump in place forever. ;)
+     while(inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
+      userPos.x += x;
+      userPos.y += y;
+      leaped += 1;
+     }
    }
 
    if(leaped>1) msg += "You leap! ";
    else if(leaped==1) msg += "You jump. ";
-   else msg += "You balk at the leap. ";
+   else {
+     msg += "You balk at the leap. ";
+     // Refund cost of unused magic:
+     score += 10;
+   }
 
    leap = false;
   } // Fallthrough to normal movement, so that the player can enter new map/attack with a leap.
