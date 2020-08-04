@@ -86,21 +86,25 @@ var staffDesc = ["can support your step and whack your enemies, but lacks any an
                  "can materialize the volatile energies of raw magic",];
 
 var armor = 0;
-var armors = ["Green Tunic","Fur Cloak","Padded Jacket","Leather Jacket","Leather Armour","Quilted Leather Armour","Studded Leather Armour","Chitin Cuirass","Brigandine","Chain Shirt","Bulletproof Vest","Scale Mail","Ironbark Breastplate","Chain Mail","Hauberk","Ring Mail","Banded Armour","Splint Mail","Half Plate Mail","Mithril Chain Mail","Full Plate Mail","Crystal Shard Mail","Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail","Solid Gold Armour","Crystal Plate Mail","Nemean Lion Hide","Adamantine Armour","Powered Armour"];
+var armors = ["<t style='color:#228B22'>Green Tunic</t>",
+              "<t style='color:#696969'>Fur</t> <t style='color:#8B4513'>Cloak</t>",
+              "Padded Jacket","Leather Jacket","Leather Armour","Quilted Leather Armour","Studded Leather Armour","Chitin Cuirass","Brigandine","Chain Shirt","Bulletproof Vest","Scale Mail","Ironbark Breastplate","Chain Mail","Hauberk","Ring Mail","Banded Armour","Splint Mail","Magic Cloak","Half Plate Mail","Mithril Chain Mail","Full Plate Mail","Crystal Shard Mail","Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail","Solid Gold Armour","Crystal Plate Mail","Nemean Lion Hide","Adamantine Armour","Powered Armour"];
 var glyph = 0;
-var glyphs = [""," of Brimstone"," of Cleansing Waters"," of Mortal Terror"," of Ethereal Escape"," of Bloody Retribution"," of Invulnerability"," of Shadowy Escape"];
+var glyphs = [""," of Brimstone"," of Cleansing Waters"," of Mortal Terror"," of Ethereal Escape"," of Retribution"," of Invulnerability"," of Shadowy Escape"," of the Blood Knight"];
 var glyphDesc = ["will dull the blows of your enemies",
                  "shall nourish your Self when fed radiant, everburning fire",
                  "will let you wash away your ailments",
                  "shall strike fear in your foes",
-                 "may provide an ephemeral bridge away from any peril",
+                 "may provide an ephemeral bridge away from peril",
                  "will make you answer violence with violence",
                  "can shield you from harm",
-                 "may shroud you in intangible shadows",];
+                 "may shroud you in intangible shadows",
+                 "will make you hunger for the lifeblood of your foes",];
 
 // Status effects:
 var aflame = 0;
 var blinded = 0;
+var bloodied = 0;
 var phased = 0;
 var panicked = 0;
 var poisoned = 0;
@@ -116,6 +120,7 @@ var wallBlock = '&#9608;';
 var tileWater = "<t style='background-color:#1E90FF'>~</t>";
 var tileLava = "<t style='background-color:#FF4500'>~</t>";
 var tileSludge = "<t style='background-color:#00FF00'>~</t>";
+var tileBlood = "<t style='background-color:#8A0303'>~</t>";
 var tileDark = "<t style='color:#696969'>#</t>";
 var tileKey = "<t style='color:#800080'>9</t>";
 var tileArmor = "<t style='color:#800080'>]</t>"; //enchanted armor, normal is just ']'
@@ -124,27 +129,29 @@ var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
 var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
 var tileTreasure = "<t style='color:#800080'>&#167;</t>";
 var tileBramble = "<t style='color:#32CD32'>!</t>";
-var tileNettles = "<t style='color:#FF0000'>!</t>";
+var tileNettles = "<t style='color:#DC143C'>!</t>";
 var tileGrassTall = "<t style='color:#32CD32'>;</t>";
 var tileGrassShort = "<t style='color:#32CD32'>.</t>";
+var tileBloodDrop = "<t style='color:#8A0303'>.</t>";
 //var tileMacGuffin = "<t style='color:#FF00FF'>&#9959;</t>"; maybe use as summoning circle?
 var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
 var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
 
 var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles]];
-var rareTerrain = ['/','0',tileKey,'_',']',[tileSludge,tileDark]];
+var rareTerrain = ['/','0',tileKey,'_',']',[tileSludge,tileDark,tileBlood]];
 var impassable = [wallBlock,tileGoldWall,tileDoor];
+var liquids = [tileBlood,tileLava,tileSludge,tileWater];
 
 var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".split('');
 var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
-                     name:"<t style='color:#FF0000'>Demon of Isolation</t>",
+                     name:"<t style='color:#FF0000'>Inner Demon</t>",
                      attack:"slams",
                      quickness:2,
                      x:0,y:0,
-                     flags: [],
+                     flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","flame","agony","regen","blind","trapper","teleother","haste","knockback","steal","lavapool","disenchant","summon","panic","dodge","boonphase","boontime","boonscore"];
+var allFlags = ["diagonal","venom","flame","agony","regen","blind","trapper","teleother","haste","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","boonphase","boontime","boonscore"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
@@ -228,6 +235,11 @@ var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                     userPos.y += dy;
                     msg += "You are knocked back. ";
                    }
+                   break;
+
+                  case 12:
+                   msg += "You are showered in blood. ";
+                   bloodied += 10+kills;
                    break;
                  }
                 } else if(!r(4) && !this.flags.includes("flee")){
@@ -363,10 +375,21 @@ function getMobName(letter){
 function getUserChar(){
  var colour = 'red';
  if(poisoned>0) colour = '#90EE90';
+ else if(phased>0) colour = '#4B0082';
+ else if(timestop>0) colour = '#FF00FF';
+ else if(ward>0) colour = '#DAA520';
 
  var bkg = '';
  if(currentMap[userPos.x][userPos.y] == tileWater) bkg = 'background-color:#1E90FF; ';
  else if(currentMap[userPos.x][userPos.y] == tileLava) bkg = 'background-color:#FF4500; ';
+ else if(currentMap[userPos.x][userPos.y] == tileSludge){
+   colour = '#000000';
+   bkg = 'background-color:#00FF00; ';
+ }
+ else if(currentMap[userPos.x][userPos.y] == tileBlood){
+   colour = '#000000';
+   bkg = 'background-color:#8A0303; ';
+ }
 
  return "<t style='"+bkg+"color:"+colour+"; font-weight: 900;'>@</t>";
 }
@@ -508,7 +531,8 @@ function getHint(says=""){
              "You cannot fix it anymore.",
              "Why did you do it?",
              "Why them?",
-             "Find the levers, once you are truly yourself..."];
+             "Find the levers, once you are truly yourself...",
+             "Conquering your inner demons brings a certain boon.",];
 
  var compass = ["north","south","east","west"];
  var adj = ["mysterious","strange","rasping","barely audible","faint","familiar","unfamiliar","inhuman"];
@@ -541,7 +565,7 @@ function getHint(says=""){
 // Make map:
 function generateMap(){
  // Tiny chance that we create a crazy level full of special terrain.
- var chanceTerrain = !r(10000) && (visited>10);
+ var chanceTerrain = !r(1000) && (visited>1);
 
  for (var i = 0; i < mapWidth; i++) {
   currentMap[i] = []; // empty map
@@ -644,7 +668,7 @@ function addLake(){
  var liquid = emptyBlock; // Just to make sure we don't accidentaly make undefined lake.
  if(r(visited)>20) liquid = tileLava;
  else {
-  switch(r(12)){
+  switch(r(14)){
    default: liquid = tileWater; break;
    case 0: liquid = ','; break;
    case 1: liquid = tileGrassTall; break;
@@ -652,6 +676,7 @@ function addLake(){
    case 3: liquid = tileNettles; break;
    case 4: liquid = tileSludge; break;
    case 5: liquid = tileDark; break;
+   case 6: liquid = tileBlood; break;
   }
  }
 
@@ -699,30 +724,30 @@ function addStructure(){
  //The winning place:
  if((r(visited)>20) && (r(distanceToOrigin())>=10) && (r(kills)>20)){
   toAdd = ["77===77                   77===77",
-      "7.....7                   7.....7",
-      "=.....777777777777777777777.....=",
-      "=......^.................^......=",
-      "=.....777777777787777777777.....=",
-      "7.....7WWWWWWWW7.7WWWWWWWW7.....7",
-      "777.777WWWWWW7778777WWWWWW777.777",
-      "  7.7WWWWWWWW7555557WWWWWWWW7.7  ",
-      "  7.7WWWWWWWW=55555=WWWWWWWW7.7  ",
-      "  7.7WWWWWWWW=55255=WWWWWWWW7.7  ",
-      "  7.7WWWWWWWW=55555=WWWWWWWW7 .  ",
-      "  7^7WWWWWWWW7555557WWWWWWWW7^7  ",
-      "  7.7WWWWWWWW77===77WWWWWWWW7... ",
-      "  7.7WWWWWWWWWWWWWWWWWWWWWWW7..W.",
-      "  7.7WWWWWWWWWWWWWWWWWWWWWWW7W.. ",
-      "  7.7  WWWWWWWWWWWWWWWWWWWWW7..  ",
-      "777.77  WWWWWWWWWWWWWWWWWW777.777",
-      "7.... .WWWWWWWWWWWWWWWWWWW7.....7",
-      ". ... .77777777777777777777.....=",
-      " .. ............................=",
-      "7... .777777777777777777777.....=",
-      "7......                   7.....7",
-      "77 . 77                   77===77"];
+           "7.....7                   7.....7",
+           "=.....777777777777777777777.....=",
+           "=......^.................^......=",
+           "=.....777777777787777777777.....=",
+           "7.....7WWWWWWWW7.7WWWWWWWW7.....7",
+           "777.777WWWWWW7778777WWWWWW777.777",
+           "  7.7WWWWWWWW7555557WWWWWWWW7.7  ",
+           "  7.7WWWWWWWW=55555=WWWWWWWW7.7  ",
+           "  7.7WWWWWWWW=55255=WWWWWWWW7.7  ",
+           "  7.7WWWWWWWW=55555=WWWWWWWW7 .  ",
+           "  7^7WWWWWWWW7555557WWWWWWWW7^7  ",
+           "  7.7WWWWWWWW77===77WWWWWWWW7... ",
+           "  7.7WWWWWWWWWWWWWWWWWWWWWWW7..W.",
+           "  7.7WWWWWWWWWWWWWWWWWWWWWWW7W.. ",
+           "  7.7  WWWWWWWWWWWWWWWWWWWWW7..  ",
+           "777.77  WWWWWWWWWWWWWWWWWW777.777",
+           "7.... .WWWWWWWWWWWWWWWWWWW7.....7",
+           ". ... .77777777777777777777.....=",
+           " .. ............................=",
+           "7... .777777777777777777777.....=",
+           "7......                   7.....7",
+           "77 . 77                   77===77"];
  }
- else switch(r(110)) {
+ else switch(r(130)) {
   default:
    if(score > 1000){
      toAdd = ["...",
@@ -749,189 +774,189 @@ function addStructure(){
 
   case 2:
    toAdd = [" W ",
-      " W ",
-      " W ",
-      " W ",
-      " W ",
-      " W ",
-      ".8.",
-      " W ",
-      " W ",
-      " W ",
-      " W ",
-      " W ",
-      " W ",
-      ".8.",
-      " W ",
-      " W ",
-      " W ",
-      " W ",
-      " W ",
-      " W "];
+            " W ",
+            " W ",
+            " W ",
+            " W ",
+            " W ",
+            ".8.",
+            " W ",
+            " W ",
+            " W ",
+            " W ",
+            " W ",
+            " W ",
+            ".8.",
+            " W ",
+            " W ",
+            " W ",
+            " W ",
+            " W ",
+            " W "];
    break;
 
   case 3:
    toAdd = [" 66 ",
-      "6666",
-      " 66 "];
+            "6666",
+            " 66 "];
    break;
 
   case 4:
    toAdd = [" 6666 ",
-      "666666",
-      "666666",
-      " 6666 "];
+            "666666",
+            "666666",
+            " 6666 "];
    break;
 
   case 5:
    toAdd = [" ~~~~~~ ",
-      "~~~~~~~~",
-      "~~~~~~~~",
-      "~~~~~~~~",
-      " ~~~~~~ "];
+            "~~~~~~~~",
+            "~~~~~~~~",
+            "~~~~~~~~",
+            " ~~~~~~ "];
    break;
 
   case 6:
    toAdd = ["WWWWWWWWWWWWWW",
-      ".........WW..W",
-      "WWWWWWW..WW..W",
-      "W$$^..W......"+['W','.'][r(2)],
-      "W$$W..WWWWW..W",
-      "WWWW.........W",
-      "W..WWW..WWWWWW"];
+            ".........WW..W",
+            "WWWWWWW..WW..W",
+            "W$$^..W......"+['W','.'][r(2)],
+            "W$$W..WWWWW..W",
+            "WWWW.........W",
+            "W..WWW..WWWWWW"];
    break;
 
   case 7:
    toAdd = ["WWWWWWW..WWWWWWW",
-      "WW...WW..WW...WW",
-      "W.....W..W.....W",
-      ".../..8..8..0...",
-      "W.....W..W.....W",
-      "WW...WW..WW...WW",
-      "WWWWWWW..WWWWWWW"];
+            "WW...WW..WW...WW",
+            "W.....W..W.....W",
+            "...i..8..8..i...",
+            "W.....W..W.....W",
+            "WW...WW..WW...WW",
+            "WWWWWWW..WWWWWWW"];
      break;
 
   case 8:
-   toAdd = ["WWWWWWWWWWWWWW",
-      "W....4...4..1W",
-      "WW..WWWWWWWWWW",
+   toAdd = [" WWWWWWWWWWWWW",
+            " W...444444.1W",
+            "WW..WWWWWWWWWW",
      ['W','.'][r(2)]+"............"+['W','.'][r(2)],
-      "WW.WWW..WWW.WW",
-      "W...W....W...W",
-      "WWWWWWWWWWWWWW"];
+            "WW#WWW33WWW#WW",
+            "W???Wi..iW???W",
+            "WWWWWWWWWWWWWW"];
      break;
 
   case 9:
    toAdd = ["WWWWWW..WWWWWW",
-      "WW...W..W....W",
-      "WW......W/...W",
-      "WW...W..WWWW.W",
-      "WWW3WW.....W.W",
-      "W----W..W..4.W",
-      "WWWWWW..WWWWWW"];
+            "W....W..W....W",
+            "W._..4..W/...W",
+            "W....W..WWWW.W",
+            "WWW3WW.....W.W",
+            "W----W..W....W",
+            "WWWWWW..WWWWWW"];
      break;
 
   case 10:
    toAdd = ["WWWWWW..WWWWWW",
-      "W.1.WW..WW.9.W",
-      "W...8....8...W",
-      "WWWWWW..WWWWWW",
-      "W...8....8...W",
-      "W.5.WW..WW..]W",
-      "WWWWWW..WWWWWW"];
+            "W.1.WW..WW.9.W",
+            "W...8....8...W",
+            "WWWWWW..WWWWWW",
+            "W...8....8...W",
+            "W.5.WW..WW.].W",
+            "WWWWWW..WWWWWW"];
      break;
 
   case 11:
    toAdd = ["WWWWWW..WWWWWW",
-      "W............W",
-      "W..WW....WW..W",
-      "......66......",
-      "W..WW....WW..W",
-      "W............W",
-      "WWWWWW..WWWWWW"];
+            "W............W",
+            "W..WW....WW..W",
+            "......66......",
+            "W..WW....WW..W",
+            "W............W",
+            "WWWWWW..WWWWWW"];
      break;
 
   case 12:
    toAdd = ["WWWWWWWWWWWWWW",
-      "W............W",
-      "W...WWWWWW...W",
-      "^...W..10W...^",
-      "W...W3WWWW...W",
-      "W............W",
-      "WWWWWWWWWWWWWW"];
+            "W............W",
+            "W...WWWWWW...W",
+            "^...W..10W...^",
+            "W...W3WWWW...W",
+            "W............W",
+            "WWWWWWWWWWWWWW"];
    break;
 
   case 13:
    toAdd = ["WWWWWWWWWWWWWW",
-      "W???W???WWW.1W",
-      "WW.WWW.WWWW..W",
-      "........WWW3WW",
-      "WWWWWW..WWW..W",
-      "W........4...W",
-      "W444WW..WWWWWW"];
+            "W???W???WWW.1W",
+            "WW.WWW.WWWW..W",
+            "........WWW3WW",
+            "WWWWWW..WWW..W",
+            "W........4...W",
+            "W444WW..WWWWWW"];
      break;
 
   case 14:
    toAdd = ["..WWWW...WWW..",
-      ".WWWWWW...WWW.",
-      "WWWWWW33...WWW",
-      ".....3333.....",
-      "WWW...33WWWWWW",
-      ".WWW...WWWWWW.",
-      "..WWW...WWWW.."];
+            ".WWWWWW...WWW.",
+            "WWWWWW33...WWW",
+            ".....3333.....",
+            "WWW...33WWWWWW",
+            ".WWW...WWWWWW.",
+            "..WWW...WWWW.."];
      break;
 
   case 15:
    toAdd = ["WWWWWW..WWW.WW",
-      "W...1W..WW...W",
-      "WW33WW..WWW.WW",
-      ".............W",
-      "WW33WW..WW._.W",
-      "W1...W..WW...W",
-      "WWWWWW..WWWWWW"];
+            "W...1W..WW???W",
+            "WW33WW..WWW.WW",
+            ".............W",
+            "WW33WW..WW._.W",
+            "W1...W..WW...W",
+            "WWWWWW..WWWWWW"];
      break;
 
   case 16:
-   toAdd = ["WW.WWWW.WWWWWW",
-      "W...W0..W1...W",
-      "WW.WWWWWWWW787",
-      "..............",
-      "W.WWWW??WWWW.W",
-      "W/W........W..",
-      "WWW.WW..WW.WWW"];
+   toAdd = ["WW.WWWW.777777",
+            "W???W0..71$$.7",
+            "WW.WWWWW777787",
+            ".............W",
+            "W.WWWW44WWWW.W",
+            "W/W........W..",
+            "WWW.WW..WW.WWW"];
      break;
 
   case 17:
     // I actually fixed the strange bugs that crop up when generating this room,
     // but then it seemed so... boring. So for this room only, please don't fix the bugs. :D
     toAdd = ["&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;",
-      "&#9608;...^....................................&#9608;",
-      "&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;",
-      "&#9608;..&#9608;......^...........................&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;^.&#9608;",
-      "&#9608;..&#9608;..&#9608;........^...................&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;..&#9608;............^.........&#9608;..&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;^.&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;???&#9608;...$$...&#9608;...&#9608;..&#9608;..&#9608;.^&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;..&#9608;.0&#9608;???&#9608;..$55$..&#9608;.9.&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;???&#9608;...$$...&#9608;...&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;.^&#9608;......................&#9608;^.&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;..&#9608;............................&#9608;/.&#9608;..&#9608;",
-      "&#9608;0.&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;",
-      "&#9608;..&#9608;............^.....................&#9608;..&#9608;",
-      "&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;",
-      "&#9608;............................^...........&#9608;",
-      "&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;"];
+             "&#9608;...^....................................&#9608;",
+             "&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;",
+             "&#9608;..&#9608;......^...........................&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;^.&#9608;",
+             "&#9608;..&#9608;..&#9608;........^...................&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;..&#9608;............^.........&#9608;..&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;^.&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;???&#9608;...$$...&#9608;...&#9608;..&#9608;..&#9608;.^&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;..&#9608;.0&#9608;???&#9608;..$55$..&#9608;.9.&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;???&#9608;...$$...&#9608;...&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;.^&#9608;......................&#9608;^.&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;..&#9608;............................&#9608;/.&#9608;..&#9608;",
+             "&#9608;0.&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;..&#9608;",
+             "&#9608;..&#9608;............^.....................&#9608;..&#9608;",
+             "&#9608;..&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;..&#9608;",
+             "&#9608;............................^...........&#9608;",
+             "&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;"];
 
-      var randTerrain = [' ','.',',','^','?','$','~','0','/','7','W','=','_',';','!','#','s','4','3'];
+      var randTerrain = [' ','.',',','\'','^','?','$','~','0','/','7','W','=','_',';','!','#','s','b','4','3','6'];
       for (var i = 0; i < toAdd.length; i++) {
        toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),randTerrain[r(randTerrain.length)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
        toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
 
-       if(!r(4)) toAdd[i] = toAdd[i].replace("9","-");
+       if(r(4)) toAdd[i] = toAdd[i].replace("9","i");
        else toAdd[i] = toAdd[i].replace("9","1");
 
        toAdd[i] = toAdd[i].replace("&",randTerrain[r(randTerrain.length)]);
@@ -941,1049 +966,1190 @@ function addStructure(){
 
    case 18:
     toAdd = ["WWWWWWW...WWWWWWW",
-      "W6666666.6666666W",
-      "W6666666.6666666W",
-      "W6666666.6666666W",
-      "W666666...666666W",
-      "W6666.......6666W",
-      "W6666.......6666W",
-      "W666W.......W666W",
-      "W666.........666W",
-      "W666W.......W666W",
-      "W6666.......6666W",
-      "W6666.......6666W",
-      "W666666...666666W",
-      "W6666666.6666666W",
-      "W6666666.6666666W",
-      "W6666666.6666666W",
-      "WWWWWWW...WWWWWWW"];
+             "W6666666.6666666W",
+             "W6666666.6666666W",
+             "W6666666.6666666W",
+             "W666666...666666W",
+             "W6666.......6666W",
+             "W6666.......6666W",
+             "W666W.......W666W",
+             "W666....i....666W",
+             "W666W.......W666W",
+             "W6666.......6666W",
+             "W6666.......6666W",
+             "W666666...666666W",
+             "W6666666.6666666W",
+             "W6666666.6666666W",
+             "W6666666.6666666W",
+             "WWWWWWW...WWWWWWW"];
     break;
 
    case 19:
     toAdd = ["WWWW.WWWW",
-      "W$.^.^.$W",
-      "WWWW.WWWW",
-      "W$.^.^.$W",
-      "WWWW.WWWW",
-      "W$.^.^.$W",
-      "WWWW.WWWW"];
+             "W$$^.^$$W",
+             "WWWW.WWWW",
+             "W$$^.^$$W",
+             "WWWW.WWWW",
+             "W$$^.^$$W",
+             "WWWW.WWWW"];
     break;
 
    case 20:
     toAdd = ["WWWW.WW",
-      "W.....W",
-      "..333.W",
-      "W.313.W",
-      "W.333..",
-      "W.....W",
-      "WW.WWWW"];
+             "W.....W",
+             "..333.W",
+             "W.313.W",
+             "W.333..",
+             "W.....W",
+             "WW.WWWW"];
     break;
 
    case 21:
     toAdd = ["7777WW.WWW",
-      "71.7.....W",
-      "7..8.....W",
-      "7777..._.W",
-      "W........W",
-      "W.WWWWWWWW",
-      "W.........",
-      "WWWWWWWWWW"];
+             "71.7.....W",
+             "7..8.....W",
+             "7777..._.W",
+             "W........W",
+             "W.WWWWWWWW",
+             "W.........",
+             "WWWWWWWWWW"];
     break;
 
    case 22:
-    toAdd = ["WWW.WWW",
-      "7778777",
-      "7$...$7",
-      "7$.$.$7",
-      "7$.5.$7",
-      "7$.$.$7",
-      "7$...$7",
-      "7778777",
-      "WWW.WWW"];
+    toAdd = ["  W.W  ",
+             "7778777",
+             "7$...$7",
+             "7$.$.$7",
+             "7$.5.$7",
+             "7$.$.$7",
+             "7$...$7",
+             "7778777",
+             "  W.W  "];
     break;
 
    case 23:
     toAdd = ["WWW.WWW",
-      "WW...WW",
-      "W.777.W",
-      "..717..",
-      "W.787.W",
-      "WW...WW",
-      "WWW.WWW"];
+             "WW$.$WW",
+             "W$777$W",
+             "..717..",
+             "W$787$W",
+             "WW...WW",
+             "WWW.WWW"];
     break;
 
    case 24:
     toAdd = ["WWW.WWW",
-      "WW...WW",
-      "W.....W",
-      "..._...",
-      "W.....W",
-      "WW...WW",
-      "WWW.WWW"];
+             "WW...WW",
+             "W.....W",
+             "..._...",
+             "W.....W",
+             "WW...WW",
+             "WWW.WWW"];
     break;
 
    case 25:
     toAdd = ["WWW.WWW",
-      "WW...WW",
-      "W.^...W",
-      "...^...",
-      "W...^.W",
-      "WW...WW",
-      "WWW.WWW"];
+             "WW...WW",
+             "W.^...W",
+             "...^...",
+             "W...^.W",
+             "WW...WW",
+             "WWW.WWW"];
    break;
 
    case 26:
     toAdd = ["WWWWWWWWWW",
-      "W...W..$.W",
-      "....W....W",
-      "W...W44W.W",
-      "W...W44W.W",
-      "....W..W.W",
-      "W...8.1W.W",
-      "WW.WWWWW.W"];
+             "W...W..$.W",
+             "....W....W",
+             "W...W44W.W",
+             "W...W44W.W",
+             "....W..W.W",
+             "W...8.1W.W",
+             "WW.WWWWW.W"];
     break;
 
    case 27:
-    toAdd = ["W.WWWWWWWW",
-      "W..3.....W",
-      "W..3......",
-      "W..3.....W",
-      "W..3.....W",
-      "W..WWWW..W",
-      "W..../W...",
-      "W..WWWWWWW"];
+    toAdd = ["W..WWWWWWW",
+             "W..3.....W",
+             "W..3..i..W",
+             "W..3..i..W",
+             "W..3.....W",
+             "W..WWWW44W",
+             "W..../W...",
+             "W..WWWWWWW"];
     break;
 
    case 28:
     toAdd = ["WWWW..WWWW",
-      "W........W",
-      "W.778777.W",
-      "W.3....3.W",
-      "..3.$].3..",
-      "..3.$$.3..",
-      "W.3....3.W",
-      "W.733337.W",
-      "W........W",
-      "WWWW..WWWW"];
+             "W........W",
+             "W.778777.W",
+             "W.3....3.W",
+             "..7.$].7..",
+             "..7.$$.7..",
+             "W.3....3.W",
+             "W.737737.W",
+             "W........W",
+             "WWWW..WWWW"];
     break;
 
    case 29:
     toAdd = ["WWWW..WWWW",
-      "W........W",
-      "W.WW##WW.W",
-      "..W????W..",
-      "..W????W..",
-      "W.WWWWWW.W",
-      "W........W",
-      "WWWW..WWWW"];
+             "W........W",
+             "W.WW##WW.W",
+             "..W????W..",
+             "..W????W..",
+             "W.WW##WW.W",
+             "W........W",
+             "WWWW..WWWW"];
     break;
 
    case 30:
     toAdd = ["WWWWW.WW",
-      "W13....W",
-      "W.3....W",
-      "W.3.....",
-      "W8WWWWWW",
-      "......0W",
-      "WWWWW.WW"];
+             "W13....W",
+             "W.3....W",
+             "W.3.....",
+             "W8WWWWWW",
+             "......0W",
+             "WWWWW.WW"];
     break;
 
    case 31:
-    toAdd = ["",
-      "WWWWW.WWWWW",
-      "W.........W",
-      "W..W...W..W",
-      "W.WWW8WWW.W",
-      "W..W...W..W",
-      "...8.9.8...",
-      "W..W...W..W",
-      "W.WWW8WWW.W",
-      "W..W...W..W",
-      "W.........W",
-      "WWWWW.WWWWW"];
+    toAdd = ["WWWWW.WWWWW",
+             "W.........W",
+             "W..W...W..W",
+             "W.WWW8WWW.W",
+             "W..W...W..W",
+             "...8.9.8...",
+             "W..W...W..W",
+             "W.WWW8WWW.W",
+             "W..W...W..W",
+             "W.........W",
+             "WWWWW.WWWWW"];
     break;
 
    case 32:
     toAdd = ["WWWW.WWWW",
-      "W.......W",
-      "W.WWWWW.W",
-      "W.W$$$W.W",
-      "W.W$$$W.W",
-      "W.W$$$W.W",
-      "W.WW8WW.W",
-      ".........",
-      "WWWWWWWWW"];
+             "W.......W",
+             "W.WWWWW.W",
+             "W.W$$$W.W",
+             "W.W$$$W.W",
+             "W.W$$$W.W",
+             "W.WW8WW.W",
+             ".........",
+             "WWWWWWWWW"];
     break;
 
    case 33:
     toAdd = ["WWWW.WWWW",
-      "W.......W",
-      "W.W...W.W",
-      "W.......W",
-      "W.W...W.W",
-      "W.......W",
-      "W.W...W.W",
-      "W.......W",
-      "W.W...W.W",
-      "W.......W",
-      "WWWW.WWWW"];
+             "W.......W",
+             "W.W...W.W",
+             "W.......W",
+             "W.W...W.W",
+             "W.......W",
+             "W.W...W.W",
+             "W.......W",
+             "W.W...W.W",
+             "W.......W",
+             "WWWW.WWWW"];
     break;
 
    case 34:
     toAdd = ["WWWW.WWWW",
-      "W.......W",
-      "W.WW.WW.W",
-      "W.WW.WW.W",
-      ".........",
-      "W.WW.WW.W",
-      "W.WW.WW.W",
-      "W.......W",
-      "WWWW.WWWW"];
+             "W.......W",
+             "W.WW.WW.W",
+             "W.WW.WW.W",
+             ".........",
+             "W.WW.WW.W",
+             "W.WW.WW.W",
+             "W.......W",
+             "WWWW.WWWW"];
     break;
 
    case 35:
     toAdd = ["WWWWW.WWWWW",
-      "W.........W",
-      "W..W...W..W",
-      "W.WWW.WWW.W",
-      "W..W...W..W",
-      "...........",
-      "W..W...W..W",
-      "W.WWW.WWW.W",
-      "W..W...W..W",
-      "W.........W",
-      "WWWWW.WWWWW"];
+             "W.........W",
+             "W..W...W..W",
+             "W.WWW.WWW.W",
+             "W..W...W..W",
+             "...........",
+             "W..W...W..W",
+             "W.WWW.WWW.W",
+             "W..W...W..W",
+             "W.........W",
+             "WWWWW.WWWWW"];
    break;
 
    case 36:
     toAdd = ["WWW.WWWWW",
-      "W........",
-      "W.W.W.W.W",
-      "........W",
-      "WWWWW.WWW"];
+             "W........",
+             "W.W.W.W.W",
+             "........W",
+             "WWWWW.WWW"];
    break;
 
    case 37:
-    toAdd = ["WWW.WWW.WWW",
-      "W.........W",
-      "W.W.W.W.W.W",
-      "...........",
-      "W.W.W.W.W.W",
-      "W.........W",
-      "W.W.W.W.W.W",
-      "...........",
-      "W.W.W.W.W.W",
-      "W.........W",
-      "WWW.WWW.WWW"];
+    toAdd = ["WWW'WWW'WWW",
+             "W'''''''''W",
+             "W'W'W'W'W'W",
+             "'''''''''''",
+             "W'W'W'W'W'W",
+             "W'''''''''W",
+             "W'W'W'W'W'W",
+             "'''''''''''",
+             "W'W'W'W'W'W",
+             "W'''''''''W",
+             "WWW'WWW'WWW"];
    break;
 
    case 38:
     toAdd = ["WWW.WWW.WWW",
-      "W.........W",
-      "W.W.W.W.W.W",
-      "...........",
-      "W.W.....W.W",
-      "W.........W",
-      "W.W.....W.W",
-      "...........",
-      "W.W.W.W.W.W",
-      "W.........W",
-      "WWW.WWW.WWW"];
+             "W.........W",
+             "W.W.W.W.W.W",
+             "...........",
+             "W.W.....W.W",
+             "W...._....W",
+             "W.W.....W.W",
+             "...........",
+             "W.W.W.W.W.W",
+             "W.........W",
+             "WWW.WWW.WWW"];
    break;
 
    case 39:
     toAdd = ["WWW.WWW.WWW",
-      "W.........W",
-      "W.W.W.W.W.W",
-      "...........",
-      "W.W.666.W.W",
-      "W...666...W",
-      "W.W.666.W.W",
-      "...........",
-      "W.W.W.W.W.W",
-      "W.........W",
-      "WWW.WWW.WWW"];
+             "W.........W",
+             "W.W.W.W.W.W",
+             "...........",
+             "W.W.666.W.W",
+             "W...666...W",
+             "W.W.666.W.W",
+             "...........",
+             "W.W.W.W.W.W",
+             "W.........W",
+             "WWW.WWW.WWW"];
    break;
 
    case 40:
     toAdd = ["WWWW.WWWW",
-      "WWW=.=WWW",
-      "WWW=.=WWW",
-      "W===.===W",
-      ".........",
-      "W===.===W",
-      "WWW=.=WWW",
-      "WWW=.=WWW",
-      "WWWW.WWWW"];
+             "WWW=.=WWW",
+             "WWW=.=WWW",
+             "W===.===W",
+             ".........",
+             "W===.===W",
+             "WWW=.=WWW",
+             "WWW=.=WWW",
+             "WWWW.WWWW"];
    break;
 
    case 41:
     toAdd = ["7777777777",
-      "71$71$71$7",
-      "7$$7$$7$$7",
-      "7787787787",
-      "..........",
-      "7777777777"];
+             "71$71$71$7",
+             "7$$7$$7$$7",
+             "7787787787",
+             "..........",
+             "7777777777"];
    break;
 
    case 42:
     toAdd = ["WWWWW.WWWWW",
-      "W.........W",
-      "W.W3W3W3W.W",
-      "W.3,,,,,3.W",
-      "W.W,,,,,W.W",
-      "..3,,1,,8.W",
-      "W.W,,,,,W.W",
-      "W.3,,,,,3.W",
-      "W.W3W3W3W.W",
-      "W.........W",
-      "WWWWW.WWWWW"];
+             "W.........W",
+             "W.W3W3W3W.W",
+             "W.3,,,,,3.W",
+             "W.W,,,,,W.W",
+             "..3,,1,,8.W",
+             "W.W,,,,,W.W",
+             "W.3,,,,,3.W",
+             "W.W3W3W3W.W",
+             "W.........W",
+             "WWWWW.WWWWW"];
    break;
 
    case 43:
     toAdd = ["W..WWWWWWW",
-      "W........W",
-      "W........W",
-      "WWWW8WW..W",
-      "W.....WW..",
-      ".......WWW",
-      "W........W",
-      "WWWWWWWW.W"];
+             "W........W",
+             "W........W",
+             "WWWW8WW..W",
+             "W.....WW..",
+             "...i...WWW",
+             "W........W",
+             "WWWWWWWW.W"];
    break;
 
    case 44:
     toAdd = ["WW.WWWWWWW",
-      "W...W....W",
-      "W...?.....",
-      "W?WWWW?WWW",
-      "W..W.....W",
-      "W..?.....W",
-      "...W.....W",
-      "WWWWWW.WWW"];
+             "W...W....W",
+             "W...?.....",
+             "W?WWWW?WWW",
+             "W..W.....W",
+             "W..?..i..W",
+             "...W.....W",
+             "WWWWWW.WWW"];
    break;
 
    case 45:
     toAdd = ["WWWWWWWWW.WWWWWWWW",
-      "WWWWW.........WWWW",
-      "WWWWW.........WWWW",
-      "W...W...333...W..W",
-      "W...W...313......W",
-      "........313...W...",
-      "W...W...333...W..W",
-      "W...W.........WWWW",
-      "WWWWW.........WWWW",
-      "WW0....77877.../WW",
-      "WWWWWW77...77WWWWW"];
+             "WWWWW.........WWWW",
+             "WWWWW.........WWWW",
+             "W...W...333...W..W",
+             "W...W...313......W",
+             "........313...W...",
+             "W...W...333...W..W",
+             "W...W.........WWWW",
+             "WWWWW.........WWWW",
+             "WW0....77877.../WW",
+             "WWWWWW77...77WWWWW"];
    break;
 
    case 46:
     toAdd = ["WWWW.WWWW",
-      "W..?....W",
-      "W.WWWWW.W",
-      "W.W$W$W?W",
-      "..8$W$8..",
-      "W?W$W$W.W",
-      "W.WWWWW.W",
-      "W....?..W",
-      "WWWW.WWWW"];
+             "W..?....W",
+             "W.WWWWW.W",
+             "W.W$WiW?W",
+             "..8$W$8..",
+             "W?WiW$W.W",
+             "W.WWWWW.W",
+             "W....?..W",
+             "WWWW.WWWW"];
    break;
 
    case 47:
     toAdd = ["WWWWWW",
-      "W.....",
-      "W.WWWW",
-      "W....W",
-      "WWWW.W",
-      ".....W",
-      "WWWWWW"];
+             "W.....",
+             "W.WWWW",
+             "W.??.W",
+             "WWWW.W",
+             ".....W",
+             "WWWWWW"];
    break;
 
    case 48:
     toAdd = ["WWWWWWWW.W",
-      ".........W",
-      "W.777777.W",
-      "W87$$$$7=W",
-      "W.7$$$$7.W",
-      "W.7????7.W",
-      "W........W",
-      "WWWWWWWWWW"];
+             ".........W",
+             "W.777777.W",
+             "W87$$$$7=W",
+             "W.7$$$$7.W",
+             "W.7????7.W",
+             "W........W",
+             "WWWWWWWWWW"];
    break;
 
    case 49:
     toAdd = ["WWWWW",
-      "W$$$W",
-      "W$$$W",
-      "W$$$W",
-      "WW8WW"];
+             "W$$$W",
+             "W$$$W",
+             "W$$$W",
+             "WW8WW",
+             "  .  "];
    break;
 
    case 50:
     toAdd = ["WWWWW.W",
-      "....W.W",
-      "WWW.W.W",
-      "W..?..W",
-      "W.W.WWW",
-      "W.W....",
-      "W.WWWWW"];
+             "....W.W",
+             "WWW.W.W",
+             "W..?..W",
+             "W.W.WWW",
+             "W.W....",
+             "W.WWWWW"];
    break;
 
    case 51:
-    toAdd = ["W.W.W",
-      "W.W.W",
-      "W...W",
-      "WW.WW",
-      "WW.WW",
-      "WW.WW"];
+    toAdd = ["W'W'W",
+             "W'W'W",
+             "W'''W",
+             "WW'WW",
+             "WW'WW",
+             "WW'WW"];
    break;
 
    case 52:
-    toAdd = ["W.W.W",
-      "W.W.W",
-      "W...W",
-      "WW.WW",
-      "...WW",
-      "WWWWW"];
+    toAdd = ["W'W'W",
+             "W'W'W",
+             "W'''W",
+             "WW'WW",
+             "'''WW",
+             "WWWWW"];
    break;
 
    case 53:
     toAdd = ["WWW7WWW",
-      "WW.7.WW",
-      "W..7..W",
-      "...8...",
-      "W..7..W",
-      "WW.7.WW",
-      "WWW7WWW"];
+             "WW.7.WW",
+             "W..7..W",
+             "...8...",
+             "W..7..W",
+             "WW.7.WW",
+             "WWW7WWW"];
    break;
 
    case 54:
-    toAdd = ["WWW.WWW",
-      "WW...WW",
-      "W..7..W",
-      "..777..",
-      "W..7..W",
-      "WW...WW",
-      "WWW.WWW"];
+    toAdd = ["WWW$WWW",
+             "WW...WW",
+             "W..7..W",
+             "$.777.$",
+             "W..7..W",
+             "WW...WW",
+             "WWW$WWW"];
    break;
 
    case 55:
     toAdd = ["WWW.WWW.WWW",
-      "W.........W",
-      "W.W.W.W.W.W",
-      "...........",
-      "W.W.===.W.W",
-      "W...=1=...W",
-      "W.W.===.W.W",
-      "...........",
-      "W.W.W.W.W.W",
-      "W.........W",
-      "WWW.WWW.WWW"];
+             "W.........W",
+             "W.W.W.W.W.W",
+             "...........",
+             "W.W.===.W.W",
+             "W...=1=...W",
+             "W.W.===.W.W",
+             "...........",
+             "W.W.W.W.W.W",
+             "W.........W",
+             "WWW.WWW.WWW"];
    break;
 
    case 56:
     toAdd = ["WWW.WWW",
-      "WW...WW",
-      "W..3..W",
-      "..313..",
-      "W..3..W",
-      "WW...WW",
-      "WWW.WWW"];
+             "WW...WW",
+             "W..3..W",
+             "..313..",
+             "W..3..W",
+             "WW...WW",
+             "WWW.WWW"];
    break;
 
    case 57:
     toAdd = ["WWWWWWWWWWWWW",
-      "W...........W",
-      "W.?.?.?.?.?.W",
-      ".............",
-      "W.?.?.?.?.?.W",
-      "W...........W",
-      "WWW^WWWWWWWWW"];
+             "W...........W",
+             "W.?.?.?.?.?.W",
+             ".............",
+             "W.?.?.?.?.?.W",
+             "W...........W",
+             "WWW^WWWWWWWWW"];
    break;
 
    case 58:
-    toAdd = ["777777777",
-      "7$.$.$.$7",
-      "7...]...8",
-      "7$.$.$.$7",
-      "777777777"];
+    toAdd = ["777777777 ",
+             "7$.$.$.$7 ",
+             "7...]...8.",
+             "7$.$.$.$7 ",
+             "777777777 "];
    break;
 
   case 59:
    toAdd = ["WWWW.WW",
-      "W=.=.=W",
-      "......W",
-      "W=.=.=W",
-      "W......",
-      "W=.=.=W",
-      "WW.WWWW"];
+            "W=.=.=W",
+            "......W",
+            "W=.=.=W",
+            "W......",
+            "W=.=.=W",
+            "WW.WWWW"];
    break;
 
   case 60:
-   toAdd = [" ===============",
-      "==.............==",
-      "=.......1.......=",
-      "=...............=",
-      "=...............=",
-      "=...............=",
-      "=...............=",
-      "=...............=",
-      "=.......W.......=",
-      "=...............=",
-      "=...............=",
-      "=...............=",
-      "=...............=",
-      "=...............=",
-      "=.......1.......=",
-      "==.............==",
-      " ==============="];
+   toAdd = [" =============== ",
+            "==.............==",
+            "=.......1.......=",
+            "=...............=",
+            "=...............=",
+            "=...............=",
+            "=...............=",
+            "=...............=",
+            "=.......W.......=",
+            "=...............=",
+            "=...............=",
+            "=...............=",
+            "=...............=",
+            "=...............=",
+            "=.......1.......=",
+            "==.............==",
+            " =============== "];
    break;
 
   case 61:
-   toAdd = ["...............",
-      ".3...3...3...3.",
-      "...............",
-      "...3...3...3...",
-      "...............",
-      ".3...3...3...3.",
-      "...............",
-      "...3.......3...",
-      "...............",
-      ".3...3...3...3.",
-      "...............",
-      "...3...3...3...",
-      "...............",
-      ".3...3...3...3.",
-      "..............."];
+   toAdd = ["  ...........  ",
+            " 3...3...3...3 ",
+            "...............",
+            "...3...3...3...",
+            "...............",
+            ".3...3   3...3.",
+            ".....      ....",
+            "...3   i   3...",
+            ".....      ....",
+            ".3...3   3...3.",
+            "...............",
+            "...3...3...3...",
+            "...............",
+            " 3...3...3...3 ",
+            "  ...........  "];
    break;
 
   case 62:
-   toAdd = ["...3...3...3...",
-      ".3.3.3.3.3.3.3.",
-      ".......3.......",
-      ".33333.3.33333.",
-      ".......3.......",
-      ".3.3.3.3.3.3.3.",
-      "...3.......3...",
-      "33.3.33333.3.33",
-      "...3.......3...",
-      ".3.3.3.3.3.3.3.",
-      ".......3.......",
-      ".33333.3.33333.",
-      ".......3.......",
-      ".3.3.3.3.3.3.3.",
-      "...3...3...3..."];
+   toAdd = ["  .3...3...3.  ",
+            " 3.3.3.3.3.3.3 ",
+            ".......3.......",
+            ".33333.3.33333.",
+            ".......3.......",
+            ".3.3.3.3.3.3.3.",
+            "...3..333..3...",
+            "33.3.3$i$3.3.33",
+            "...3..333..3...",
+            ".3.3.3.3.3.3.3.",
+            ".......3.......",
+            ".33333.3.33333.",
+            ".......3.......",
+            " 3.3.3.3.3.3.3 ",
+            "  .3...3...3.  "];
    break;
 
   case 63:
    toAdd = ["=================================================================",
-      "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
-      "=================================================================",
-      "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=1=$=$=$=$=$=$=$=$=$=$=$=",
-      "=================================================================",
-      "=$=$=$=$=$=$=$=$=$=$=$=1=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
-      "=================================================================",
-      "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
-      "================================================================="];
+            "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
+            "=================================================================",
+            "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=1=$=$=$=$=$=$=$=$=$=$=$=",
+            "=================================================================",
+            "=$=$=$=$=$=$=$=$=$=$=$=1=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
+            "=================================================================",
+            "=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=$=",
+            "================================================================="];
    break;
 
   case 64:
    toAdd = ["WWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWW",
-      "WWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWW",
-      "WWWW...........WWWWWWW...........WWWWWWW...........WWWWWWW...........WWWW",
-      "WWW.............WWWWW.............WWWWW.............WWWWW.............WWW",
-      "WW...............WWW...............WWW...............WWW...............WW",
-      "WW...............WWW...............WWW...............WWW...............WW",
-      "..................W.................W.................W..................",
-      "W........$.................$.................$.................$........W",
-      "W.......................................................................W",
-      ".......$.=.................=.................=.................=.$.......",
-      "W.......................................................................W",
-      "W........$.................$.................$.................$........W",
-      "..................W.................W.................W..................",
-      "WW...............WWW...............WWW...............WWW...............WW",
-      "WW...............WWW...............WWW...............WWW...............WW",
-      "WWW.............WWWWW.............WWWWW.............WWWWW.............WWW",
-      "WWWW...........WWWWWWW...........WWWWWWW...........WWWWWWW...........WWWW",
-      "WWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWW",
-      "WWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWW"];
+            "WWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWW",
+            "WWWW...........WWWWWWW...........WWWWWWW...........WWWWWWW...........WWWW",
+            "WWW.............WWWWW.............WWWWW.............WWWWW.............WWW",
+            "WW...............WWW...............WWW...............WWW...............WW",
+            "WW...............WWW...............WWW...............WWW...............WW",
+            "..................W.................W.................W..................",
+            "W........$.................$.................$.................$........W",
+            "W.......................................................................W",
+            ".......$.=.................=.................=.................=.$.......",
+            "W.......................................................................W",
+            "W........$.................$.................$.................$........W",
+            "..................W.................W.................W..................",
+            "WW...............WWW...............WWW...............WWW...............WW",
+            "WW...............WWW...............WWW...............WWW...............WW",
+            "WWW.............WWWWW.............WWWWW.............WWWWW.............WWW",
+            "WWWW...........WWWWWWW...........WWWWWWW...........WWWWWWW...........WWWW",
+            "WWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWWWWWWW.......WWWWWW",
+            "WWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWWWWWWWWWW.WWWWWWWWW"];
    break;
 
   case 65:
    toAdd = ["WW.WWWWWWWWW.WW",
-      "W...WWWWWWW...W",
-      "..W.........W..",
-      "W...WW333WW...W",
-      "WW.WW33333WW.WW",
-      "WW.WW77877WW.WW",
-      "WW.WW7$$$7WW.WW",
-      "WW.WW7$1$7WW.WW",
-      "WW.WW7$$$7WW.WW",
-      "WW.WW77877WW.WW",
-      "WW.WW33333WW.WW",
-      "W...WW333WW...W",
-      "..W.........W..",
-      "W...WWWWWWW...W",
-      "WW.WWWWWWWWW.WW"];
+            "W...WWWWWWW...W",
+            "..W.........W..",
+            "W...WW333WW...W",
+            "WW.WW33333WW.WW",
+            "WW.WW77877WW.WW",
+            "WW.WW7$$$7WW.WW",
+            "WW.WW759]7WW.WW", // orb location?
+            "WW.WW7$$$7WW.WW",
+            "WW.WW77877WW.WW",
+            "WW.WW33333WW.WW",
+            "W...WW333WW...W",
+            "..W.........W..",
+            "W...WWWWWWW...W",
+            "WW.WWWWWWWWW.WW"];
    break;
 
   case 66:
    toAdd = ["WW..WW",
-      "W....W",
-      "..WW..",
-      "..WW..",
-      "W....W",
-      "WW..WW"];
+            "W....W",
+            "..WW..",
+            "..WW..",
+            "W....W",
+            "WW..WW"];
    break;
 
   case 67:
    toAdd = ["WW...WW",
-      "W.....W",
-      "..WWW..",
-      "..WWW..",
-      "..WWW..",
-      "W.....W",
-      "WW...WW"];
+            "W.....W",
+            "..W6W..",
+            "..6W6..",
+            "..W6W..",
+            "W.....W",
+            "WW...WW"];
    break;
 
   case 68:
-   toAdd = ["WWWWWW..WW",
-      "....WW..WW",
-      "....WW..WW",
-      "WW........",
-      "WW........",
-      "WW..WWWWWW",
-      "WW..WWWWWW",
-      "WW..WWWWWW"];
+   toAdd = ["WWWWWW..W ",
+            "....WW..W ",
+            ".''.WW.'WW",
+            "WW''..''..",
+            " W..'''...",
+            " W.'WWWWWW",
+            " W..W     ",
+            " W..W     "];
    break;
 
   case 69:
-   toAdd = ["WWWW..WWWW",
-      "WWWW..WWWW",
-      "WWWW..WWWW",
-      "..........",
-      "..........",
-      "WWWW..WWWW",
-      "WWWW..WWWW",
-      "WWWW..WWWW"];
+   toAdd = ["   W..W   ",
+            "   W..W   ",
+            "WWWW..WWWW",
+            "..........",
+            "..........",
+            "WWWW..WWWW",
+            "   W..W   ",
+            "   W..W   "];
    break;
 
   case 70:
    toAdd = ["WWWW.WWWW",
-      "W13W.W31W",
-      "W33...33W",
-      "WW.....WW",
-      ".........",
-      "WW.....WW",
-      "W33...33W",
-      "W13W.W31W",
-      "WWWW.WWWW"];
+            "W13W.W31W",
+            "W33...33W",
+            "WW.....WW",
+            ".........",
+            "WW.....WW",
+            "W33...33W",
+            "W13W.W31W",
+            "WWWW.WWWW"];
    break;
 
   case 71:
    toAdd = ["WWWWW.WWWWW",
-      "WWWW...WWWW",
-      "WWW.....WWW",
-      "WW.......WW",
-      "W...W.W...W",
-      ".....].....",
-      "W...W.W...W",
-      "WW.......WW",
-      "WWW.....WWW",
-      "WWWW...WWWW",
-      "WWWWW.WWWWW"];
+            "WWWW...WWWW",
+            "WWW.....WWW",
+            "WW.......WW",
+            "W...W.W...W",
+            ".....].....",
+            "W...W.W...W",
+            "WW.......WW",
+            "WWW.....WWW",
+            "WWWW...WWWW",
+            "WWWWW.WWWWW"];
    break;
 
   case 72:
    toAdd = ["WWWWW.WWWWW",
-      "W.........W",
-      "W.W.W.W.W.W",
-      "W.........W",
-      "...........",
-      "W.........W",
-      "W.W.W.W.W.W",
-      "W.........W",
-      "WWWWW.WWWWW"];
+            "W.........W",
+            "W.W.W.W.W.W",
+            "W.........W",
+            "...........",
+            "W.........W",
+            "W.W.W.W.W.W",
+            "W.........W",
+            "WWWWW.WWWWW"];
    break;
 
   case 73:
    toAdd = ["WWWWWW..WW",
-      "W...W....W",
-      "....W....W",
-      "W...3....W",
-      "W...W....W",
-      "W...W....W",
-      "W...W....W",
-      "WW.WWW..WW"];
+            "W.i.W....W",
+            "W...W....W",
+            "....3....W",
+            "W...W....W",
+            "W...W....W",
+            "W...W....W",
+            "WW.WWW..WW"];
    break;
 
   case 74:
    toAdd = ["WWWWW",
-      "..0..",
-      "WW.WW",
-      "WW.WW"];
+            "..0..",
+            "WW.WW",
+            " W.W "];
    break;
 
   case 75:
    toAdd = ["WWWWWW",
-      ".3...W",
-      "777877",
-      "7$$$$7",
-      "7$$$$7",
-      "7$$$$7",
-      "7$$$$7",
-      "778777",
-      "W...3.",
-      "WWWWWW"];
+            ".44.WW",
+            "777877",
+            "7$$$$7",
+            "7$$$$7",
+            "7$$$$7",
+            "7$$$$7",
+            "778777",
+            "WW..3.",
+            "WWWWWW"];
    break;
 
   case 76:
    toAdd = ["/W/",
-      "WWW",
-      "/W/"];
+            "WWW",
+            "/W/"];
    break;
 
   case 77:
    toAdd = ["WWWWW...W",
-      "....W....",
-      "....W....",
-      "....8....",
-      "....W....",
-      "....W....",
-      "W...WWWWW"];
+            "....W....",
+            "....W....",
+            "....8....",
+            "....W....",
+            "....W....",
+            "W...WWWWW"];
    break;
 
   case 78:
    toAdd = ["WWWWWWWWWWW",
-      "W.........W",
-      "W.$......$W",
-      "W......7777",
-      "W^.$.$.===7",
-      ".^======1=8",
-      "W^.....===7",
-      "W..$.$.7777",
-      "W.......$.W",
-      "W...$.....W",
-      "WWWWWWWWWWW"];
+            "W....i....W",
+            "W.$......$W",
+            "W......7777",
+            "W^.$.$.===7",
+            ".^======1.8",
+            "W^.....===7",
+            "W..$.$.7777",
+            "W.......$.W",
+            "W...$.....W",
+            "WWWWWWWWWWW"];
    break;
 
   case 79:
-   toAdd = ["WWWWWWWWWWWW",
-      "WWWWWWWWWWWW",
-      "WWW444444WWW",
-      "WWW44WWW44WW",
-      ".444WWWW44WW",
-      ".44WW14444WW",
-      ".44WW44444WW",
-      ".444W4444WWW",
-      "WW44WWW44WWW",
-      "WWW444444WWW",
-      "WWWWW44WWWWW",
-      "WWWWWWWWWWWW"];
+   toAdd = ["   WWWWWW   ",
+            "  WWWWWWWW  ",
+            "WWW444444WW ",
+            "WWW44WWW44WW",
+            ".444WWWW44WW",
+            ".44WW14444WW",
+            ".44WW44444WW",
+            ".444W4444WWW",
+            "WW44WWW44WWW",
+            " WW444444WWW",
+            "  WWW44WWWW ",
+            "   WWWWWW   "];
    break;
 
   case 80:
    toAdd = ["WW.W",
-      "W..W",
-      "W..W",
-      "W..W",
-      "....",
-      "W..W",
-      "W..W",
-      "W..W",
-      "W.WW"];
+            "W..W",
+            "W..W",
+            "W..W",
+            "....",
+            "W..W",
+            "W..W",
+            "W..W",
+            "W.WW"];
    break;
 
   case 81:
    toAdd = ["WWWWWW.WW",
-      "W/......W",
-      "W.......W",
-      "W.WWWWW.W",
-      "W.W,,,W..",
-      "W.W,1,W.W",
-      "..W,,,W.W",
-      "W.WWWWW.W",
-      "W.......W",
-      "WWW..WWWW"];
+            "W/......W",
+            "W.......W",
+            "W.WWWWW.W",
+            "W.W,,,W..",
+            "W.W,1,W.W",
+            "..W,,,W.W",
+            "W.WWWWW.W",
+            "W.......W",
+            "WWW..WWWW"];
    break;
 
   case 82:
    toAdd = [" ,,,,, ",
-      ",,sss, ",
-      ",ssss,,",
-      ",,ssss,",
-      ",sssss,",
-      ",,ss,,,",
-      " ,,,,  "];
+            ",,sss, ",
+            ",ssss,,",
+            ",,ssss,",
+            ",sssss,",
+            ",,ss,,,",
+            " ,,,,  "];
    break;
 
   case 83:
    toAdd = ["WW.WWWWWW",
-      "WW...W...",
-      "WW.W/W.WW",
-      "WW.WWW.WW",
-      "WW...3.WW",
-      "...WWW.WW",
-      "WWWWWW.WW"];
+            "WW...W...",
+            "WW.W/W.WW",
+            "WW.WWW.WW",
+            "WW...3.WW",
+            "...WWW.WW",
+            "WWWWWW.WW"];
    break;
 
   case 84:
    toAdd = ["WWW",
-      "W$W",
-      "W^W"];
+            "WiW",
+            "W^W"];
    break;
 
   case 85:
    toAdd = ["WWWWWW",
-      "W....^",
-      "W/.$.W",
-      "WWWWWW"];
+            "W....^",
+            "W/.$.W",
+            "WWWWWW"];
    break;
 
   case 86:
-   toAdd = [",,,,==,,",
-      "==,,,==,",
-      "==,,,,=,",
-      "====,,==",
-      "====,,,=",
-      ",,===,,,",
-      ",,,===,,"];
+   toAdd = ["  ,,==,,",
+            "==,,,==,",
+            "==,,,,=,",
+            "====,,==",
+            "====,,,=",
+            ",,===,,,",
+            " ,,===, "];
    break;
 
   case 87:
    toAdd = ["  =====   ",
-      " ======   ",
-      "========  ",
-      "========  ",
-      "==  ======",
-      "===   ====",
-      "=====  ===",
-      " =====    ",
-      "   ===    ",
-      "     =    "];
+            " ======   ",
+            "========  ",
+            "========  ",
+            "==i ======",
+            "===   ====",
+            "=====  ===",
+            " =====    ",
+            "   ===    ",
+            "     =    "];
    break;
 
   case 88:
-   toAdd = ["W=====WWW",
-      "W=======W",
-      "W===1===W",
-      "W===^===W",
-      "W===^====",
-      "====^===="];
+   toAdd = ["W=====WW ",
+            "W=======W",
+            " ===1===W",
+            " ===^===W",
+            "W===^====",
+            "====^===="];
    break;
 
    case 89:
     toAdd = ["   444 ",
-      " 444444",
-      " 44??44",
-      "444??44",
-      " 444444",
-      " 44444 "];
+             " 444444",
+             " 44??44",
+             "444??44",
+             " 444444",
+             " 44444 "];
    break;
 
    case 90:
     toAdd = ["WWWWWWW...WWWWWWW",
-      "W===============W",
-      "W===============W",
-      "W===============W",
-      "W======W.W======W",
-      "W====.......====W",
-      "W====.......====W",
-      "W===W.......W===W",
-      "W===..1.1.1..===W",
-      "W===W.......W===W",
-      "W====.......====W",
-      "W====.......====W",
-      "W======W.W======W",
-      "W===============W",
-      "W===============W",
-      "W===============W",
-      "WWWWWWW...WWWWWWW"];
+             "W===============W",
+             "W===============W",
+             "W===============W",
+             "W======W.W======W",
+             "W====.......====W",
+             "W====.......====W",
+             "W===W.......W===W",
+             "W===..1.1.1..===W",
+             "W===W.......W===W",
+             "W====.......====W",
+             "W====.......====W",
+             "W======W.W======W",
+             "W===============W",
+             "W===============W",
+             "W===============W",
+             "WWWWWWW...WWWWWWW"];
     break;
 
    case 91:
-    toAdd = ["WWW=WWW",
-      "WW.=.WW",
-      "W..=..W",
-      "...=...",
-      "W..=..W",
-      "WW.=.WW",
-      "WWW=WWW"];
+    toAdd = ["WWW6WWW",
+             "WW.6.WW",
+             "W..6..W",
+             "...6...",
+             "W..6..W",
+             "WW.6.WW",
+             "WWW6WWW"];
    break;
 
    case 92:
     toAdd = ["WWW.WWW",
-      "WW...WW",
-      "W..=..W",
-      "..===..",
-      "W..=..W",
-      "WW...WW",
-      "WWW.WWW"];
+             "WW...WW",
+             "W..b..W",
+             "..~7=..",
+             "W..s..W",
+             "WW...WW",
+             "WWW.WWW"];
    break;
 
    case 93:
     toAdd = ["3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3",
-      "3.3"];
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3",
+             "3.3"];
    break;
 
    case 94:
     toAdd = ["33333333333333333333",
-      "....................",
-      "33333333333333333333"];
+             "....................",
+             "33333333333333333333"];
    break;
 
 
    case 95:
     toAdd = ["WWWWWWWWWWWWW",
-      "W...........W",
-      "W.=.=.=.=.=.W",
-      ".............",
-      "W.=.=.=.=.=.W",
-      "W...........W",
-      "WWW3WWWWWWWWW"];
+             "W...........W",
+             "W.=.=.=.=.=.W",
+             ".............",
+             "W.=.=.=.=.=.W",
+             "W...........W",
+             "WWW3WWWWWWWWW"];
    break;
 
    case 96:
     toAdd = ["WWW4WWW",
-      "WW.4.WW",
-      "W..4..W",
-      "...4...",
-      "W..4..W",
-      "WW.4.WW",
-      "WWW4WWW"];
+             "WW.4.WW",
+             "W..4..W",
+             "...4...",
+             "W..4..W",
+             "WW.4.WW",
+             "WWW4WWW"];
    break;
 
    case 97:
     toAdd = ["...4...4...4...",
-      ".4.4.4.4.4.4.4.",
-      ".......4.......",
-      ".44444.4.44444.",
-      ".......4.......",
-      ".4.4.44444.4.4.",
-      "...4.4.$.4.4...",
-      "44.4.4$$$4.4.44",
-      "...4.4.$.4.4...",
-      ".4.4.44444.4.4.",
-      ".......4.......",
-      ".44444.4.44444.",
-      ".......4.......",
-      ".4.4.4.4.4.4.4.",
-      "...4...4...4..."];
+             ".4.4.4.4.4.4.4.",
+             ".......4.......",
+             ".44444.4.44444.",
+             ".......4.......",
+             ".4.4.44444.4.4.",
+             "...4.4.$.4.4...",
+             "44.4.4$$$4.4.44",
+             "...4.4.$.4.4...",
+             ".4.4.44444.4.4.",
+             ".......4.......",
+             ".44444.4.44444.",
+             ".......4.......",
+             ".4.4.4.4.4.4.4.",
+             "...4...4...4..."];
    break;
 
    case 98:
     toAdd = ["W.WWWWW",
-      "W=...#.",
-      "W..$..W",
-      "W.$_$.W",
-      "W..$..W",
-      ".s...^W",
-      "WWWWW.W"];
+             "W=...#.",
+             "W..$..W",
+             "W.$_$.W",
+             "W..$..W",
+             ".s...^W",
+             "WWWWW.W"];
    break;
 
    case 99:
     toAdd = ["W..W",
-      ".44.",
-      ".44.",
-      "W..W"];
+             ".44.",
+             ".44.",
+             "W..W"];
    break;
 
    case 100:
-    toAdd = [" W3W4W",
-      "WW...WW",
-      "4.$.$.3",
-      "W..]..W",
-      "3.$.$.4",
-      "WW...WW",
-      " W4W3W"];
+    toAdd = [" WW0WW ",
+             "WW...WW",
+             "3.$.$.3",
+             "W..]..W",
+             "3.$.$.3",
+             "WW...WW",
+             " WW8WW ",
+             "   .   "];
    break;
 
    case 101:
     toAdd = ["WWWWWW.WW.WWWWWW",
-      "W..............W",
-      "W....WW..WW....W",
-      ".....WW..WW.....",
-      "W....WW..WW....W",
-      "W..............W",
-      "W....WW..WW....W",
-      ".....WW..WW.....",
-      "W....WW..WW....W",
-      "W..............W",
-      "WWWWWW.WW.WWWWWW"];
+             "W..............W",
+             "W....WW..WW....W",
+             ".....WW..WW.....",
+             "W....WW..WW....W",
+             "W..............W",
+             "W....WW..WW....W",
+             ".....WW..WW.....",
+             "W....WW..WW....W",
+             "W..............W",
+             "WWWWWW.WW.WWWWWW"];
    break;
 
    case 102:
     toAdd = ["WWWWWWWWWWWW  ",
-      ".....^.....WWW",
-      ".WWWWWWWWW...W",
-      "WW...^...WWW.W",
-      " W.WWWWW.WWW^W",
-      " W^W01$$.WWW.W",
-      " W.WWWWWWWW..W",
-      " W....WWW...WW",
-      " WWWW..^..WWW ",
-      "    WWWWWWW   "];
+             ".....^.....WWW",
+             ".WWWWWWWWW...W",
+             "WW...^...WWW.W",
+             " W.WWWWW.WWW^W",
+             " W^Wi15$.WWW.W",
+             " W.WWWWWWWW..W",
+             " W....WWW...WW",
+             " WWWW..^..WWW ",
+             "    WWWWWWW   "];
    break;
 
    case 103:
     toAdd = [" ==.== ",
-      "==,,,==",
-      "=,,,,,=",
-      "=,,1,,=",
-      "==,,,= ",
-      " ====  "];
+             "==,,,==",
+             "=,,,,,=",
+             "=,,1,,=",
+             "==,,,= ",
+             " ====  "];
    break;
 
    case 104:
     toAdd = ["     44444     ",
-      "    4444444    ",
-      "   44.....44   ",
-      "  44.......44  ",
-      " 44..44444..44 ",
-      "44..4444444..44",
-      "44..44$$$44..44",
-      "44..44$$$44..44",
-      "44..44$$$44..44",
-      "44..4444444..44",
-      " 44..44444..44 ",
-      "  44.......44  ",
-      "   44.....44   ",
-      "    4444444    ",
-      "     44444     "];
+             "    4444444    ",
+             "   44.....44   ",
+             "  44.......44  ",
+             " 44..44444..44 ",
+             "44..4444444..44",
+             "44..44$$$44..44",
+             "44..44$$$44..44",
+             "44..44$$$44..44",
+             "44..4444444..44",
+             " 44..44444..44 ",
+             "  44.......44  ",
+             "   44.....44   ",
+             "    4444444    ",
+             "     44444     "];
    break;
 
    case 105:
     toAdd = ["     W4W4W     ",
-      "   W4.....4W   ",
-      "  4...._....4  ",
-      " W...........W ",
-      " 4...37373...4 ",
-      "W...3.....3...W",
-      "4..7..???..7..4",
-      "W..3..?1?..3..W",
-      "4..7..???..7..4",
-      "W...3.....3...W",
-      " 4...37873...4 ",
-      " W...........W ",
-      "  4...._....4  ",
-      "   W4.....4W   ",
-      "     W4W4W     "];
+             "   W4.....4W   ",
+             "  4...._....4  ",
+             " W...........W ",
+             " 4...37373...4 ",
+             "W...3.....3...W",
+             "4..7..$$$..7..4",
+             "W..3..$1$..3..W",
+             "4..7..$$$..7..4",
+             "W...3.....3...W",
+             " 4...37873...4 ",
+             " W...........W ",
+             "  4...._....4  ",
+             "   W4.....4W   ",
+             "     W4W4W     "];
+   break;
+
+   case 106:
+    toAdd = ["     7.7.7     ",
+             "   7.......7   ",
+             "  ...........  ",
+             " 7...........7 ",
+             " .....7.7..... ",
+             "7.............7",
+             "...7.......7...",
+             "7......1......7", // orb location?
+             "...7.......7...",
+             "7.............7",
+             " ............. ",
+             " 7....7.7....7 ",
+             "  ...........  ",
+             "   7.......7   ",
+             "     7.7.7     "];
+   break;
+
+   case 107:
+    toAdd = ["   77777    77777   ",
+             " 777414777777616777 ",
+             "77$$4.4$$77$$6.6$$77",
+             "77$$4.4$$77$$6.6$$77",
+             "77$$4.4$$77$$6.6$$77",
+             "77777877777777877777",
+             "77   .  7777  .   77",
+             "7        77        7"];
+   break;
+
+   case 108:
+    toAdd = ["     WW     ",
+             "  6WW16WW6  ",
+             "WW66$W6666WW",
+             "666WW66WW666",
+             "WW6666W$66WW",
+             "  6WW61WW6  ",
+             "     WW     "];
+   break;
+
+   case 109:
+    toAdd = ["7777777      ",
+             "7.....7      ",
+             "7._._.7.7.7.7",
+             "7.....8......",
+             "7._._.7.7.7.7",
+             "7.....7      ",
+             "7777777      "];
+   break;
+
+   case 110:
+    toAdd = ["   WWWW...WWWW   ",
+             "  W.....W.....W  ",
+             "  W.??..W..??.W  ",
+             "  W.??..W..??.W  ",
+             "  W....WWW....W  ",
+             "W....WW$$$WW....W",
+             "W....8$$1$$8....W",
+             "W....WW$$$WW....W",
+             "  W....WWW....W  ",
+             "  W.??..W..??.W  ",
+             "  W.??..W..??.W  ",
+             "  W.....W.....W  ",
+             "   WWWW...WWWW   "];
+   break;
+
+   case 111:
+    toAdd = ["W...W",
+             "W...W",
+             "W...W",
+             "W...W",
+             "W;;;W",
+             "W;;;W",
+             "W;;;W",
+             "W;_;W",
+             "W;;;W",
+             "W;;;W",
+             "W;;;W",
+             "W...W",
+             "W...W",
+             "W...W",
+             "W...W"];
+   break;
+
+   case 112:
+    toAdd = ["~~~",
+             "~~~",
+             "~7~",
+             "~~~",
+             "~~~",
+             "~~~",
+             "~~~",
+             "~7~",
+             "~~~",
+             "~~~",
+             "~~~",
+             "~~~",
+             "~7~",
+             "~~~",
+             "~~~"];
+   break;
+
+   case 113:
+    toAdd = ["7777777WWW7777777",
+             "7$.$.$=...=$,$,$7",
+             "7.;;;.=._.=,,,,,7",
+             "7.;1;.=...=,$i$,7",
+             "7.;;;.=...=,,,,,7",
+             "7$.$.$=...=$,$,$7",
+             "7777777...7777777",
+             "     WWW8WWW     ",
+             "        .        "];
+   break;
+
+   case 114:
+    toAdd = ["    WWW    ",
+             "    W_W    ",
+             "    ...    ",
+             "WWWWW.WWWWW"];
+   break;
+
+   case 115:
+    toAdd = ["6    6  6  6   66",
+             "66   6  6  6  66 ",
+             " 66  66 6 66 66  ",
+             "  66  6 6 6 66   ",
+             "   66 6666666    ",
+             "666 66 66666  666",
+             "  666666666 666  ",
+             "    666$$$666    ",
+             "6666666$_$6666666",
+             "    666$$$666    ",
+             "  666 666666666  ",
+             "666  66666 66 666",
+             "    6666666 66   ",
+             "   66 6 6 6  66  ",
+             "  66 66 6 66  66 ",
+             " 66  6  6  6   66",
+             "66   6  6  6    6"];
    break;
  }
 
@@ -2002,7 +2168,7 @@ function addStructure(){
  // Defined here to make it consistent for each room.
  var randDanger = ['^',tileLava,wallBlock][r(3)];
  var randAnnoy = [',',tileBramble,tileSludge,tileDark,tileNettles][r(5)];
- var randLiquid = [tileLava,tileSludge,tileWater][r(3)];
+ var randLiquid = liquids.sampleRec();
 
  // Mirror and flip:
  var mirrorRoom = r(2);
@@ -2028,6 +2194,9 @@ function addStructure(){
     case "=":
      currentMap[x+i][y+j] = tileLava;
      break;
+    case "'": // bloody floor
+     currentMap[x+i][y+j] = tileBloodDrop;
+     break;
     case "-":
      currentMap[x+i][y+j] = tileKey;
      break;
@@ -2043,8 +2212,14 @@ function addStructure(){
     case "#": // dark smoke
      currentMap[x+i][y+j] = tileDark;
      break;
+    case "b": // blood
+     currentMap[x+i][y+j] = tileBlood;
+     break;
     case "s": // sludge
      currentMap[x+i][y+j] = tileSludge;
+     break;
+    case "i": // minor treasure
+     currentMap[x+i][y+j] = ['$','_',']',tileKey][r(4)];
      break;
     case "1": // random treasure
      currentMap[x+i][y+j] = [tileTreasure,tileStaff,tileArmor][r(3)];
@@ -2107,7 +2282,7 @@ function newMap(x,y){
 
  // Spawn enemies:
  currCre = []; // Get rid of all creatures from old map. We don't save them, instead spawn new ones if the player returns.
- var cQ = r(visited); // How many to spawn.
+ var cQ = Math.max(distanceToOrigin(), r(visited)); // How many to spawn.
  // More powerful enemies are towards the start of creatureList, so spawn more powerful enemies in later areas.
  var cHere = r(Math.max(creatureList.length-distanceToOrigin(),creatureList.length/2));
  for (var i = 0; i < cQ; i++) {
@@ -2222,7 +2397,7 @@ function useStaff(){
    msg += "Where would you like to direct them? ";
    break;
  }
- //TODO: Somehow take a turn?
+ // Do not take a turn, or staves of Conjuration and Soaring Leap will be broken.
  displayMap();
 }
 
@@ -2297,11 +2472,11 @@ function playerTakeDamage(dmg,i=9999){
   ward--;
   return;
  }
- if(phased>0){ // double armour when phased
-   score -= Math.max(1, dmg-(armor*2));
- } else {
-   score -= Math.max(1, dmg-armor);
- }
+
+ var resist = armor;
+ if(phased>0) resist *= 2; // Double armour when phased.
+ if(bloodied>0) dmg += kills; // Extra damage when bloodied.
+ score -= Math.max(1, dmg-resist);
 
  // Proc glyphs:
  if(!r(3)){
@@ -2361,6 +2536,13 @@ function killCreature(i){
   return;
  }
 
+ // A little bit of score for killing enemies:
+ score += 10;
+ if(glyph==8 && bloodied>0){ // blood knight armour
+   score += 10;
+   msg += "You drain the lifeblood of "+currCre[i].name+". ";
+ }
+
  msg += currCre[i].name+" dies. ";
  onDeath(i);
  currCre = currCre.removeElement(currCre[i]);
@@ -2417,6 +2599,7 @@ function moveUser(x,y){
   aflame--;
  }
  if(blinded>0) blinded--;
+ if(bloodied>0) bloodied--;
  if(panicked>0) panicked--;
  if(phased>0) phased--;
 
@@ -2462,7 +2645,11 @@ function moveUser(x,y){
    currCre.push(mobOrb);
    currCre[currCre.length-1].x = userPos.x+x;
    currCre[currCre.length-1].y = userPos.y+y;
-  } else msg += "The conjuration fizzles. ";
+  } else {
+    msg += "The conjuration fizzles. ";
+    // Refund cost of unused magic:
+    score += 10;
+  }
 
   orb = false;
  } else {
@@ -2470,15 +2657,22 @@ function moveUser(x,y){
   if(leap){
    // Move player in direction until blocked.
    var leaped = 0;
-   while(inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
-    userPos.x += x;
-    userPos.y += y;
-    leaped += 1;
+   if(x!=0 || y!=0){
+     // Don't jump in place forever. ;)
+     while(inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
+      userPos.x += x;
+      userPos.y += y;
+      leaped += 1;
+     }
    }
 
    if(leaped>1) msg += "You leap! ";
    else if(leaped==1) msg += "You jump. ";
-   else msg += "You balk at the leap. ";
+   else {
+     msg += "You balk at the leap. ";
+     // Refund cost of unused magic:
+     score += 10;
+   }
 
    leap = false;
   } // Fallthrough to normal movement, so that the player can enter new map/attack with a leap.
@@ -2508,6 +2702,10 @@ function moveUser(x,y){
    msg += "Your "+getArmorName()+" envelops you in shadows. ";
    phased += 10+r(20);
  }
+ if(glyph==8 && currentMap[userPos.x][userPos.y]==emptyBlock && bloodied>0){
+  // Armor of the blood knight trails blood as the player moves.
+  currentMap[userPos.x][userPos.y]=tileBloodDrop;
+ }
 
  // Handle special terrain underfoot.
  switch(currentMap[userPos.x][userPos.y]){
@@ -2529,7 +2727,7 @@ function moveUser(x,y){
    switch(r(6)){
     case 0:
      if(r(visited)>10){
-      aflame += r(30)+r(30);
+      aflame += r(30)+r(30)+3;
       msg += "A gout of hellfire sets you ablaze. ";
      }
      else{
@@ -2542,7 +2740,7 @@ function moveUser(x,y){
      msg += "You hear the grinding of ancient mechanisms. ";
      if(r(2)) currentMap[userPos.x][userPos.y]=wallBlock;
      else {
-      var q = r(10)+1;
+      var q = r(10)+3;
       var intoWhat = [wallBlock,'^'][r(2)];
       while(q--){
        currentMap[r(mapWidth)][r(mapWidth)]=intoWhat;
@@ -2561,12 +2759,12 @@ function moveUser(x,y){
      break;
 
     case 4:
-     msg += "You are surrounded by noxious gas. ";
      if(glyph != 3){
+       msg += "You are surrounded by horrific gas. ";
        if(panicked==0)
          msg += "You panic! ";
-       panicked += 5+r(6)+r(6)+r(6);
-     }
+       panicked += r(50)+r(50)+5;
+     } else msg += "You are surrounded by pleasant odour. ";
      break;
 
     default:
@@ -2649,7 +2847,7 @@ function moveUser(x,y){
   //armor enchanted
   case tileArmor:
    currentMap[userPos.x][userPos.y]='.';
-   armor = Math.max(r(distanceToOrigin()), parseInt(distanceToOrigin()/2));
+   armor = Math.max(r(visited), parseInt(distanceToOrigin()/2));
    glyph = r(glyphs.length);
    msg += "You find a "+getArmorName()+" and equip it. It "+glyphDesc[glyph]+". ";
    break;
@@ -2657,37 +2855,59 @@ function moveUser(x,y){
   //armor normal
   case "]":
    currentMap[userPos.x][userPos.y]='.';
-   armor = Math.max(r(distanceToOrigin()), parseInt(distanceToOrigin()/2));
+   armor = Math.max(r(visited), parseInt(distanceToOrigin()/2));
    glyph = 0;
    msg += "You find a "+getArmorName()+" and equip it. ";
    break;
 
   case tileWater:
    if(glyph == 2){ //cleansing
-    if(cureAll()) msg += "Your armour glows with soft blue light. ";
+    if(cureAll())
+      msg += "Your armour glows with soft blue light. ";
    }
    else if(aflame>0){
     aflame = 0;
     msg += "You no longer burn. ";
+   }
+   if(bloodied>0){
+    bloodied = 0;
+    msg += "You wash yourself clean. ";
    }
    break;
 
   case tileLava:
    if(!r(20))
      msg += "Aargh! The floor is lava here! ";
-   aflame += r(30);
+   aflame += r(30)+1;
    break;
 
   case tileSludge:
    if(!r(4))
      msg += "Ack! This sludge is "+["disgusting","revolting","foul","nauseating"].sampleRec()+". ";
-   poisoned += r(10);
+   poisoned += r(10)+distanceToOrigin();
    break;
 
   case tileDark:
    if(!r(4))
      msg += "The dense smoke stings your eyes. ";
    blinded += r(4)+1;
+   break;
+
+  case tileBlood:
+   if(glyph==8 && !r(10)) // blood knight armour
+     msg += ["What's that smell? The sweet blood! It's enough to make a man sick. ",
+             "Glorious blood! Oh, it sings to me! ",
+             "Blessed be blood! ",
+             "Blood makes us human, makes us more than human, makes us human no more. "].sampleRec();
+   else if(!r(4))
+     msg += ["You wade knee deep in blood. ","You are covered in blood. "].sampleRec();
+   else if(!r(100))
+     msg += "Where does all this blood come from? ";
+   if(aflame>0){
+     aflame = 0;
+     msg += "You no longer burn. ";
+   }
+   bloodied += r(10)+kills;
    break;
 
   case ',': //rubble
@@ -2700,34 +2920,53 @@ function moveUser(x,y){
    break;
 
   case tileGrassTall:
-   msg += "You trample the grass. ";
-   currentMap[userPos.x][userPos.y]=tileGrassShort;
+   if(aflame>0){
+     msg += "You burn the grass. ";
+     currentMap[userPos.x][userPos.y]='.';
+   } else {
+     msg += "You trample the grass. ";
+     currentMap[userPos.x][userPos.y]=tileGrassShort;
+   }
    break;
 
   case tileBramble:
-   msg += "You tear through the bramble. ";
-   playerTakeDamage(r(6)+2);
-   currentMap[userPos.x][userPos.y]=tileGrassShort;
+   if(aflame>0){
+     msg += "You burn the bramble. ";
+     currentMap[userPos.x][userPos.y]='.';
+   } else {
+     msg += "You tear through the bramble. ";
+     playerTakeDamage(r(6)+2);
+     currentMap[userPos.x][userPos.y]=tileGrassShort;
+   }
    break;
 
   case tileNettles:
-   msg += "You trample the dread nettles. ";
-   if(glyph != 3){
-     if(panicked==0)
-       msg += "You panic! ";
-     panicked += r(10)+visited;
+   if(aflame>0){
+     msg += "You burn the dread nettles. ";
+     currentMap[userPos.x][userPos.y]='.';
+   } else {
+     msg += "You trample the dread nettles. ";
+     if(glyph != 3){
+       if(panicked==0)
+         msg += "You panic! ";
+       panicked += r(10)+currCre.length;
+     }
+     currentMap[userPos.x][userPos.y]=tileBloodDrop; // Close enough.
    }
-   currentMap[userPos.x][userPos.y]=emptyBlock;
    break;
 
   case "_":
    msg += "You kneel at the altar. ";
-
-   // Cures afflictions, but if you have none, you instead get a ranom boon.
-   if(!cureAll()){
+   // Set score to 100 if it's low enough.
+   if(score<20){
+     score = 100;
+     msg += "You feel uplifted. ";
+   }
+   // Cure afflictions, but if you have none, you instead get a random boon.
+   else if(!cureAll()){
     switch(r(5)){
      default:
-      // Enchants armor, otherwise try give a different boon.
+      // Enchants armor, otherwise tries to give a different boon.
       if(glyph==0){
        msg += "Your "+armors[armor]+" glows bright purple for a second. ";
        glyph = 1+r(glyphs.length-1);
@@ -2879,6 +3118,21 @@ function tryMove(x,y,i){
      msg += currCre[i].name+" explodes. ";
      onExplosion(i);
      break;
+
+    case "bloody":
+     msg += currCre[i].name+" bleeds profusely. ";
+     bloodied += 10+kills;
+     // Lots of blood:
+     for(var k=-1; k < 2; k++){
+      for(var l=-1; l < 2; l++){
+       if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)){
+         // I will rather make doubly sure we're not checking outside the map's borders.
+         if(currentMap[currCre[i].x+k][currCre[i].y+l] == emptyBlock)
+           currentMap[currCre[i].x+k][currCre[i].y+l] = tileBloodDrop;
+       }
+      }
+     }
+     break;
    }
   }
 
@@ -2895,8 +3149,18 @@ function doMove(x,y,i){
 }
 
 function onDeath(i){
+ // Handle special death effects:
  for(var j = 0; j < currCre[i].flags.length; j++){
   switch(currCre[i].flags[j]){
+   case "bloodpool":
+    for(var k=-1; k < 2; k++){
+     for(var l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)) currentMap[currCre[i].x+k][currCre[i].y+l] = tileBlood;
+     }
+    }
+    msg += currCre[i].name+" explodes in a shower of gore. ";
+    break;
+
    case "lavapool":
     for(var k=-1; k < 2; k++){
      for(var l=-1; l < 2; l++){
@@ -2907,6 +3171,16 @@ function onDeath(i){
     break;
 
    case "boss":
+    // Lots of blood:
+    for(var k=-1; k < 2; k++){
+     for(var l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)){
+        // I will rather make doubly sure we're not checking outside the map's borders.
+        if(currentMap[currCre[i].x+k][currCre[i].y+l] == emptyBlock)
+          currentMap[currCre[i].x+k][currCre[i].y+l] = tileBloodDrop;
+      }
+     }
+    }
     // Spawn MacGuffin when the boss dies.
     currentMap[currCre[i].x][currCre[i].y] = tileMacGuffin;
     break;
@@ -2936,11 +3210,15 @@ function onDeath(i){
     break;
 
    case "boonscore":
-    score += Math.max(5, kills);
+    score += 5+kills; // Not much at first, but snowballs if you keep killing.
     msg += "You absorb some essence of memory from "+currCre[i].name+". ";
     break;
   }
  }
+
+ // Create a bloodstain:
+ if(currentMap[currCre[i].x][currCre[i].y] == emptyBlock)
+   currentMap[currCre[i].x][currCre[i].y] = tileBloodDrop;
 }
 
 function onExplosion(i){
@@ -3026,7 +3304,7 @@ function getFinalScore(){
  return "<t style='color:#8B008B; font-weight: bold;'>"+String(parseInt(winner))+"</t>";
 }
 
-function displayMap(){
+function displayMap(findPlayer=false){
  var displayString = "";
  var outputMap = [];
 
@@ -3036,7 +3314,7 @@ function displayMap(){
   outputMap[currCre[i].x][currCre[i].y]=currCre[i].icon;
  }
  // If blind, only display the player:
- if(blinded>0){
+ if(blinded>0 || findPlayer){
   for (var i = 0; i < mapWidth; i++) {
    for (var j = 0; j < mapWidth; j++) {
     outputMap[i][j] = emptyBlock;
@@ -3068,7 +3346,8 @@ function displayMap(){
  var equipped = "Weapon: Staff" + staves[staff] + "<br />Armour: " + getArmorName() + " - Defense: "+String(armor);
  var states = ((aflame>0) ? "<t style='color:#FF4500'>Aflame</t> " : "") +
               ((blinded>0) ? "<t style='background-color:#000000; color:#FFFFFF;'>Blind</t> " : "") + // white on black
-              ((panicked>0) ? "<t style='color:#FF0000'>Panicked</t> " : "") +
+              ((bloodied>0) ? "<t style='color:#8A0303'>Bloodied</t> " : "") +
+              ((panicked>0) ? "<t style='color:#DC143C'>Panicked</t> " : "") +
               ((phased>0) ? "<t style='color:#4B0082'>Phasing</t> " : "") +
               ((poisoned>0) ? "<t style='color:#90EE90'>Poisoned</t> " : "") +
               ((timestop>0) ? "<t style='color:#FF00FF'>Time Stop</t> " : "") +
@@ -3119,7 +3398,22 @@ document.onkeydown = function(e) {
         case 188://?
         case 191:// An alternate question mark code, apparently.
          // Open a help window.
-         alert("Wanderer "+VERSION+"\n\nUse arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\nUse 'X' or '0' to invoke the powers of your magic staff.\nGather the '$' memories of your life, or you may fade away before you reach your closure.");
+         alert("Wanderer "+VERSION+"\n\n"+
+               "Use arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\n"+
+               "Press 'X' or '0' to invoke the powers of your magic staff.\n"+
+               "Hold Ctrl to highlight your avatar.\n\n"+
+               "Gather the '$' memories of your life, or you may fade away before you reach your closure.");
+         break;
+        case 17: //Ctrl
+         displayMap(true);
+         break;
+    }
+};
+
+document.onkeyup = function(e) {
+    switch (e.keyCode) {
+        case 17: //Ctrl
+         displayMap();
          break;
     }
 };
