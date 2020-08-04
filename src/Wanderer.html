@@ -76,8 +76,8 @@ var kills = 0;
 
 var staff = 0;
 var staves = [""," of Ethereal Paths"," of Frozen Time"," of Secret Paths"," of Life Triumphant"," of Vorpal Sharpness"," of Soaring Leap"," of Conjuration"];
-var staffDesc = ["lacks any and all magical powers, unfortunately",
-                 "may open ephemeral bridges to faraway distances",
+var staffDesc = ["can support your step and whack your enemies, but lacks any and all magical powers, unfortunately",
+                 "may open ephemeral bridges to faraway locations",
                  "can momentarily remove you from the flow of time, rendering all monsters and mechanisms frozen and unable to affect you",
                  "may reveal concealed corridors and crevices in nearby walls",
                  "can cleanse your body of all ills, or even save your life",
@@ -86,21 +86,25 @@ var staffDesc = ["lacks any and all magical powers, unfortunately",
                  "can materialize the volatile energies of raw magic",];
 
 var armor = 0;
-var armors = ["Green Tunic","Fur Cloak","Padded Jacket","Leather Jacket","Leather Armour","Quilted Leather Armour","Studded Leather Armour","Chitin Cuirass","Brigandine","Chain Shirt","Bulletproof Vest","Scale Mail","Ironbark Breastplate","Chain Mail","Hauberk","Ring Mail","Banded Armour","Splint Mail","Half Plate Mail","Mithril Chain Mail","Full Plate Mail","Crystal Shard Mail","Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail","Solid Gold Armour","Crystal Plate Mail","Nemean Lion Hide","Adamantine Armour","Powered Armour"];
+var armors = ["<t style='color:#228B22'>Green Tunic</t>",
+              "<t style='color:#696969'>Fur</t> <t style='color:#8B4513'>Cloak</t>",
+              "Padded Jacket","Leather Jacket","Leather Armour","Quilted Leather Armour","Studded Leather Armour","Chitin Cuirass","Brigandine","Chain Shirt","Bulletproof Vest","Scale Mail","Ironbark Breastplate","Chain Mail","Hauberk","Ring Mail","Banded Armour","Splint Mail","Magic Cloak","Half Plate Mail","Mithril Chain Mail","Full Plate Mail","Crystal Shard Mail","Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail","Solid Gold Armour","Crystal Plate Mail","Nemean Lion Hide","Adamantine Armour","Powered Armour"];
 var glyph = 0;
-var glyphs = [""," of Brimstone"," of Cleansing Waters"," of Mortal Terror"," of Ethereal Escape"," of Bloody Retribution"," of Invulnerability"," of Shadowy Escape"];
+var glyphs = [""," of Brimstone"," of Cleansing Waters"," of Mortal Terror"," of Ethereal Escape"," of Retribution"," of Invulnerability"," of Shadowy Escape"," of the Blood Knight"];
 var glyphDesc = ["will dull the blows of your enemies",
                  "shall nourish your Self when fed radiant, everburning fire",
                  "will let you wash away your ailments",
                  "shall strike fear in your foes",
-                 "may provide an ephemeral bridge away from any peril",
+                 "may provide an ephemeral bridge away from peril",
                  "will make you answer violence with violence",
                  "can shield you from harm",
-                 "may shroud you in intangible shadows",];
+                 "may shroud you in intangible shadows",
+                 "will make you hunger for the lifeblood of your foes",];
 
 // Status effects:
 var aflame = 0;
 var blinded = 0;
+var bloodied = 0;
 var phased = 0;
 var panicked = 0;
 var poisoned = 0;
@@ -116,6 +120,7 @@ var wallBlock = '&#9608;';
 var tileWater = "<t style='background-color:#1E90FF'>~</t>";
 var tileLava = "<t style='background-color:#FF4500'>~</t>";
 var tileSludge = "<t style='background-color:#00FF00'>~</t>";
+var tileBlood = "<t style='background-color:#8A0303'>~</t>";
 var tileDark = "<t style='color:#696969'>#</t>";
 var tileKey = "<t style='color:#800080'>9</t>";
 var tileArmor = "<t style='color:#800080'>]</t>"; //enchanted armor, normal is just ']'
@@ -124,27 +129,29 @@ var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
 var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
 var tileTreasure = "<t style='color:#800080'>&#167;</t>";
 var tileBramble = "<t style='color:#32CD32'>!</t>";
-var tileNettles = "<t style='color:#FF0000'>!</t>";
+var tileNettles = "<t style='color:#DC143C'>!</t>";
 var tileGrassTall = "<t style='color:#32CD32'>;</t>";
 var tileGrassShort = "<t style='color:#32CD32'>.</t>";
+var tileBloodDrop = "<t style='color:#8A0303'>.</t>";
 //var tileMacGuffin = "<t style='color:#FF00FF'>&#9959;</t>"; maybe use as summoning circle?
 var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
 var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
 
 var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles]];
-var rareTerrain = ['/','0',tileKey,'_',']',[tileSludge,tileDark]];
+var rareTerrain = ['/','0',tileKey,'_',']',[tileSludge,tileDark,tileBlood]];
 var impassable = [wallBlock,tileGoldWall,tileDoor];
+var liquids = [tileBlood,tileLava,tileSludge,tileWater];
 
 var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".split('');
 var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
-                     name:"<t style='color:#FF0000'>Demon of Isolation</t>",
+                     name:"<t style='color:#FF0000'>Inner Demon</t>",
                      attack:"slams",
                      quickness:2,
                      x:0,y:0,
-                     flags: [],
+                     flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","flame","agony","regen","blind","trapper","teleother","haste","knockback","steal","lavapool","disenchant","summon","panic","dodge","boonphase","boontime","boonscore"];
+var allFlags = ["diagonal","venom","flame","agony","regen","blind","trapper","teleother","haste","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","boonphase","boontime","boonscore"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
@@ -228,6 +235,11 @@ var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                     userPos.y += dy;
                     msg += "You are knocked back. ";
                    }
+                   break;
+
+                  case 12:
+                   msg += "You are showered in blood. ";
+                   bloodied += 10+kills;
                    break;
                  }
                 } else if(!r(4) && !this.flags.includes("flee")){
@@ -363,10 +375,21 @@ function getMobName(letter){
 function getUserChar(){
  var colour = 'red';
  if(poisoned>0) colour = '#90EE90';
+ else if(phased>0) colour = '#4B0082';
+ else if(timestop>0) colour = '#FF00FF';
+ else if(ward>0) colour = '#DAA520';
 
  var bkg = '';
  if(currentMap[userPos.x][userPos.y] == tileWater) bkg = 'background-color:#1E90FF; ';
  else if(currentMap[userPos.x][userPos.y] == tileLava) bkg = 'background-color:#FF4500; ';
+ else if(currentMap[userPos.x][userPos.y] == tileSludge){
+   colour = '#000000';
+   bkg = 'background-color:#00FF00; ';
+ }
+ else if(currentMap[userPos.x][userPos.y] == tileBlood){
+   colour = '#000000';
+   bkg = 'background-color:#8A0303; ';
+ }
 
  return "<t style='"+bkg+"color:"+colour+"; font-weight: 900;'>@</t>";
 }
@@ -508,7 +531,8 @@ function getHint(says=""){
              "You cannot fix it anymore.",
              "Why did you do it?",
              "Why them?",
-             "Find the levers, once you are truly yourself..."];
+             "Find the levers, once you are truly yourself...",
+             "Conquering your inner demons brings a certain boon.",];
 
  var compass = ["north","south","east","west"];
  var adj = ["mysterious","strange","rasping","barely audible","faint","familiar","unfamiliar","inhuman"];
@@ -541,7 +565,7 @@ function getHint(says=""){
 // Make map:
 function generateMap(){
  // Tiny chance that we create a crazy level full of special terrain.
- var chanceTerrain = !r(10000) && (visited>10);
+ var chanceTerrain = !r(1000) && (visited>1);
 
  for (var i = 0; i < mapWidth; i++) {
   currentMap[i] = []; // empty map
@@ -644,7 +668,7 @@ function addLake(){
  var liquid = emptyBlock; // Just to make sure we don't accidentaly make undefined lake.
  if(r(visited)>20) liquid = tileLava;
  else {
-  switch(r(12)){
+  switch(r(14)){
    default: liquid = tileWater; break;
    case 0: liquid = ','; break;
    case 1: liquid = tileGrassTall; break;
@@ -652,6 +676,7 @@ function addLake(){
    case 3: liquid = tileNettles; break;
    case 4: liquid = tileSludge; break;
    case 5: liquid = tileDark; break;
+   case 6: liquid = tileBlood; break;
   }
  }
 
@@ -2002,7 +2027,7 @@ function addStructure(){
  // Defined here to make it consistent for each room.
  var randDanger = ['^',tileLava,wallBlock][r(3)];
  var randAnnoy = [',',tileBramble,tileSludge,tileDark,tileNettles][r(5)];
- var randLiquid = [tileLava,tileSludge,tileWater][r(3)];
+ var randLiquid = liquids.sampleRec();
 
  // Mirror and flip:
  var mirrorRoom = r(2);
@@ -2042,6 +2067,9 @@ function addStructure(){
      break;
     case "#": // dark smoke
      currentMap[x+i][y+j] = tileDark;
+     break;
+    case "b": // blood
+     currentMap[x+i][y+j] = tileBlood;
      break;
     case "s": // sludge
      currentMap[x+i][y+j] = tileSludge;
@@ -2107,7 +2135,7 @@ function newMap(x,y){
 
  // Spawn enemies:
  currCre = []; // Get rid of all creatures from old map. We don't save them, instead spawn new ones if the player returns.
- var cQ = r(visited); // How many to spawn.
+ var cQ = Math.max(distanceToOrigin(), r(visited)); // How many to spawn.
  // More powerful enemies are towards the start of creatureList, so spawn more powerful enemies in later areas.
  var cHere = r(Math.max(creatureList.length-distanceToOrigin(),creatureList.length/2));
  for (var i = 0; i < cQ; i++) {
@@ -2297,11 +2325,11 @@ function playerTakeDamage(dmg,i=9999){
   ward--;
   return;
  }
- if(phased>0){ // double armour when phased
-   score -= Math.max(1, dmg-(armor*2));
- } else {
-   score -= Math.max(1, dmg-armor);
- }
+
+ var resist = armor;
+ if(phased>0) resist *= 2; // Double armour when phased.
+ if(bloodied>0) dmg += kills; // Extra damage when bloodied.
+ score -= Math.max(1, dmg-resist);
 
  // Proc glyphs:
  if(!r(3)){
@@ -2361,6 +2389,13 @@ function killCreature(i){
   return;
  }
 
+ // A little bit of score for killing enemies:
+ score += 10;
+ if(glyph==8 && bloodied>0){ // blood knight armour
+   score += 10;
+   msg += "You drain the lifeblood of "+currCre[i].name+". ";
+ }
+
  msg += currCre[i].name+" dies. ";
  onDeath(i);
  currCre = currCre.removeElement(currCre[i]);
@@ -2417,6 +2452,7 @@ function moveUser(x,y){
   aflame--;
  }
  if(blinded>0) blinded--;
+ if(bloodied>0) bloodied--;
  if(panicked>0) panicked--;
  if(phased>0) phased--;
 
@@ -2508,6 +2544,10 @@ function moveUser(x,y){
    msg += "Your "+getArmorName()+" envelops you in shadows. ";
    phased += 10+r(20);
  }
+ if(glyph==8 && currentMap[userPos.x][userPos.y]==emptyBlock && bloodied>0){
+  // Armor of the blood knight trails blood as the player moves.
+  currentMap[userPos.x][userPos.y]=tileBloodDrop;
+ }
 
  // Handle special terrain underfoot.
  switch(currentMap[userPos.x][userPos.y]){
@@ -2529,7 +2569,7 @@ function moveUser(x,y){
    switch(r(6)){
     case 0:
      if(r(visited)>10){
-      aflame += r(30)+r(30);
+      aflame += r(30)+r(30)+3;
       msg += "A gout of hellfire sets you ablaze. ";
      }
      else{
@@ -2542,7 +2582,7 @@ function moveUser(x,y){
      msg += "You hear the grinding of ancient mechanisms. ";
      if(r(2)) currentMap[userPos.x][userPos.y]=wallBlock;
      else {
-      var q = r(10)+1;
+      var q = r(10)+3;
       var intoWhat = [wallBlock,'^'][r(2)];
       while(q--){
        currentMap[r(mapWidth)][r(mapWidth)]=intoWhat;
@@ -2561,12 +2601,12 @@ function moveUser(x,y){
      break;
 
     case 4:
-     msg += "You are surrounded by noxious gas. ";
      if(glyph != 3){
+       msg += "You are surrounded by horrific gas. ";
        if(panicked==0)
          msg += "You panic! ";
-       panicked += 5+r(6)+r(6)+r(6);
-     }
+       panicked += r(50)+r(50)+5;
+     } else msg += "You are surrounded by pleasant odour. ";
      break;
 
     default:
@@ -2577,8 +2617,9 @@ function moveUser(x,y){
    break;
 
   case '?': //random fun
-   currentMap[userPos.x][userPos.y]=['$','^',','][r(3)];
    if(!r(100)) currentMap[userPos.x][userPos.y]=['0','_','/',tileKey,']'][r(5)];
+   else if(!r(100)) currentMap[userPos.x][userPos.y]=[tileArmor,tileStaff][r(2)];
+   else currentMap[userPos.x][userPos.y]=['$','^',','][r(3)];
    msg += "You investigate the mysterious pile. ";
    break;
 
@@ -2648,7 +2689,7 @@ function moveUser(x,y){
   //armor enchanted
   case tileArmor:
    currentMap[userPos.x][userPos.y]='.';
-   armor = Math.max(r(distanceToOrigin()), parseInt(distanceToOrigin()/2));
+   armor = Math.max(r(visited), parseInt(distanceToOrigin()/2));
    glyph = r(glyphs.length);
    msg += "You find a "+getArmorName()+" and equip it. It "+glyphDesc[glyph]+". ";
    break;
@@ -2656,37 +2697,59 @@ function moveUser(x,y){
   //armor normal
   case "]":
    currentMap[userPos.x][userPos.y]='.';
-   armor = Math.max(r(distanceToOrigin()), parseInt(distanceToOrigin()/2));
+   armor = Math.max(r(visited), parseInt(distanceToOrigin()/2));
    glyph = 0;
    msg += "You find a "+getArmorName()+" and equip it. ";
    break;
 
   case tileWater:
    if(glyph == 2){ //cleansing
-    if(cureAll()) msg += "Your armour glows with soft blue light. ";
+    if(cureAll())
+      msg += "Your armour glows with soft blue light. ";
    }
    else if(aflame>0){
     aflame = 0;
     msg += "You no longer burn. ";
+   }
+   if(bloodied>0){
+    bloodied = 0;
+    msg += "You wash yourself clean. ";
    }
    break;
 
   case tileLava:
    if(!r(20))
      msg += "Aargh! The floor is lava here! ";
-   aflame += r(30);
+   aflame += r(30)+1;
    break;
 
   case tileSludge:
    if(!r(4))
      msg += "Ack! This sludge is "+["disgusting","revolting","foul","nauseating"].sampleRec()+". ";
-   poisoned += r(10);
+   poisoned += r(10)+distanceToOrigin();
    break;
 
   case tileDark:
    if(!r(4))
      msg += "The dense smoke stings your eyes. ";
    blinded += r(4)+1;
+   break;
+
+  case tileBlood:
+   if(glyph==8 && !r(10)) // blood knight armour
+     msg += ["What's that smell? The sweet blood! It's enough to make a man sick. ",
+             "Glorious blood! Oh, it sings to me! ",
+             "Blessed be blood! ",
+             "Blood makes us human, makes us more than human, makes us human no more. "].sampleRec();
+   else if(!r(4))
+     msg += ["You wade knee deep in blood. ","You are covered in blood. "].sampleRec();
+   else if(!r(100))
+     msg += "Where does all this blood come from? ";
+   if(aflame>0){
+     aflame = 0;
+     msg += "You no longer burn. ";
+   }
+   bloodied += r(10)+kills;
    break;
 
   case ',': //rubble
@@ -2699,34 +2762,49 @@ function moveUser(x,y){
    break;
 
   case tileGrassTall:
-   msg += "You trample the grass. ";
-   currentMap[userPos.x][userPos.y]=tileGrassShort;
+   if(aflame>0){
+     msg += "You burn the grass. ";
+     currentMap[userPos.x][userPos.y]='.';
+   } else {
+     msg += "You trample the grass. ";
+     currentMap[userPos.x][userPos.y]=tileGrassShort;
+   }
    break;
 
   case tileBramble:
-   msg += "You tear through the bramble. ";
-   playerTakeDamage(r(6)+2);
-   currentMap[userPos.x][userPos.y]=tileGrassShort;
+   if(aflame>0){
+     msg += "You burn the bramble. ";
+     currentMap[userPos.x][userPos.y]='.';
+   } else {
+     msg += "You tear through the bramble. ";
+     playerTakeDamage(r(6)+2);
+     currentMap[userPos.x][userPos.y]=tileGrassShort;
+   }
    break;
 
   case tileNettles:
-   msg += "You trample the dread nettles. ";
-   if(glyph != 3){
-     if(panicked==0)
-       msg += "You panic! ";
-     panicked += r(10)+visited;
+   if(aflame>0){
+     msg += "You burn the dread nettles. ";
+     currentMap[userPos.x][userPos.y]='.';
+   } else {
+     msg += "You trample the dread nettles. ";
+     if(glyph != 3){
+       if(panicked==0)
+         msg += "You panic! ";
+       panicked += r(10)+currCre.length;
+     }
+     currentMap[userPos.x][userPos.y]=tileBloodDrop; // Close enough.
    }
-   currentMap[userPos.x][userPos.y]=emptyBlock;
    break;
 
   case "_":
    msg += "You kneel at the altar. ";
 
-   // Cures afflictions, but if you have none, you instead get a ranom boon.
+   // Cures afflictions, but if you have none, you instead get a random boon.
    if(!cureAll()){
     switch(r(5)){
      default:
-      // Enchants armor, otherwise try give a different boon.
+      // Enchants armor, otherwise tries to give a different boon.
       if(glyph==0){
        msg += "Your "+armors[armor]+" glows bright purple for a second. ";
        glyph = 1+r(glyphs.length-1);
@@ -2878,6 +2956,21 @@ function tryMove(x,y,i){
      msg += currCre[i].name+" explodes. ";
      onExplosion(i);
      break;
+
+    case "bloody":
+     msg += currCre[i].name+" bleeds profusely. ";
+     bloodied += 10+kills;
+     // Lots of blood:
+     for(var k=-1; k < 2; k++){
+      for(var l=-1; l < 2; l++){
+       if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)){
+         // I will rather make doubly sure we're not checking outside the map's borders.
+         if(currentMap[currCre[i].x+k][currCre[i].y+l] == emptyBlock)
+           currentMap[currCre[i].x+k][currCre[i].y+l] = tileBloodDrop;
+       }
+      }
+     }
+     break;
    }
   }
 
@@ -2894,8 +2987,18 @@ function doMove(x,y,i){
 }
 
 function onDeath(i){
+ // Handle special death effects:
  for(var j = 0; j < currCre[i].flags.length; j++){
   switch(currCre[i].flags[j]){
+   case "bloodpool":
+    for(var k=-1; k < 2; k++){
+     for(var l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)) currentMap[currCre[i].x+k][currCre[i].y+l] = tileBlood;
+     }
+    }
+    msg += currCre[i].name+" explodes in a shower of gore. ";
+    break;
+
    case "lavapool":
     for(var k=-1; k < 2; k++){
      for(var l=-1; l < 2; l++){
@@ -2906,6 +3009,16 @@ function onDeath(i){
     break;
 
    case "boss":
+    // Lots of blood:
+    for(var k=-1; k < 2; k++){
+     for(var l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)){
+        // I will rather make doubly sure we're not checking outside the map's borders.
+        if(currentMap[currCre[i].x+k][currCre[i].y+l] == emptyBlock)
+          currentMap[currCre[i].x+k][currCre[i].y+l] = tileBloodDrop;
+      }
+     }
+    }
     // Spawn MacGuffin when the boss dies.
     currentMap[currCre[i].x][currCre[i].y] = tileMacGuffin;
     break;
@@ -2935,11 +3048,15 @@ function onDeath(i){
     break;
 
    case "boonscore":
-    score += Math.max(5, kills);
+    score += 5+kills; // Not much at first, but snowballs if you keep killing.
     msg += "You absorb some essence of memory from "+currCre[i].name+". ";
     break;
   }
  }
+
+ // Create a bloodstain:
+ if(currentMap[currCre[i].x][currCre[i].y] == emptyBlock)
+   currentMap[currCre[i].x][currCre[i].y] = tileBloodDrop;
 }
 
 function onExplosion(i){
@@ -3025,7 +3142,7 @@ function getFinalScore(){
  return "<t style='color:#8B008B; font-weight: bold;'>"+String(parseInt(winner))+"</t>";
 }
 
-function displayMap(){
+function displayMap(findPlayer=false){
  var displayString = "";
  var outputMap = [];
 
@@ -3035,7 +3152,7 @@ function displayMap(){
   outputMap[currCre[i].x][currCre[i].y]=currCre[i].icon;
  }
  // If blind, only display the player:
- if(blinded>0){
+ if(blinded>0 || findPlayer){
   for (var i = 0; i < mapWidth; i++) {
    for (var j = 0; j < mapWidth; j++) {
     outputMap[i][j] = emptyBlock;
@@ -3052,7 +3169,7 @@ function displayMap(){
  // Highlight Self levels:
  var currentSelf;
  if(score <= 0) {
-   currentSelf = "<t style='background-color:#FF0000; padding: 1px;'>Gone</t>";
+   currentSelf = "<t style='color:#FF0000; font-weight: bold;'>faded</t>";
  } else if(score < 50) {
    currentSelf = "<t style='background-color:#FF0000; padding: 1px;'>"+String(score)+"</t>";
  } else if(score > 1000){
@@ -3067,7 +3184,8 @@ function displayMap(){
  var equipped = "Weapon: Staff" + staves[staff] + "<br />Armour: " + getArmorName() + " - Defense: "+String(armor);
  var states = ((aflame>0) ? "<t style='color:#FF4500'>Aflame</t> " : "") +
               ((blinded>0) ? "<t style='background-color:#000000; color:#FFFFFF;'>Blind</t> " : "") + // white on black
-              ((panicked>0) ? "<t style='color:#FF0000'>Panicked</t> " : "") +
+              ((bloodied>0) ? "<t style='color:#8A0303'>Bloodied</t> " : "") +
+              ((panicked>0) ? "<t style='color:#DC143C'>Panicked</t> " : "") +
               ((phased>0) ? "<t style='color:#4B0082'>Phasing</t> " : "") +
               ((poisoned>0) ? "<t style='color:#90EE90'>Poisoned</t> " : "") +
               ((timestop>0) ? "<t style='color:#FF00FF'>Time Stop</t> " : "") +
@@ -3116,8 +3234,24 @@ document.onkeydown = function(e) {
          useStaff();
          break;
         case 188://?
+        case 191:// An alternate question mark code, apparently.
          // Open a help window.
-         alert("Wanderer "+VERSION+"\n\nUse arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\nUse 'X' or '0' to invoke the powers of your magic staff.\nGather the '$' memories of your life, or you may fade away before you reach your closure.");
+         alert("Wanderer "+VERSION+"\n\n"+
+               "Use arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\n"+
+               "Press 'X' or '0' to invoke the powers of your magic staff.\n"+
+               "Hold Ctrl to highlight your avatar.\n\n"+
+               "Gather the '$' memories of your life, or you may fade away before you reach your closure.");
+         break;
+        case 17: //Ctrl
+         displayMap(true);
+         break;
+    }
+};
+
+document.onkeyup = function(e) {
+    switch (e.keyCode) {
+        case 17: //Ctrl
+         displayMap();
          break;
     }
 };
