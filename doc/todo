@@ -14,6 +14,7 @@ README
 
 * fun colors for armor/staff names
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
+* more common default room?
 
 * lava/liquids blocks mobs??
 * maybe also highlight mobs/boss; treasure (Alt??)
@@ -28,6 +29,7 @@ README
    Hard - no Staff, xx
 
 * debug mob behaviour
+  * switch to flags?
 
 * online scoreboard
    https://stackoverflow.com/questions/31655085/database-on-a-personal-github-page
