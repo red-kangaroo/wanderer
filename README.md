@@ -31,6 +31,8 @@ Use Space, '.' or '5' to wait a turn.
 
 Use 'X' or '0' to invoke the powers of your magic staff, if you have one.
 
+Hold Ctrl to highlight your avatar.
+
 Use 'F11' for fullscreen mode.
 
 Use 'Ctrl +' and 'Ctrl -' to adjust the size to your liking.

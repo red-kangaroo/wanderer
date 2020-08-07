@@ -11,25 +11,32 @@ README
 * story/very short lore?
 * preview:
    https://jbt.github.io/markdown-editor/
+* update commands
 
+* refactor player!!!
 * fun colors for armor/staff names
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
-* more common default room?
+* also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
+* make sure player doesn't start in lava or in a locked treasure room
 
 * lava/liquids blocks mobs??
+* terrain that causes Stuck status, prevents move away with some chance
+
 * maybe also highlight mobs/boss; treasure (Alt??)
-* Run in direction command
-* Tiny amount of Self for
-  * new area 5+d6??
+* run in direction command
 * persistent messages
   * message history command
-* game difficulty + New Game button
-   Easy - 1000 Self
+* game difficulty + New Game button ??
    Normal
-   Hard - no Staff, xx
+   Causal Crybaby - 1000 Self
 
 * debug mob behaviour
   * switch to flags?
+* guarantee different glyph/staff than current from pick ups?
+
+addRiver
+* fix diagonal rivers
+* allow_weird_liquids
 
 * online scoreboard
    https://stackoverflow.com/questions/31655085/database-on-a-personal-github-page
@@ -37,10 +44,11 @@ README
 * dark mode
 
 * spawn extra monsters on . // respawn monsters on .
+* make all enemies faster / as fast as player
 
 * traps
-   summon adjacent monsters // extant monsters to adjacent (maybe lever?)
    area teleport (random already visited, or anywhere?)
+   explosion
 * armor
   explosions (destroy adjacent mobs and terrain, but grants no kills)
   time mastery (randomly/on damage time stop)
@@ -48,10 +56,14 @@ README
   water lily steps (immune to liquids, even beneficial effects)
   zen (no hunger and invulnerable while blind??)
   plant lordship (some effect when trampling grass, nettles and brambles)
-  sludge?
+  sludge (cap damage taken at 1, but only when Poisoned)
 * staff
-  Summoning - add random boon to Inner Demon   OR
-  Convocation - blink mobs near
+  Sunlight - 20 radius light on dark levels (even though walls, unlike the FOV); causes nearby mobs to flee (range 5?)
+* consumable: Scroll
+  Word of Convocation - blink mobs near??
+  Omnipotence - regenerates level
+  Incantation of Rushing Waters - generate random river
+  Four Humours - at diagonals if empty spawns water/lava/blood/sludge
 
 * orbs: one use step-on features with powerful effects
   * only in rooms, signs '1' around them explain their effect
@@ -62,12 +74,19 @@ README
    r(100) <disttoorigin: map is dark level (add simple FOV)
 * maybe refactor maps into worldData struct with map, name + other future stuff
 * maybe more decorations based on name?
-   forest display wall as 48|
-   deserts with sand?
+   forests have alternate walls:
+     4  dark green coniferous
+     8  light green leafy
+     |  brown, dead tree
+     %  bush
+   deserts with sand
+* statue of yourself:  8
+   new statues var, when >0 add that many statues to all new maps
+   +1 whenever you step on statue
+   mostly just flavour, but has the potential to swamp levels
 * vaults:
    https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
    https://github.com/crawl/crawl/tree/master/crawl-ref/source/dat/des
-   that lava pool with peninsula should have $
 
 
 Mobs
