@@ -4,23 +4,27 @@ $5?/0-9]_
 ~,;678
 =bs!#^34
 
-https://www.w3schools.com/colors/colors_names.asp
 
+https://www.w3schools.com/colors/colors_names.asp
+https://www.w3schools.com/charsets/ref_utf_symbols.asp
 
 README
 * story/very short lore?
 * preview:
    https://jbt.github.io/markdown-editor/
-* update commands
 
 * refactor player!!!
-* fun colors for armor/staff names
+* fun colors for armor
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
 * make sure player doesn't start in lava or in a locked treasure room
+   floodfill the level, add teleporters to all closed-off spaces and prevent player spawning
+   what about closed vaults?
 
-* lava/liquids blocks mobs??
+* lava/liquids block mobs??
 * terrain that causes Stuck status, prevents move away with some chance
+   quicksand: yellow ,
+* stun
 
 * maybe also highlight mobs/boss; treasure (Alt??)
 * run in direction command
@@ -29,26 +33,20 @@ README
 * game difficulty + New Game button ??
    Normal
    Causal Crybaby - 1000 Self
-
-* debug mob behaviour
-  * switch to flags?
-* guarantee different glyph/staff than current from pick ups?
-
-addRiver
 * fix diagonal rivers
-* allow_weird_liquids
 
 * online scoreboard
    https://stackoverflow.com/questions/31655085/database-on-a-personal-github-page
 * select from several fonts
 * dark mode
 
-* spawn extra monsters on . // respawn monsters on .
+* spawn extra monsters on . OR respawn monsters on .
 * make all enemies faster / as fast as player
 
 * traps
    area teleport (random already visited, or anywhere?)
    explosion
+   stun
 * armor
   explosions (destroy adjacent mobs and terrain, but grants no kills)
   time mastery (randomly/on damage time stop)
@@ -60,14 +58,16 @@ addRiver
 * staff
   Sunlight - 20 radius light on dark levels (even though walls, unlike the FOV); causes nearby mobs to flee (range 5?)
 * consumable: Scroll
-  Word of Convocation - blink mobs near??
+  Word of Convocation - blink mobs near
   Omnipotence - regenerates level
-  Incantation of Rushing Waters - generate random river
+  Incantation of Rushing Waters - generate random lake centered on avatar
+   * allow_weird_liquids
   Four Humours - at diagonals if empty spawns water/lava/blood/sludge
-
-* orbs: one use step-on features with powerful effects
-  * only in rooms, signs '1' around them explain their effect
-  alternate reality - regens map
+  Enchantment of XX - specific armour glyphs, to let the player pick
+  Genocide - remove all currCre
+  Bloodlust - adds 10? Kills
+  Dessication - removes all liquids on level
+  timed bomb
 
 * new generators
    r(1000)<visited: map is maze level
@@ -79,7 +79,7 @@ addRiver
      8  light green leafy
      |  brown, dead tree
      %  bush
-   deserts with sand
+   deserts with sand, quicksand
 * statue of yourself:  8
    new statues var, when >0 add that many statues to all new maps
    +1 whenever you step on statue
@@ -96,6 +96,8 @@ phasing
 invulnerable
 antimagic - cannot be harmed with magic/when player under influence of magic
 paralysis
+stun - random movement
+haste - move faster, don't attack faster
 
 * behaviour:
 teleport to player
@@ -104,11 +106,3 @@ explode when adjacent
 summon
 when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
-
-=====================================
-
-* random MacGuffin??
-Amulet of Yendor
-Orb of Zot
-Eye of Larn
-Ring of Ananias
