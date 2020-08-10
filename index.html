@@ -81,7 +81,7 @@ var staves = ["",
               " of <t style='color:#85C1E9'>Se</t><t style='background-color:#85C1E9; color:#FFFFFF;'>c</t><t style='color:#85C1E9'>ret</t> Paths",
               " of <t style='color:#32CD32'>L</t><t style='color:#DC143C'>i</t><t style='color:#32CD32'>fe Tr</t><t style='color:#DC143C'>i</t><t style='color:#32CD32'>um</t><t style='color:#1E90FF'>p</t><t style='color:#32CD32'>hant</t>",
               " of <t style='color:#000000; font-style: italic;'>Vor</t><t style='color:#282828; font-style: italic;'>pal </t><t style='color:#484848; font-style: italic;'>Sha</t><t style='color:#686868; font-style: italic;'>rpn</t><t style='color:#808080; font-style: italic;'>ess</t>",
-              " of S<t style='color:#FF0000'>o</t><t style='color:#FFA500'>a</t>ring L<t style='color:#FF0000'>e</t><t style='color:#FFA500'>a</t>p",
+              " of <t style='font-style: italic;'>Soa r i&nbsp;&nbsp;n&nbsp;&nbsp;&nbsp;g</t> Leap",
               " of <t style='color:#800080'>C</t><t style='color:#FF1493'>o</t><t style='color:#800080'>njuration</t>",
               " of <t style='color:#006400'>Bur</t><t style='color:#32CD32'>g</t><t style='color:#006400'>eonin</t><t style='color:#32CD32'>g</t>",];
 var staffDesc = ["can support your step and whack your enemies, but lacks any and all magical powers, unfortunately",
@@ -117,11 +117,11 @@ var glyph = 0;
 var glyphs = ["",
               " of <t style='color:#FF4500'>Brim</t>s<t style='color:#FF4500'>tone</t>",
               " of <t style='color:#1E90FF'>Cl</t><t style='color:#000080'>ea</t><t style='color:#1E90FF'>nsing </t><t style='color:#000080'>W</t><t style='color:#1E90FF'>a</t><t style='color:#000080'>t</t><t style='color:#1E90FF'>e</t><t style='color:#000080'>rs</t>",
-              " of Mortal Terror",
+              " of <t style='color:#FF0000; font-weight: bold;'>Mor</t><t style='color:#8B0000; font-weight: bold;'>tal Ter</t><t style='color:#FF0000; font-weight: bold;'>ror</t>",
               " of <t style='color:#00008B'>E</t><t style='color:#1E90FF'>th</t><t style='color:#00FFFF'>er</t><t style='color:#1E90FF'>ea</t><t style='color:#00008B'>l</t> Escape",
-              " of R<t style='color:#FF0000; font-weight: bold;'>e</t>tributi<t style='color:#FF0000; font-weight: bold;'>o</t>n",
-              " of Invulnerability",
-              " of Shadowy Escape",
+              " of R<t style='background-color:#FF0000; color:#FFFFFF; font-weight: bold;'>e</t><t style='color:#FF0000'>tributi</t><t style='background-color:#FF0000; color:#FFFFFF; font-weight: bold;'>o</t>n",
+              " of <t style='color:#DAA520'>In&#9930;ulnerability</t>",
+              " of <t style='color:#808080'>Sha</t><t style='color:#686868'>do</t><t style='color:#484848'>wy</t> Escape",
               " of the <t style='color:#8A0303; font-family:URW Chancery L, cursive;'>Blood Knight</t>"];
 var glyphDesc = ["will dull the blows of your enemies",
                  "shall nourish your Self when fed radiant, everburning fire",
@@ -183,7 +183,7 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","flame","agony","regen","blind","trapper","teleself","teleother","haste","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","dispel","extraattack","boonphase","boontime","boonscore"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","dispel","extraattack","boonphase","boontime","boonscore"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
@@ -332,100 +332,111 @@ function getMobBehaviour(){
 
   case 0:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = tileWater;
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" tears up. ";
+    if(!r(4) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileWater;
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" tears up. ";
+    }
     return false;
    };
 
   case 1:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = tileGrassTall;
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" plants a seed. ";
+    if(!r(2) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileGrassTall;
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" plants a seed. ";
+    }
     return false;
    };
 
   case 2:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = tileBramble;
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" plants a seed. ";
+    if(!r(6) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileBramble;
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" plants a seed. ";
+    }
     return false;
    };
 
   case 3:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = tileNettles;
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" plants a seed. ";
+    if(!r(6) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileNettles;
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" plants a seed. ";
+    }
     return false;
    };
 
   case 4:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = tileSludge;
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" vomits a torrent of sludge. ";
+    if(!r(6) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileSludge;
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" vomits a torrent of sludge. ";
+    }
     return false;
    };
 
   case 5:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = tileLava;
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" vomits a torrent of magma. ";
+    if(!r(6) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileLava;
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" vomits a torrent of magma. ";
+    }
     return false;
    };
 
   case 6:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = tileDark;
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" breathes out dark fumes. ";
+    if(!r(4) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileDark;
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" breathes out dark fumes. ";
+    }
     return false;
    };
 
   case 7:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = tileBlood;
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" bleeds profusely. ";
+    if(!r(4) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileBlood;
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" bleeds profusely. ";
+    }
     return false;
    };
 
   case 8:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = '^';
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" fiddles with something on the ground. ";
+    if(!r(6) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = '^';
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" fiddles with something on the ground. ";
+    }
     return false;
    };
 
   case 9:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = ',';
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" leaves something behind. ";
+    if(!r(2) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = ',';
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" leaves something behind. ";
+    }
     return false;
    };
 
   case 10:
    return function(){
-    if(currentMap[this.x][this.y] == emptyBlock)
-     currentMap[this.x][this.y] = '?';
-    if(distanceBetween(userPos,this)<5)
-      msg += this.name+" leaves something behind. ";
+    if(!r(6) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = '?';
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" leaves something behind. ";
+    }
     return false;
    };
  }
@@ -2807,10 +2818,6 @@ function moveUser(x,y){
   // Armor of the blood knight trails blood as the player moves.
   currentMap[userPos.x][userPos.y]=tileBloodDrop;
  }
- if(staff==8 && currentMap[userPos.x][userPos.y]==emptyBlock && !r(10)){
-  // burgeoning
-  currentMap[userPos.x][userPos.y]=tileGrassTall;
- }
 
  // Handle special terrain underfoot.
  switch(currentMap[userPos.x][userPos.y]){
@@ -3142,6 +3149,11 @@ function moveUser(x,y){
   timestop--;
  }else moveCreatures();
 
+ // Staff of Burgeoning leaves behind tall grass:
+ if(staff==8 && currentMap[userPos.x][userPos.y]==emptyBlock && !r(5))
+   currentMap[userPos.x][userPos.y]=tileGrassTall;
+
+ // If no other message is displayed, you have a chance to receive a hint:
  if((msg == "") && !r(100))
    getHint();
 
@@ -3165,12 +3177,17 @@ function tryMove(x,y,i){
 
     case "flame":
      msg += currCre[i].name+" burns you. ";
-     aflame += r(visited)+r(visited);
+     aflame += r(visited)+r(visited)+1;
      break;
 
     case "venom":
      msg += "You feel a little ill. ";
-     poisoned += r(distanceToOrigin()*2);
+     poisoned += r(distanceToOrigin()*2)+3;
+     break;
+
+    case "toxic":
+     msg += "You feel a deathly ill. ";
+     poisoned += 10+parseInt(score/5);
      break;
 
     case "blind":
@@ -3267,7 +3284,7 @@ function tryMove(x,y,i){
     case "dispel":
      msg += "You feel powerless. ";
      if(phased>0) phased=0;
-     if(timestop>0) timestop=0; // I'm not sure it this can even happen, but...
+     if(timestop>0) timestop=0; // I'm not sure if this can even happen, but...
      if(ward>0) ward=0;
      break;
 
@@ -3407,8 +3424,6 @@ function moveCreatures(){
  for (var k = 0; k < currCre.length; k++) {
   // Check for special action:
   if(currCre[k].behaviour()) continue;
-  // Hasted creatures will sometimes move twice.
-  //if(currCre[k].flags.includes("haste") && !r(4)) k--;
 
   if(r(currCre[k].quickness)>0){
    // Get direction to player normalized to <-1,1>.
@@ -3565,7 +3580,7 @@ document.onkeydown = function(e) {
          alert("Wanderer "+VERSION+"\n\n"+
                "Use arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\n"+
                "Press 'X' or '0' to invoke the powers of your magic staff.\n"+
-               "Hold Ctrl to highlight your avatar.\n\n"+
+               "Hold 'Ctrl' to highlight your avatar.\n\n"+
                "Gather the '$' memories of your life, or you may fade away before you reach your closure.");
          break;
         case 17: //Ctrl
