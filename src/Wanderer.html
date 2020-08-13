@@ -2677,6 +2677,10 @@ function distanceBetween(mob1, mob2){
  return Math.ceil(Math.sqrt(Math.pow(mob1.x-mob2.x,2)+Math.pow(mob1.y-mob2.y,2)));
 }
 
+function stepsTo(x1,y1, x2,y2){
+ return Math.abs(x2-x1) + Math.abs(y2-y1);
+}
+
 function semiModulo(a,b){
  if(a<0) return b-1;
  else if(a>=b) return 0;
@@ -3483,7 +3487,7 @@ function getFinalScore(){
  return "<t style='color:#8B008B; font-weight: bold;'>"+String(parseInt(winner))+"</t>";
 }
 
-function displayMap(findPlayer=false){
+function displayMap(findPlayer=false, findTreasure=false){
  var displayString = "";
  var outputMap = [];
 
@@ -3499,6 +3503,8 @@ function displayMap(findPlayer=false){
     outputMap[i][j] = emptyBlock;
    }
   }
+ } else if (findTreasure) {
+  mapTreasureOnto(outputMap);
  }
  // Display the player:
  outputMap[userPos.x][userPos.y] = getUserChar();
@@ -3536,6 +3542,33 @@ function displayMap(findPlayer=false){
  // Print everything on screen:
  document.getElementById("mapText").innerHTML = displayString;
  document.getElementById("statusLine").innerHTML = names+"<br />"+attributes+"<br />"+equipped+"<br />"+states+msg;
+}
+
+function mapTreasureOnto(outputMap) {
+ // treasure your Self first
+ var treasure = [[userPos.x, userPos.y]];
+ var legend = impassable.concat(['$', tileKey, ']', tileArmor, tileStaff, tileTreasure, '?']);
+ for (var i = 0; i < mapWidth; i++) {
+  for (var j = 0; j < mapWidth; j++) {
+   if ('$' == outputMap[i][j]) {
+    treasure.push([i,j]);
+   } else if (!legend.includes(outputMap[i][j])) {
+    outputMap[i][j] = emptyBlock;
+   }
+  }
+ }
+ // Draw a perimiter within which treasure is worth a round trip
+ for (var t=treasure.length-1; t >= 0; t--) {
+  var tx = treasure[t][0];
+  var ty = treasure[t][1];
+  for (var i = 0; i < mapWidth; i++) {
+   for (var j = 0; j < mapWidth; j++) {
+    if (stepsTo(tx, ty, i, j) == 10 && !legend.includes(outputMap[i][j])) {
+     outputMap[i][j] = t == 0 ? '+' :'˙';
+    }
+   }
+  }
+ }
 }
 
 // Player commands:
@@ -3586,12 +3619,16 @@ document.onkeydown = function(e) {
         case 17: //Ctrl
          displayMap(true);
          break;
+        case 18: // Alt (Option)
+         displayMap(false, true);
+         break;
     }
 };
 
 document.onkeyup = function(e) {
     switch (e.keyCode) {
         case 17: //Ctrl
+        case 18: //Alt (Option)
          displayMap();
          break;
     }
