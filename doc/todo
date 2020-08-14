@@ -21,12 +21,21 @@ README
    floodfill the level, add teleporters to all closed-off spaces and prevent player spawning
    what about closed vaults?
 
-* lava/liquids block mobs??
+* stun
+* invisibility – doesn't work against adjacent mobs, otherwise they ignore player no matter their aggro range
+* player haste – mobs only act on even turns (what about slow mobs?)
+* rage – player looses control, avatar attacks
+
+https://heyjavascript.com/field-of-view-in-javascript-using-recursive-shadow-casting/
+* lava and mobs with „light“ always visible
+
 * terrain that causes Stuck status, prevents move away with some chance
    quicksand: yellow ,
-* stun
 
-* maybe also highlight mobs/boss; treasure (Alt??)
+* highlight mobs + treasure (Alt)
+* highlight area 10 (green +) and score-1 (red +) away, to let the player plan their move
+* switch findPlayer to highlight=""
+
 * run in direction command
 * persistent messages
   * message history command
@@ -39,9 +48,6 @@ README
    https://stackoverflow.com/questions/31655085/database-on-a-personal-github-page
 * select from several fonts
 * dark mode
-
-* spawn extra monsters on . OR respawn monsters on .
-* make all enemies faster / as fast as player
 
 * traps
    area teleport (random already visited, or anywhere?)
@@ -57,8 +63,10 @@ README
   sludge (cap damage taken at 1, but only when Poisoned)
 * staff
   Sunlight - 20 radius light on dark levels (even though walls, unlike the FOV); causes nearby mobs to flee (range 5?)
-* consumable: Scroll
-  Word of Convocation - blink mobs near
+  Enslavement - Mob vs mob combat
+  Polymorph - can change mobs or features
+* consumable: Scroll/Potion
+  Convocation - blink mobs near
   Omnipotence - regenerates level
   Incantation of Rushing Waters - generate random lake centered on avatar
    * allow_weird_liquids
@@ -91,16 +99,32 @@ README
 
 Mobs
 ====
+* Special effects of some attack verbs?
+   Freezes: stop Aflame
+* add A*
+https://briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated/
+https://github.com/bgrins/javascript-astar
+https://www.reddit.com/r/javascript/comments/71k0nr/i_made_a_very_fast_path_finding_library_what_do/
+https://easystarjs.com/     https://github.com/prettymuchbryce/easystarjs
+
+* lava/liquids block mobs??
+* add descriptions for mob abilities
+* spawn extra monsters on . OR respawn monsters on .
+
 * flags:
 phasing
-invulnerable
+invulnerable to bump attacks, slow speed
 antimagic - cannot be harmed with magic/when player under influence of magic
 paralysis
 stun - random movement
 haste - move faster, don't attack faster
+pull close - if player is in straight unobstructed orthogonal line, pull d4 squares closer
 
 * behaviour:
 teleport to player
+teleport randomly
+spawn / clone self
+summon random
 dig
 explode when adjacent
 summon

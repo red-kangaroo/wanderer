@@ -155,7 +155,7 @@ var tileSludge = "<t style='background-color:#00FF00'>~</t>";
 var tileBlood = "<t style='background-color:#8A0303'>~</t>";
 var tileDark = "<t style='color:#696969'>#</t>";
 var tileKey = "<t style='color:#800080'>9</t>";
-var tileArmor = "<t style='color:#800080'>]</t>"; //enchanted armor, normal is just ']'
+var tileArmor = "<t style='color:#800080; font-weight: 900;'>]</t>"; //enchanted armor, normal is just ']'
 var tileDoor = "<t style='background-color:#8B4513; color:#FFD700;'>#</t>";
 var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
 var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
@@ -178,18 +178,18 @@ var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".spli
 var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      name:"<t style='color:#FF0000'>Inner Demon</t>",
                      attack:"slams",
-                     quickness:2,
+                     aggro:4,
                      x:0,y:0,
                      flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","dispel","extraattack","boonphase","boontime","boonscore"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","dispel","extraattack","pierce","slow","esp","boonphase","boontime","boonscore"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                name:"<t style='color:#8B008B'>Reflection of True Self</t>",
                attack: attackVerbs[r(attackVerbs.length)],
-               quickness:100,
+               aggro:100,
                x:0,y:0,
                flags: ["diagonal","regen","dodge","boss"],
                behaviour: function(){
@@ -303,7 +303,7 @@ var mobNames = {
   'h': ["Hallucination","Hatred","Havoc","Heartbreak","Hedonism","Helplessness","Hesitation","Hopelessness","Hostility","Hubris","Humiliation","Hypocrisy","Hysteria"],
   'i': ["Idiocy","Ignorance","Illusion","Immorality","Impatience","Impediment","Imperfection","Imprudence","Impudence","Inadequacy","Incest","Incivility","Incomprehension","Indecency","Indecision","Indifference","Indoctrination","Infamy","Inferiority","Infidelity","Infuriation","Injustice","Insanity","Insult","Intoxication","Irrationality","Irresponsibility","Irritation","Isolation"],
   'j': ["Jealousy","Jeer","Jeopardy","Jerk","Jitter"],
-  'k': ["Killjoy","Kook","Krazyness"],
+  'k': ["Killjoy","Kleptomania","Kook","Krazyness"],
   'l': ["Lambast","Lament","Languish","Languor","Lapse","Leer","Lechery","Lethargy","Lewdness","Liability","Limitation","Loathing","Loneliness","Loss","Loveless","Lovelorn","Lunacy"],
   'm': ["Madness","Malaise","Malcontent","Malevolence","Malice","Malignant","Mania","Manipulation","Martyrdom","Mediocrity","Melancholy","Menace","Mendacity","Mercilessness","Misconception","Misery","Misfortune","Misgiving","Mishap","Mischief","Mistake","Mistrust","Mockery","Molestation","Morbidity","Mordant","Moribund","Mourning","Mystification"],
   'n': ["Nagging","Naivety","Nasty","Negativity","Negligence","Nepotism","Nervosity","Neurosis","Niggle","Nightmare","Nuisance","Numbness"],
@@ -316,12 +316,11 @@ var mobNames = {
   'u': ["Ugliness","Uncaring","Uncertainty","Uncleanness","Underestimation","Unease","Unfortune","Unhappiness","Unimportance","Unrest","Upheaval","Uproar","Upset","Usurpation"],
   'v': ["Vagrancy","Vainglory","Vanity","Vehemence","Vengeance","Vexation","Vice","Viciousness","Vile","Villainy","Vindictiveness","Violation","Volatility","Vulgarity","Vulnerability"],
   'w': ["Wail","Wanton","Wariness","Wastefulness","Weakness","Weariness","Whining","Wickedness","Wilt","Wily","Wimp","Woe","Worry","Worst","Wrath","Wreak","Wretch","Wrong"],
-  'x': ["Xenophobia"],
-  'y': ["Yuck"],
-  'z': ["Zeal"],
+  'x': ["Xanthosis","Xenophobia"],
+  'y': ["Yearning","Yen","Yoke","Yuck"],
+  'z': ["Zealotry","Zilch","Zit"],
 };
 var mobSelves = ["Self-Abnegation","Self-Absorption","Self-Abuse","Self-Aggrandizement","Self-Censorship","Self-Complacency","Self-Conceit","Self-Congratulation","Self-Contempt","Self-Contradiction","Self-Criticism","Self-Deceit","Self-Defeat","Self-Defilement","Self-Delusion","Self-Denial","Self-Deprecation","Self-Discrimination","Self-Disgust","Self-Doubt","Self-Flattery","Self-Gratification","Self-Guilt","Self-Harm","Self-Hatred","Self-Importance","Self-Incrimination","Self-Indulgence","Self-Justification","Self-Loathing","Self-Love","Self-Obsession","Self-Pity","Self-Praise","Self-Recrimination","Self-Reproach","Self-Sabotage","Self-Sacrifice","Self-Satisfaction"];
-var mobDemons = ["Hag","Troll","Imp","Phantom","Phantasm","Sprite","Spirit","Angel","Archon","Devil","Fiend"];
 var msg = "";
 
 function getMobBehaviour(){
@@ -457,17 +456,12 @@ function getMobFlags(){
 function getMobName(letter){
   letter = letter.toLowerCase();
 
-  if(letter.match(/[a-z]/i)){
-    if(r(mobNames[letter].length+1))
-      return mobNames[letter].sampleRec();
-    else
-      return newSillyName(letter);
-  } else if(letter == '@')
+  if(letter.match(/[a-z]/i))
+    return mobNames[letter].pop();
+  else if(letter == '@')
     return mobSelves.sampleRec();
-  else {
-    var demonName = "abcdefghijklmnopqrstuvwxyz".split('');
-    return mobDemons.sampleRec() + " of " + mobNames[demonName.sampleRec()].sampleRec();
-  }
+  else
+    return newSillyName();
 }
 
 function getUserChar(){
@@ -562,7 +556,7 @@ function newName(){
  }
 }
 
-var aland = ["Abandoned","Aberrant","Abhorrent","Abominable","Abyssal","Accidental","Accursed","Acidous","Acrid","Actinic","Aerial","Afflicted","Akratic","Alien","Alpha","Amaranthine","Amethyst","Anarchic","Ancient","Angel","Angelic","Animalistic","Animistic","Antediluvian","Arcane","Arctic","Argent","Archaic","Arid","Artful","Ascendant","Ashen","Astral","Awoken","Axiomatic","Azure","Baleful","Banished","Barbaric","Barren","Bawdy","Beastly","Beautiful","Belligerent","Bewitched","Bizarre","Black","Blessed","Blighted","Blind","Blissful","Bloody","Blue","Boiling","Bone","Bountiful","Brave New","Brazen","Broken","Brooding","Brown","Brutal","Buried","Burning","Burnt","Calm","Cancerous","Cannibal","Capitalist","Capricious","Captivating","Carnal","Carrion","Cataclysmic","Caustic","Cavernous","Celestial","Central","Ceramic","Cerulean","Clockwise","Clockwork","Cobalt","Cold","Colourless","Communist","Conquering","Contaminated","Corpse","Corrupt","Coruscant","Cracked","Cratered","Creepy","Crenellated","Crimson","Crooked","Crown","Cruel","Cursed","Damned","Dancing","Dangerous","Dank","Dead","Deadly","Deathless","Deathly","Decaying","Deep","Deeper","Deepest","Defiant","Deformed","Demon","Demonic","Dendroid","Depraved","Deranged","Desecrated","Deserted","Desolate","Despoiled","Destroyed","Devil","Diabolic","Diamond","Dire","Diseased","Divine","Dolm","Doomed","Dormant","Draconic","Dragon","Dreadful","Dreaming","Dreary","Drowned","Dry","Dryad","Dusty","Dwarven","Dying","Earthen","Eastern","Ebon","Eldritch","Electric","Elven","Emerald","Empty","Empyrean","Enclosed","Enchanted","Enigmatic","Enlightened","Ephemeral","Epic","Errant","Eternal","Ethereal","Evening","Exalted","Experimental","Extradimansional","Fading","Failed","Fair","Fairy","Fallen","False","Familiar","Fancy","Far","Faraway","Fearful","Fearless","Fearsome","Feral","Ferric","Fertile","Fetid","Fey","Fiery","Filthy","Final","Flaming","Flawed","Flayed","Floating","Flowing","Forbidden","Forgotten","Forlorn","Forsaken","Forsworn","Foul","Fractal","Fractured","Fragrant","Frail","Freakish","Frenetic","Friendly","Frigid","Frosty","Frozen","Fuligin","Fungal","Gargantuan","Gay","Ghastly","Ghostly","Ghoulish","Giant","Ginger","Glacial","Gloomy","Glowing","Gnomish","Goblin","Golden","Good","Grand","Grandiose","Gray","Great","Greater","Green","Grim","Gruesome","Guarded","Hallowed","Hanging","Harsh","Haunted","Heavenly","Hellish","Hidden","Higher","Hoary","Hollow","Holy","Homeward","Hostile","Hot","Hungry","Hypergreen","Chained","Chaotic","Chthonic","Icy","Igneous","Ill-Fated","Illustrated","Immaculate","Immortal","Imperial","Inbred","Indigo","Industrial","Infected","Infernal","Infrared","Inhuman","Insidious","Irradiated","Jagged","Jale","Joyous","Knotted","Kobold","Kraken","Lachrymose","Last","Legendary","Leper","Lesser","Leviathan","Lifeless","Little","Long","Lost","Low","Lower","Lunar","Lush","Luxurious","Macabre","Mad","Magenta","Magical","Magnificent","Machine","Majestic","Marginal","Marked","Masked","Mechanical","Mercantile","Mercurial","Metablue","Midsummer","Mighty","Miraculous","Mirror","Mirthful","Miserable","Misty","Molten","Monster","Monstrous","Morning","Mouldy","Mournful","Mutant","Mysterious","Mystic","Narrow","Nascent","Negative","Nether","Ninth","Noble","Nocturnal","Nomadic","Northern","Noxious","Nuclear","Occidental","Occult","Octarine","Ogrish","Old","Omega","Orange","Orcish","Organic","Oriental","Ornery","Orthodox","Other","Overgrown","Pale","Pallid","Penitent","Peregrine","Perilous","Petrified","Phallic","Phasic","Phoenix","Pink","Pious","Plagued","Pleasant","Poisoned","Potent","Praised","Prehistoric","Primitive","Primordial","Prismatic","Pristine","Profane","Promiscuous","Pure","Purple","Putrescent","Putrid","Quiet","Radiant","Rambunctious","Rampant","Rapt","Ravaged","Ravenous","Ravished","Red","Reforged","Regal","Resplendent","Revenant","Rich","Rising","Rocky","Rotting","Royal","Ruby","Ruined","Runic","Sacred","Sanguine","Savage","Scandalous","Scarlet","Scarred","Scorched","Screaming","Sealed","Searing","Secret","Sentient","Serene","Serpent","Serpentine","Seventh","Shadowed","Shattered","Shifting","Shrouded","Sidereal","Silent","Sinful","Singing","Sinking","Sinuous","Skeletal","Skeleton","Skull","Sleeping","Snowy","Solar","Southern","Spectral","Spirit","Steampunk","Sterile","Stinking","Strange","Succulent","Sunken","Supernatural","Supreme","Tattered","Tepid","Terrestrial","Third","Thirteenth","Titanic","Torturous","Toxic","Tranquil","Transdimensional","Tribal","Trollish","Troubled","Turbulent","Twin","Twisted","Ugly","Ulfire","Ultraviolet","Unabashed","Unborn","Unconquered","Undying","Unholy","Unchained","Uncharted","Unicorn","Unknown","Unmapped","Unnamed","Unnatural","Unstable","Untamed","Upper","Vampire","Veiled","Vermillion","Very Small","Vibrant","Vicious","Vile","Villainous","Violet","Virgin","Viridian","Volcanic","Voltaic","Wandering","Warded","Warm","Warped","War-Torn","Wasting","Watery","Wayward","Wealthy","Weeping","Weird","Western","Whispering","White","Wicked","Wild","Winded","Windy","Withered","Witching","Wooded","Worm","Worthless","Wraith","Wretched","Wyrm","Xanthous","Xeric","Yawning","Yellow","Zombie"];
+var aland = ["Abandoned","Aberrant","Abhorrent","Abominable","Abyssal","Accidental","Accursed","Acidous","Acrid","Actinic","Aerial","Afflicted","Akratic","Alien","Alpha","Amaranthine","Amethyst","Anarchic","Ancient","Angel","Angelic","Animalistic","Animistic","Antediluvian","Arcane","Arctic","Argent","Archaic","Arid","Artful","Ascendant","Ashen","Astral","Awoken","Axiomatic","Azure","Baleful","Banished","Barbaric","Barren","Bawdy","Beastly","Beautiful","Belligerent","Bewitched","Bizarre","Black","Blessed","Blighted","Blind","Blissful","Bloody","Blue","Boiling","Bone","Bountiful","Brave New","Brazen","Broken","Brooding","Brown","Brutal","Buried","Burning","Burnt","Calm","Cancerous","Cannibal","Capitalist","Capricious","Captivating","Carnal","Carrion","Cataclysmic","Caustic","Cavernous","Celestial","Central","Ceramic","Cerulean","Clockwise","Clockwork","Cobalt","Cold","Colourless","Communist","Conquering","Contaminated","Corpse","Corrupt","Coruscant","Cracked","Cratered","Creepy","Crenellated","Crimson","Crooked","Crown","Cruel","Cursed","Damned","Dancing","Dangerous","Dank","Dead","Deadly","Deathless","Deathly","Decaying","Deep","Deeper","Deepest","Defiant","Deformed","Demon","Demonic","Dendroid","Depraved","Deranged","Desecrated","Deserted","Desolate","Despoiled","Destroyed","Devil","Diabolic","Diamond","Dire","Diseased","Divine","Dolm","Doomed","Dormant","Draconic","Dragon","Dreadful","Dreaming","Dreary","Drowned","Dry","Dryad","Dusty","Dwarven","Dying","Earthen","Eastern","Ebon","Eldritch","Electric","Elven","Emerald","Empty","Empyrean","Enclosed","Enchanted","Enigmatic","Enlightened","Ephemeral","Epic","Errant","Eternal","Ethereal","Evening","Exalted","Experimental","Extradimensional","Fading","Failed","Fair","Fairy","Fallen","False","Familiar","Fancy","Far","Faraway","Fearful","Fearless","Fearsome","Feral","Ferric","Fertile","Fetid","Fey","Fiery","Filthy","Final","Flaming","Flawed","Flayed","Floating","Flowing","Forbidden","Forgotten","Forlorn","Forsaken","Forsworn","Foul","Fractal","Fractured","Fragrant","Frail","Freakish","Frenetic","Friendly","Frigid","Frosty","Frozen","Fuligin","Fungal","Gargantuan","Gay","Ghastly","Ghostly","Ghoulish","Giant","Ginger","Glacial","Gloomy","Glowing","Gnomish","Goblin","Golden","Good","Grand","Grandiose","Gray","Great","Greater","Green","Grim","Gruesome","Guarded","Hallowed","Hanging","Harsh","Haunted","Heavenly","Hellish","Hidden","Higher","Hoary","Hollow","Holy","Homeward","Hostile","Hot","Hungry","Hypergreen","Chained","Chaotic","Chthonic","Icy","Igneous","Ill-Fated","Illustrated","Immaculate","Immortal","Imperial","Inbred","Indigo","Industrial","Infected","Infernal","Infrared","Inhuman","Insidious","Irradiated","Jagged","Jale","Joyous","Knotted","Kobold","Kraken","Lachrymose","Last","Legendary","Leper","Lesser","Leviathan","Lifeless","Little","Long","Lost","Low","Lower","Lunar","Lush","Luxurious","Macabre","Mad","Magenta","Magical","Magnificent","Machine","Majestic","Marginal","Marked","Masked","Mechanical","Mercantile","Mercurial","Metablue","Midsummer","Mighty","Miraculous","Mirror","Mirthful","Miserable","Misty","Molten","Monster","Monstrous","Morning","Mouldy","Mournful","Mutant","Mysterious","Mystic","Narrow","Nascent","Negative","Nether","Ninth","Noble","Nocturnal","Nomadic","Northern","Noxious","Nuclear","Occidental","Occult","Octarine","Ogrish","Old","Omega","Orange","Orcish","Organic","Oriental","Ornery","Orthodox","Other","Overgrown","Pale","Pallid","Penitent","Peregrine","Perilous","Petrified","Phallic","Phasic","Phoenix","Pink","Pious","Plagued","Pleasant","Poisoned","Potent","Praised","Prehistoric","Primitive","Primordial","Prismatic","Pristine","Profane","Promiscuous","Pure","Purple","Putrescent","Putrid","Quiet","Radiant","Rambunctious","Rampant","Rapt","Ravaged","Ravenous","Ravished","Red","Reforged","Regal","Resplendent","Revenant","Rich","Rising","Rocky","Rotting","Royal","Ruby","Ruined","Runic","Sacred","Sanguine","Savage","Scandalous","Scarlet","Scarred","Scorched","Screaming","Sealed","Searing","Secret","Sentient","Serene","Serpent","Serpentine","Seventh","Shadowed","Shattered","Shifting","Shrouded","Sidereal","Silent","Sinful","Singing","Sinking","Sinuous","Skeletal","Skeleton","Skull","Sleeping","Snowy","Solar","Southern","Spectral","Spirit","Steampunk","Sterile","Stinking","Strange","Succulent","Sunken","Supernatural","Supreme","Tattered","Tepid","Terrestrial","Third","Thirteenth","Titanic","Torturous","Toxic","Tranquil","Transdimensional","Tribal","Trollish","Troubled","Turbulent","Twin","Twisted","Ugly","Ulfire","Ultraviolet","Unabashed","Unborn","Unconquered","Undying","Unholy","Unchained","Uncharted","Unicorn","Unknown","Unmapped","Unnamed","Unnatural","Unstable","Untamed","Upper","Vampire","Veiled","Vermillion","Very Small","Vibrant","Vicious","Vile","Villainous","Violet","Virgin","Viridian","Volcanic","Voltaic","Wandering","Warded","Warm","Warped","War-Torn","Wasting","Watery","Wayward","Wealthy","Weeping","Weird","Western","Whispering","White","Wicked","Wild","Winded","Windy","Withered","Witching","Wooded","Worm","Worthless","Wraith","Wretched","Wyrm","Xanthous","Xeric","Yawning","Yellow","Zombie"];
 var pland = ["Adamant","Adventure","Alabaster","Amber","Apocalypse","Ash","Asphalt","Autumn","Bark","Beer","Blood","Brass","Briar","Brimstone","Bronze","Cinder","Cinnamon","Clay","Coal","Concrete","Copper","Coral","Crystal","Dark","Dawn","Deer","Dusk","East","Ember","Evil","Flame","Flint","Fog","Fossil","Glass","God","Gold","Gossamer","Grass","Honey","Chaos","Chrome","Ice","Iron","Ivory","Jade","Lichen","Magic","Malachite","Mandrake","Marble","Mead","Meat","Metal","Midnight","Milk","Mithril","Moss","Mourning","Mud","Mystery","Nephrite","Night","Nightmare","Noon","North","Obsidian","Onyx","Ooze","Opal","Pepper","Plastic","Platinum","Porcelain","Prism","Quicksilver","Rainbow","Rime","Rust","Saffron","Salt","Sand","Sap","Seaweed","Shadow","Sheep","Silk","Silver","Skin","Sky","Slime","Sludge","Snow","Soap","South","Spring","Steam","Steel","Stone","Sugar","Sulphur","Summer","Sweat","Throne","Trash","Treasure","Undead","Verdigris","Vinegar","Wax","West","Wine","Winter"];
 var nland = ["Abyss","Academy","Badlands","Barony","Barrows","Bastion","Battlefield","Beach","Bog","Borderlands","Borough","Bulwark","Burrow","Caldera","Caliphate","Camp","Canton","Canyon","Castle","Catacombs","Cathedral","Cave","Cavern","Caverns","Caves","Cemetery","Citadel","City","Clearing","Cliffs","Cloister","Coast","Colony","Country","County","Court","Cove","Crater","Crossroads","Crypt","Dale","Deeps","Dell","Demesne","Den","Depths","Desert","Desolation","Dimension","District","Domain","Dunes","Dungeon","Dystopia","Earldom","Edge","Emirate","Empire","Estate","Exarchate","Expanse","Eyrie","Factory","Fen","Fiefdom","Field","Fields","Fissures","Fjord","Forest","Fort","Fortress","Freehold","Gaol","Garden","Glade","Glen","Gorge","Grassland","Graveyard","Grotto","Grounds","Gulch","Halls","Hamlet","Haven","Heaven","Hell","Highlands","Hillocks","Hills","Hive","Holdings","Hollow","Chambers","Channels","Chasm","Jungle","Keep","Kingdom","Laboratory","Labyrinth","Lair","Land","League","Library","Lowlands","Manse","March","Marsh","Marshland","Mausoleum","Maze","Meadow","Mine","Mines","Monastery","Moor","Mountain","Necropolis","Nest","Nexus","Oasis","Ossuary","Oubliette","Outlands","Palace","Paradise","Parish","Pass","Pastures","Paths","Pit","Pits","Place","Plain","Plains","Plane","Plateau","Prairie","Precinct","Prefecture","Prison","Protectorate","Province","Pyramid","Quagmire","Rampart","Ravine","Reach","Reaches","Realm","Refuge","Region","Reich","Retreat","Rift","Road","Ruins","Sanctuary","Sanctum","Savanna","Sea","Sepulcher","Sewers","Shire","Shrine","Springs","State","Steppe","Stronghold","Sultanate","Swamp","Taiga","Temple","Territory","Tomb","Towers","Town","Trenches","Tundra","Tunnels","Underground","Underworld","Utopia","Vale","Valley","Vault","Vineyard","Volcano","Warrens","Wasteland","Wastes","Wetland","Wild","Wilderness","Wilds","Wood","Woods","World","Ziggurat"];
 var lland = ["Abortion","Adversity","Afflictions","Agony","Air","Alcohol","Alchemy","Angels","Anger","Anguish","Annihilation","Anomalies","Answers","Anxiety","Apes","Apotheosis","Apparitions","Architecture","Arson","Art","Artifice","Ascension","Ashes","Aspirations","Avarice","Baboons","Bandits","Banners","Baubles","Bears","Beasts","Bee-Eaters","Bees","Beggars","Bells","Berries","Berserks","Birds","Blades","Bliss","Blizzards","Bloodlust","Bloodshed","Boars","Bodies","Bogeymen","Bondage","Bones","Books","Boulders","Brambles","Bravery","Bread","Buffalos","Butterflies","Cacophony","Cactae","Cakes","Camels","Cancer","Candles","Candy","Carnage","Catastrophes","Cats","Cattle","Cauldron","Celebration","Centaurs","Claws","Clergy","Clocks","Clones","Clowns","Colossi","Compassion","Conquest","Contempt","Crabs","Crates","Crime","Crocodiles","Crows","Crucible","Crucifixion","Curses","Darkness","Daughters","Death","Decay","Deception","Deicide","Delight","Delirium","Delusion","Dementia","Demise","Demons","Depression","Desires","Despair","Desperation","Destiny","Destruction","Devolution","Dew","Diligence","Dinosaurs","Disasters","Discord","Diseases","Domes","Doom","Dragons","Dread","Drizzle","Drugs","Ducks","Duck-Sized Horses","Dust","Duty","Dwarves","Earth","Earthquake","Ectoplasm","Echoes","Elephants","Elves","Endings","Ennui","Envy","Essence","Eternity","Etiquette","Eunuchs","Exorcism","Explosions","Eyes","Fables","Fae","Failure","Fairies","Faith","Famine","Fangs","Fata Morgana","Fate","Fathers","Fear","Feasts","Feathers","Festivities","Fire","Fish","Flesh","Flotsam","Flowers","Forges","Forgiveness","Fortune","Freaks","Freedom","Fright","Frogs","Fruit","Funerals","Fungi","Furniture","Gambling","Garbage","Gardens","Gates","Gems","Genesis","Ghosts","Ghouls","Giants","Glory","Gluttony","Goblins","Golems","Gossip","Grace","Grandfathers","Grandmothers","Grapes","Gratitude","Graves","Greed","Growth","Hallucinations","Hammers","Harmony","Hatred","Haunts","Hazards","Healing","Hearts","Hellfire","Heresy","Heroes","Heroics","Herrings","Honour","Hope","Horrors","Horses","Horse-Sized Ducks","Hymns","Chains","Chants","Charity","Chastity","Cheese","Chickens","Chimneys","Chocolate","Idols","Ills","Illusions","Imagination","Imps","Incest","Ink","Insanity","Insects","Intimacy","Invaders","Jaywalking","Jesters","Jewels","Journeys","Joy","Keys","Knights","Knives","Koans","Kobolds","Kung Fu","Lakes","Lamentation","Lamentations","Lances","Lava","Leeches","Legends","Lemmings","Liars","Liberty","Lice","Lies","Life","Light","Lightning","Limbs","Lions","Lizard Kings","Lizards","Locks","Loot","Lords","Lore","Loss","Love","Lovers","Lust","Madness","Magma","Magpies","Maids","Maladies","Mana","Masochism","Mathematics","Melancholy","Memories","Mercury","Mercy","Mermaids","Mice","Might","Mildew","Mirrors","Mirth","Misery","Misfortune","Mist","Mockery","Monkeys","Monsters","Monuments","Moon","Mothers","Mucus","Murder","Muses","Mushrooms","Music","Mutants","Myths","Narwhals","Nature","Nausea","Needles","Nobility","Noise","Nymphs","Obelisks","Obliteration","Oblivion","Occultism","Octopi","Ogres","Olm","Orcs","Ordeals","Outlaws","Owls","Oysters","Pacifism","Pacts","Pain","Panthers","Parrots","Passion","Patience","Peace","Peacocks","Pearls","Penance","Penguins","Perdition","Peril","Perversion","Pestilence","Phantoms","Philosophy","Pigeons","Pillars","Pirates","Pitchforks","Plague","Plants","Plenty","Poetry","Power","Powers","Predators","Pretence","Pride","Promises","Prophecy","Prosperity","Protection","Providence","Puissance","Punishment","Purity","Pus","Putrescence","Pygmies","Pyres","Questions","Quests","Raiders","Rain","Rats","Ravens","Reason","Rebels","Rebirth","Reflections","Regret","Reincarnation","Remorse","Responsibility","Rest","Revelations","Rhythm","Riches","Rituals","Rivers","Roses","Rot","Sacrifice","Sadism","Saliva","Scorn","Scrap","Screams","Secrets","Serenity","Serpents","Servitude","Sex","Shame","Sharks","Shields","Ships","Sickness","Silence","Simulacra","Sin","Sins","Skulduggery","Skulls","Slaughter","Slavery","Sleep","Sloth","Slumber","Smoke","Snakes","Soldiers","Sons","Soot","Sorcerers","Sorcery","Sorrow","Souls","Spears","Spices","Spiders","Spirals","Spires","Spirits","Spoons","Squids","Stars","Statues","Staves","Storms","Strength","Strife","Succour","Suffering","Sun","Sunlight","Swans","Sweat","Swords","Sympathy","Taboos","Tea","Tears","Teatime","Teeth","Temperance","Temptation","Tentacles","Terror","Thieves","Thorns","Thoughts","Thunder","Tides","Tigers","Timber","Time","Titans","Tongues","Torment","Tornados","Torture","Tragedy","Traitors","Traps","Travels","Travesty","Treason","Trees","Trials","Trombones","Trouble","Trust","Truth","Tumult","Turnips","Turtles","Twilight","Underwear","Unicorns","Unrest","Urns","Valour","Vengeance","Vermin","Voices","Void","Vultures","Wands","War","Warlocks","Warmth","Wasps","Water","Wealth","Weapons","Weed","Werewolves","Whales","Whispers","Whores","Winds","Wisdom","Wizards","Woe","Wolves","Women","Wonder","Wood","Worms","Wrath","Wyrms","Wyverns"];
@@ -629,8 +623,11 @@ function getHint(says=""){
              "You cannot fix it anymore.",
              "Why did you do it?",
              "Why them?",
-             "Find the levers, once you are truly yourself...",
-             "Conquering your inner demons brings a certain boon.",];
+             "Seek the levers, once you are truyl yourself.",
+             "Conquering your inner demons brings a certain boon.",
+             "Water will not harm you, Wanderer. ",
+             "Have you lost your way?",
+             "You might never be the same again...",];
 
  var compass = ["north","south","east","west"];
  var adj = ["mysterious","strange","rasping","barely audible","faint","familiar","unfamiliar","inhuman"];
@@ -846,7 +843,7 @@ function addStructure(){
            "7......                   7.....7",
            "77 . 77                   77===77"];
  }
- else switch(r(130)) {
+ else switch(r(140)) {
   default:
    if(score > 1000){
      toAdd = ["...",
@@ -2250,7 +2247,202 @@ function addStructure(){
              " 66  6  6  6   66",
              "66   6  6  6    6"];
    break;
+
+   case 116:
+    toAdd = [" .WWW  ",
+             " ..4WW ",
+             " 7744WW",
+             "774444W",
+             "7i$444W",
+             "774444W",
+             " 7744WW",
+             " ..4WW ",
+             " .WWW  "];
+   break;
+
+   case 117:
+    toAdd = ["      77777      ",
+             "      7$$$7      ",
+             "      7$i$7      ",
+             "      7$$$7      ",
+             "      77877      ",
+             "        .        ",
+             "77777 77.77 77777",
+             "7$$$7 7...7 7$$$7",
+             "7$i$8...0...8$i$7",
+             "7$$$7 7...7 7$$$7",
+             "77777 77.77 77777",
+             "        .        ",
+             "      77877      ",
+             "      7$$$7      ",
+             "      7$i$7      ",
+             "      7$$$7      ",
+             "      77777      "];
+   break;
+
+   case 118:
+    toAdd = ["  6.6  ",
+             " 66.66 ",
+             " 66666 ",
+             " 66666 ",
+             "WWW8WWW",
+             "W$...$W",
+             "W$._.$W",
+             "W$...$W",
+             "WW$$$WW",
+             " WWWWW "];
+   break;
+
+   case 119:
+    toAdd = [" ..'.WW   ",
+             "WW...'bWW ",
+             "  WW..'bWW",
+             "   WWW.'bW",
+             "   WWWb'.W",
+             "  '.'b'.WW",
+             "WWW.bb'.W ",
+             " ...'.WWW ",
+             " ....WW   ",
+             "  WWWW    "];
+   break;
+
+   case 120:
+    toAdd = [" WWWWW ",
+             "WWWWWWW",
+             "WW$$$WW",
+             "WW$1$WW",
+             "WW$$$WW",
+             "WWW0WWW",
+             " WW.WW "];
+   break;
+
+   case 121:
+    toAdd = ["    WWW    ",
+             "   WW'WW   ",
+             "   W'5'W   ",
+             " WWWW'WWWW ",
+             "WW''W8W''WW",
+             "W'9'8.8']'W",
+             "WW'WW.WW'WW",
+             " WWW...WWW ",
+             "    .W.    ",
+             "    WWW    "];
+   break;
+
+   case 122:
+    toAdd = ["     .     ",
+             "  77...77  ",
+             " 777787777 ",
+             "77$$787$$77",
+             "77$$$$$$$77",
+             " 77$$$$$77 ",
+             "  77$1$77  ",
+             "   77$77   ",
+             "    777    "];
+   break;
+
+   case 123:
+    toAdd = ["     777     ",
+             "    77=77    ",
+             "   77$=$77   ",
+             "  77$$=$$77  ",
+             " 77$$$=$$$77 ",
+             "77$$$$=$$$$77",
+             "7$9$78787$]$7",
+             "77$77.7.77$77",
+             " 777.^7^.777 ",
+             "     777     "];
+   break;
+
+   case 124:
+    toAdd = ["'''''",
+             "'b'b'",
+             "''_''",
+             "'b'b'",
+             "'''''"];
+   break;
+
+   case 125:
+    toAdd = [" WWWWW ",
+             "WW6i6WW",
+             "W$6.6WW",
+             "WW6.6$W",
+             "W$6.6WW",
+             "WW6.6$W",
+             "W$6.6WW",
+             "WW6.6$W",
+             "WWW8WWW",
+             "   .   "];
+   break;
+
+   case 126:
+    toAdd = ["  .  ",
+             " ... ",
+             ".._..",
+             " ... ",
+             "  .  "];
+   break;
+
+   case 127:
+    toAdd = ["  666  ",
+             " 66666 ",
+             "6666666",
+             "..._666",
+             "6666666",
+             " 66666 ",
+             "  666  "];
+   break;
+
+   case 128:
+    toAdd = ["    66666    ",
+             "  666666666  ",
+             " 66666666666 ",
+             "66666$$$66666",
+             "66666$_$66666",
+             "66666$$$66666",
+             " 66666666666 ",
+             " 666666666   ",
+             "   66666     "];
+   break;
+
+   case 129:
+    toAdd = ["777.777.777...7777.7777....7777.7777...777.777.777",
+             "77777777777787777777777788777777777778777777777777",
+             "777.777.777...7777.7777....7777.7777...777.777.777"];
+   break;
+
+   case 130:
+    toAdd = ["WWWW..WWWW",
+             "W?WW..WW?W",
+             "W........W",
+             "W.bW^^W~.W",
+             "..WW$$WW..",
+             "..WW$$WW..",
+             "W.=W^^Ws.W",
+             "W........W",
+             "W?WW..WW?W",
+             "WWWW..WWWW"];
+   break;
  }
+
+ // Mirror, flip, rotate:
+ var mirrorRoom = r(2);
+ if(!r(2)) toAdd = toAdd.reverse();
+ // if(!r(2)) { // Rotate room:
+ //   // We have to transform the array of strings into a matrix to properly
+ //   // transpose it, then back to array of strings because of code below...
+ //   for (var i = 0; i < toAdd.length; i++)
+ //     toAdd[i] = toAdd[i].split('');
+ //   for (var k = 0; k < toAdd.length; k++) {
+ //     for (var l = 0; l < k; l++) {
+ //       const tmp = toAdd[k][l];
+ //       toAdd[k][l] = toAdd[l][k];
+ //       toAdd[l][k] = tmp;
+ //     }
+ //   }
+ //   for (var j = 0; j < toAdd.length; j++)
+ //     toAdd[j] = toAdd[j].join('');
+ // } // Somewhere here in the transpose function is a BUG, fix it!
 
  // Get coordinates for the upper left corner of our new structure. Let really big structures be generated
  // partially outside of the map, but limit smaller structures to within the map's confines.
@@ -2268,10 +2460,6 @@ function addStructure(){
  var randDanger = ['^',tileLava,wallBlock][r(3)];
  var randAnnoy = [',',tileBramble,tileSludge,tileDark,tileNettles][r(5)];
  var randLiquid = liquids.sampleRec();
-
- // Mirror and flip:
- var mirrorRoom = r(2);
- if(r(2)) toAdd = toAdd.reverse();
 
  for (var i = 0; i < toAdd.length; i++) {
   currentLine = toAdd[i];
@@ -2414,7 +2602,7 @@ function fixEntry(a,b, showBlue){
    if(!inRange(escapePath)) break;
   }
   if(showBlue)
-    msg += "You discover a secret path. ";
+    msg += "You discover a <t style='color:#85C1E9'>secret path</t>. ";
  }
 }
 
@@ -2586,7 +2774,11 @@ function playerTakeDamage(dmg,i=9999){
  }
 
  var resist = armor;
- if(phased>0) resist *= 2; // Double armour when phased.
+ if(phased>0) resist = parseInt(resist*1.5); // Extra armour when phased.
+ if(i != 9999){
+   // Armor piercing monster attack:
+   if(currCre[i].flags.includes("pierce")) resist = 0;
+ }
  if(bloodied>0) dmg += kills; // Extra damage when bloodied.
  score -= Math.max(1, dmg-resist);
 
@@ -2631,6 +2823,10 @@ function tryPlayerMove(x,y){
 
 function damageCreature(i){
  msg += "You strike "+currCre[i].name+". ";
+ if(phased>0 && !r(3)){
+   msg += "Your attack phases right through "+currCre[i].name+". ";
+   return;
+ }
  // Attempt to lowercase the monster, if already lowercase, kill it instead. Vorpal staff always kills.
  var injured = currCre[i].icon.replaceAt(25, currCre[i].icon.charAt(25).toLowerCase());
  if(currCre[i].icon != injured && staff != 5){
@@ -2737,7 +2933,7 @@ function moveUser(x,y){
    var mobOrb = {icon:"<t style='color:#800080'>*</t>",
                  name:"<t style='color:#800080'>Prismatic Orb</t>",
                  attack:"kamikazes",
-                 quickness:10,
+                 aggro:10, // Doesn't really matter.
                  x:0, y:0,
                  flags:["explode", {x:x,y:y}],
                  behaviour: function(){
@@ -2835,12 +3031,15 @@ function moveUser(x,y){
 
   case '^': //trap
    msg += "You step on a pressure plate. ";
-   if(timestop>0) break;
+   if(timestop>0){
+     msg += "It doesn't seem to be working. ";
+     break;
+   }
    switch(r(9)){
     case 0:
      if(r(visited)>10){
       aflame += r(30)+r(30)+3;
-      msg += "A gout of hellfire sets you ablaze. ";
+      msg += "A gout of hellfire sets you ablaze! ";
      }
      else{
       poisoned += r(30)+visited;
@@ -2884,7 +3083,7 @@ function moveUser(x,y){
        msg += "Your Staff"+staves[staff]+" glows dull brown for a moment and looses all its magic. ";
        staff = 0;
      } else
-       msg += "You feel rather lucky. ";
+       msg += "Nothing seems to happen. ";
      break;
 
     case 6: //convocation
@@ -2903,7 +3102,7 @@ function moveUser(x,y){
      if(nbr>0)
        msg += "Monsters suddenly appear all around you. ";
      else
-       msg += "You feel rather lucky. ";
+       msg += "You hear a distant growl. ";
      break;
 
     default:
@@ -2925,11 +3124,16 @@ function moveUser(x,y){
    msg += "The lever clicks as you turn it. ";
    currentMap[userPos.x][userPos.y]='\\';
    // Create boss arena:
-   if(score>1000 && !r(4) && userPos.x>4 && userPos.x<(mapWidth-6) && userPos.y>4 && userPos.y<(mapWidth-6)){
-    msg += "Suddenly, you feel a mysterious force tear a piece of your soul away. ";
-    score = parseInt(score/2);
-    addBoss();
-    break;
+   if(score>1000){
+     if(!r(3) && userPos.x>4 && userPos.x<(mapWidth-6) && userPos.y>4 && userPos.y<(mapWidth-6)){
+       msg += "Suddenly, you feel a mysterious force tear a piece of your soul away. ";
+       score = parseInt(score/2);
+       addBoss();
+       break;
+     } else
+       msg += ["You hear a distant rumble coming close, but then it subsides. ",
+               "You feel a strange presence watching you intently. ",
+               "You sense a mysterious force brush past you. "].sampleRec();
    }
    // Hint:
    if(!r(10))
@@ -2948,6 +3152,7 @@ function moveUser(x,y){
      }
     }
    }
+   msg += "Walls crumble around you. ";
    break;
 
   case '0': //teleporter
@@ -2983,17 +3188,27 @@ function moveUser(x,y){
   //armor enchanted
   case tileArmor:
    currentMap[userPos.x][userPos.y]='.';
+   var old_glyph = glyph;
+   var old_armor = armor;
    armor = Math.max(r(visited), parseInt(distanceToOrigin()/2)+1);
    glyph = 1+r(glyphs.length-1);
+   // Guarantee either different glyph, or better armour:
+   if(glyph==old_glyph && armor<old_armor)
+     armor = old_armor + r(4)+1;
    msg += "You find a "+getArmorName()+" and equip it. It "+glyphDesc[glyph]+". ";
    break;
 
   //armor normal
   case "]":
    currentMap[userPos.x][userPos.y]='.';
-   armor = Math.max(r(visited), parseInt(distanceToOrigin()/2)+1);
-   glyph = 0;
-   msg += "You find a "+getArmorName()+" and equip it. ";
+   var new_armor = Math.max(r(visited), parseInt(distanceToOrigin()/2)+1);
+   if(new_armor>armor){
+     armor = new_armor;
+     glyph = 0;
+     msg += "You find a "+getArmorName()+" and equip it. ";
+   } else {
+     msg += "You find a "+armors[new_armor]+", but as you already have a better armour, you discard it. ";
+   }
    break;
 
   case tileWater:
@@ -3425,53 +3640,55 @@ function moveCreatures(){
   // Check for special action:
   if(currCre[k].behaviour()) continue;
 
-  if(r(currCre[k].quickness)>0){
-   // Get direction to player normalized to <-1,1>.
-   var dist = distanceBetween(userPos,currCre[k]);
-   var nextStep;
+  // Slow creatures only act once per two turns.
+  if(currCre[k].flags.includes("slow") && (turn % 2 != 0))
+    continue;
 
-   // Pursue the player if close enough.
-   if(dist <= 8){
-    var dx = Math.round((userPos.x - currCre[k].x)/dist);
-    var dy = Math.round((userPos.y - currCre[k].y)/dist);
+  // Get direction to player normalized to <-1,1>.
+  var dist = distanceBetween(userPos,currCre[k]);
+  var nextStep;
 
-    if(currCre[k].flags.includes("flee")){
-      if(dist>=4 && !r(4)) // calm down eventually
-       currCre[k].flags = currCre[k].flags.removeElement("flee");
-      else {
-        dx = -dx;
-        dy = -dy;
-      }
-    }
+  // Pursue the player if close enough, or if the creature has ESP.
+  if(dist <= currCre[k].aggro || currCre[k].flags.includes("esp")){
+   var dx = Math.round((userPos.x - currCre[k].x)/dist);
+   var dy = Math.round((userPos.y - currCre[k].y)/dist);
 
-    nextStep = [{x: currCre[k].x+dx, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+dy}];
-    if(currCre[k].flags.includes("diagonal")){
-     nextStep.push({x: currCre[k].x+dx, y: currCre[k].y+dy});
-     nextStep.shuffle();
-    }
-
-    // Move in one of possible directions, if blocked try the other:
-    var tryStep;
-    if(!r(2)) tryStep = nextStep.pop();
-    else tryStep = nextStep.shift();
-    if((tryStep.x != currCre[k].x || tryStep.y != currCre[k].y) && tryMove(tryStep.x,tryStep.y,k)){
-     doMove(tryStep.x,tryStep.y,k);
-     continue;
-    }
-    if((tryStep.x != currCre[k].x || tryStep.y != currCre[k].y) && tryMove(nextStep[0].x,nextStep[0].y,k)){
-     doMove(nextStep[0].x,nextStep[0].y,k);
-     continue;
-    }
+   if(currCre[k].flags.includes("flee")){
+     if(dist>=4 && !r(4)) // calm down eventually
+      currCre[k].flags = currCre[k].flags.removeElement("flee");
+     else {
+       dx = -dx;
+       dy = -dy;
+     }
    }
 
-   // Move randomly otherwise.
-   nextStep = [{x: currCre[k].x+1, y: currCre[k].y},{x: currCre[k].x-1, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+1},{x: currCre[k].x, y: currCre[k].y-1}];
-   if(currCre[k].flags.includes("diagonal")) nextStep.push({x: currCre[k].x+1, y: currCre[k].y+1},{x: currCre[k].x+1, y: currCre[k].y-1},{x: currCre[k].x-1, y: currCre[k].y+1},{x: currCre[k].x-1, y: currCre[k].y-1});
-   var j = r(nextStep.length);
-   if(tryMove(nextStep[j].x,nextStep[j].y,k)){
-     doMove(nextStep[j].x,nextStep[j].y,k);
-     continue;
+   nextStep = [{x: currCre[k].x+dx, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+dy}];
+   if(currCre[k].flags.includes("diagonal")){
+    nextStep.push({x: currCre[k].x+dx, y: currCre[k].y+dy});
+    nextStep.shuffle();
    }
+
+   // Move in one of possible directions, if blocked try the other:
+   var tryStep;
+   if(!r(2)) tryStep = nextStep.pop();
+   else tryStep = nextStep.shift();
+   if((tryStep.x != currCre[k].x || tryStep.y != currCre[k].y) && tryMove(tryStep.x,tryStep.y,k)){
+    doMove(tryStep.x,tryStep.y,k);
+    continue;
+   }
+   if((tryStep.x != currCre[k].x || tryStep.y != currCre[k].y) && tryMove(nextStep[0].x,nextStep[0].y,k)){
+    doMove(nextStep[0].x,nextStep[0].y,k);
+    continue;
+   }
+  }
+
+  // Move randomly otherwise.
+  nextStep = [{x: currCre[k].x+1, y: currCre[k].y},{x: currCre[k].x-1, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+1},{x: currCre[k].x, y: currCre[k].y-1}];
+  if(currCre[k].flags.includes("diagonal")) nextStep.push({x: currCre[k].x+1, y: currCre[k].y+1},{x: currCre[k].x+1, y: currCre[k].y-1},{x: currCre[k].x-1, y: currCre[k].y+1},{x: currCre[k].x-1, y: currCre[k].y-1});
+  var j = r(nextStep.length);
+  if(tryMove(nextStep[j].x,nextStep[j].y,k)){
+    doMove(nextStep[j].x,nextStep[j].y,k);
+    continue;
   }
  }
 }
@@ -3628,11 +3845,11 @@ Array.prototype.removeElement = function(element) {
 };
 
 function cloneCreature(creature){
- var clone = {icon:"",name:"",attack:undefined,quickness:0,x:0,y:0,flags:[],behaviour:function(){return false;}};
+ var clone = {icon:"",name:"",attack:undefined,aggro:0,x:0,y:0,flags:[],behaviour:function(){return false;}};
  clone.icon = creature.icon;
  clone.name = creature.name;
  clone.attack = creature.attack;
- clone.quickness = creature.quickness;
+ clone.aggro = creature.aggro;
  clone.flags = creature.flags;
  clone.behaviour = creature.behaviour;
 
@@ -3641,12 +3858,15 @@ function cloneCreature(creature){
 
 function initialise(){
  // Init creatures:
+ var creatureName = "abcdefghijklmnopqrstuvwxyz".split('');
+ for (var i = 0; i < creatureName.length; i++)
+   mobNames[creatureName[i]].shuffle();
  for (; creatureChar.length>0; ) {
-  var base = {icon:"",name:"",attack:undefined,quickness:0,x:0,y:0,flags:[],behaviour:function(){return false;}};
+  var base = {icon:"",name:"",attack:undefined,aggro:0,x:0,y:0,flags:[],behaviour:function(){return false;}};
   base.icon = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+creatureChar.pop()+"</t>";
   base.name = "<t style='color:#"+base.icon.substr(17,6)+"'>"+getMobName(base.icon.charAt(25))+"</t>";
   base.attack = attackVerbs[r(attackVerbs.length)];
-  base.quickness = r(4)+2;
+  base.aggro = r(8)+r(8)+4;
   base.flags = getMobFlags();
   base.behaviour = getMobBehaviour();
   creatureList.push(base);
@@ -3661,11 +3881,11 @@ function initialise(){
 
  var welcome = ["May you find that which you seek.",
                 "Strike down anyone who stands in your path.",
-                "Have you lost your way?",
                 "Their blood shall purify you.",
                 "Your journey's end awaits in the distance.",
                 "Nourish your Self or fade to oblivion.",
-                "You might never be the same again..."];
+                "Seek the levers once your Self glows again. ",
+                "Venture beyond, where new lands await. ",];
 
  // Init game:
  addUser();
