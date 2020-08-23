@@ -38,7 +38,7 @@
     a comment on my <a href="https://attnam.blogspot.com/2020/08/wanderer.html">blog</a>.
     Have fun!
   </br></br>
-    Use <code>F11</code> for fullscreen mode.
+    Use <code>F11</code> for fullscreen mode (recommended).
   </br></br>
     Use <code>Ctrl +</code> and <code>Ctrl -</code> to adjust the size
     to your liking.
@@ -84,7 +84,7 @@ var staves = ["",
               " of <t style='font-style: italic;'>Soa r i&nbsp;&nbsp;n&nbsp;&nbsp;&nbsp;g</t> Leap",
               " of <t style='color:#800080'>C</t><t style='color:#FF1493'>o</t><t style='color:#800080'>njuration</t>",
               " of <t style='color:#006400'>Bur</t><t style='color:#32CD32'>g</t><t style='color:#006400'>eonin</t><t style='color:#32CD32'>g</t>",];
-var staffDesc = ["can support your step and whack your enemies, but lacks any and all magical powers, unfortunately",
+var staffDesc = ["with no enchantment can whack your enemies good, but unfortunately lacks magical powers",
                  "may open ephemeral bridges to faraway locations",
                  "can momentarily remove you from the flow of time, rendering all monsters and mechanisms frozen and unable to affect you",
                  "may reveal concealed corridors and crevices in nearby walls",
@@ -173,6 +173,7 @@ var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNett
 var rareTerrain = ['/','0',tileKey,'_',']',[tileSludge,tileDark,tileBlood]];
 var impassable = [wallBlock,tileGoldWall,tileDoor];
 var liquids = [tileBlood,tileLava,tileSludge,tileWater];
+var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
 
 var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".split('');
 var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
@@ -183,7 +184,7 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","dispel","extraattack","pierce","slow","esp","boonphase","boontime","boonscore"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","dispel","extraattack","pierce","slow","esp","explode","boonphase","boontime","boonscore"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
@@ -287,6 +288,37 @@ var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                   this.x = j;
                   this.y = k;
                   msg += this.name+" disappears and suddenly reappears near you. ";
+                 }
+                } else {
+                 var x = r(3)-1;
+                 var y = r(3)-1;
+                 // We require at least two squares in given direction to be empty:
+                 if(inRangeCoords(this.x+x,this.y+y) && checkEmpty(this.x+x,this.y+y) && checkEmpty(this.x+x+x,this.y+y+y)){
+                  msg += this.name+" conjures an orb of prismatic energy. ";
+                  // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
+                  var mobOrb = {icon:"<t style='color:#800080'>*</t>",
+                                name:"<t style='color:#800080'>Prismatic Orb</t>",
+                                attack:"kamikazes",
+                                aggro:10, // Doesn't really matter.
+                                x:0, y:0,
+                                flags:["explode", {x:x,y:y}],
+                                behaviour: function(){
+                                 // Change colour randomly:
+                                 this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
+                                 // Move in one direction, then explode:
+                                 var i = currCre.indexOf(this);
+                                 if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
+                                  doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                                 } else {
+                                  msg += currCre[i].name+" explodes. ";
+                                  onExplosion(i);
+                                 }
+                                 return true;
+                                }
+                               };
+                  currCre.push(mobOrb);
+                  currCre[currCre.length-1].x = this.x+x;
+                  currCre[currCre.length-1].y = this.y+y;
                  }
                 }
                 return false;
@@ -437,6 +469,44 @@ function getMobBehaviour(){
         msg += this.name+" leaves something behind. ";
     }
     return false;
+   };
+
+  case 11:
+   return function(){
+     var x = r(3)-1;
+     var y = r(3)-1;
+     // We require at least two squares in given direction to be empty:
+     if(!r(4) && inRangeCoords(this.x+x,this.y+y) && checkEmpty(this.x+x,this.y+y) && checkEmpty(this.x+x+x,this.y+y+y)){
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" conjures an orb of prismatic energy. ";
+      // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
+      var mobOrb = {icon:"<t style='color:#800080'>*</t>",
+                    name:"<t style='color:#800080'>Prismatic Orb</t>",
+                    attack:"kamikazes",
+                    aggro:10, // Doesn't really matter.
+                    x:0, y:0,
+                    flags:["explode", {x:x,y:y}],
+                    behaviour: function(){
+                     // Change colour randomly:
+                     this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
+                     // Move in one direction, then explode:
+                     var i = currCre.indexOf(this);
+                     if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
+                      doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                     } else {
+                      msg += currCre[i].name+" explodes. ";
+                      onExplosion(i);
+                     }
+                     return true;
+                    }
+                   };
+      currCre.push(mobOrb);
+      currCre[currCre.length-1].x = this.x+x;
+      currCre[currCre.length-1].y = this.y+y;
+      return true;
+     }
+     else
+       return false;
    };
  }
 }
@@ -816,6 +886,10 @@ function addBoss(){
 function addStructure(){
  var toAdd = [];
  var currentLine = "";
+ //TODO:
+ var noMirror = false;
+ var noFlip = false;
+ var noRotate = false;
 
  //The winning place:
  if((r(visited)>20) && (r(distanceToOrigin())>=10) && (r(kills)>20)){
@@ -847,14 +921,14 @@ function addStructure(){
   default:
    if(score > 1000){
      toAdd = ["...",
-       "./.",
-       "..."];
+              "./.",
+              "..."];
    } else {
      toAdd = [["WWWWWWWWWWWWWW","WWWWWW..WWWWWW"][r(2)],
        "W............W",
        "W............W",
-      ['W','.'][r(2)]+"............"+['W','.'][r(2)],
-       "W............W",
+      ['W','.','.'][r(3)]+"............"+['W','.','.'][r(3)],
+       "W..."+['i','.'][r(2)]+"........W",
        "W............W",
       ["WWWWWWWWWWWWWW","WWWWWW..WWWWWW"][r(2)],
      ];
@@ -1023,6 +1097,7 @@ function addStructure(){
      break;
 
   case 17:
+    // Temple of the RNG
     // I actually fixed the strange bugs that crop up when generating this room,
     // but then it seemed so... boring. So for this room only, please don't fix the bugs. :D
     toAdd = ["&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;",
@@ -1051,10 +1126,11 @@ function addStructure(){
       for (var i = 0; i < toAdd.length; i++) {
        toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),randTerrain[r(randTerrain.length)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
        toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
-
-       if(r(4)) toAdd[i] = toAdd[i].replace("9","i");
-       else toAdd[i] = toAdd[i].replace("9","1");
-
+       toAdd[i] = toAdd[i].replace("9","t");
+       toAdd[i] = toAdd[i].replace("6",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace("0",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace("#",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace(";",randTerrain[r(randTerrain.length)]);
        toAdd[i] = toAdd[i].replace("&",randTerrain[r(randTerrain.length)]);
        toAdd[i] = toAdd[i].replace("8",randTerrain[r(randTerrain.length)]);
       }
@@ -2330,6 +2406,8 @@ function addStructure(){
    break;
 
    case 122:
+    noFlip = true;
+    noRotate = true;
     toAdd = ["     .     ",
              "  77...77  ",
              " 777787777 ",
@@ -2342,6 +2420,8 @@ function addStructure(){
    break;
 
    case 123:
+    noFlip = true;
+    noRotate = true;
     toAdd = ["     777     ",
              "    77=77    ",
              "   77$=$77   ",
@@ -2427,8 +2507,9 @@ function addStructure(){
 
  // Mirror, flip, rotate:
  var mirrorRoom = r(2);
- if(!r(2)) toAdd = toAdd.reverse();
- // if(!r(2)) { // Rotate room:
+ if(!r(2) && !noFlip) // Flip vertically.
+   toAdd = toAdd.reverse();
+ // if(!r(2) && !noRotate) { // Rotate room:
  //   // We have to transform the array of strings into a matrix to properly
  //   // transpose it, then back to array of strings because of code below...
  //   for (var i = 0; i < toAdd.length; i++)
@@ -2464,7 +2545,7 @@ function addStructure(){
  for (var i = 0; i < toAdd.length; i++) {
   currentLine = toAdd[i];
   currentLine = currentLine.split('');
-  if(mirrorRoom) currentLine.reverse();
+  if(mirrorRoom && !noMirror) currentLine.reverse();
 
   for (var j = 0; j < currentLine.length; j++) {
    if(inRangeCoords(x+i,y+j)) {
@@ -2505,10 +2586,13 @@ function addStructure(){
     case "s": // sludge
      currentMap[x+i][y+j] = tileSludge;
      break;
+    case "t": // random treasure
+     currentMap[x+i][y+j] = treasures[r(treasures.length-1)];
+     break;
     case "i": // minor treasure
      currentMap[x+i][y+j] = ['$','_',']',tileKey][r(4)];
      break;
-    case "1": // random treasure
+    case "1": // major treasure
      currentMap[x+i][y+j] = [tileTreasure,tileStaff,tileArmor][r(3)];
      break;
     case "2": // the End
@@ -2871,6 +2955,10 @@ function distanceToOrigin(){
 
 function distanceBetween(mob1, mob2){
  return Math.ceil(Math.sqrt(Math.pow(mob1.x-mob2.x,2)+Math.pow(mob1.y-mob2.y,2)));
+}
+
+function stepsBetween(mob1, mob2){
+ return Math.abs(mob1.x-mob2.x) + Math.abs(mob1.y-mob2.y);
 }
 
 function semiModulo(a,b){
@@ -3700,24 +3788,39 @@ function getFinalScore(){
  return "<t style='color:#8B008B; font-weight: bold;'>"+String(parseInt(winner))+"</t>";
 }
 
-function displayMap(findPlayer=false){
+function displayMap(highlight=""){
  var displayString = "";
  var outputMap = [];
 
  // Clone the map for output, then add monster symbols to it:
  currentMap.clone2d(outputMap);
- for (var i = 0; i < currCre.length; i++) {
-  outputMap[currCre[i].x][currCre[i].y]=currCre[i].icon;
- }
- // If blind, only display the player:
- if(blinded>0 || findPlayer){
+ if(blinded>0 || highlight != ""){
+  // If blind, we only display the player. Highlighting can display the player,
+  // mobs and treasures, or outline of nearby/furthest reachable area.
   for (var i = 0; i < mapWidth; i++) {
    for (var j = 0; j < mapWidth; j++) {
-    outputMap[i][j] = emptyBlock;
+     if(blinded>0) // Blindess overrides highlighting.
+       outputMap[i][j] = emptyBlock;
+     else if(highlight == "interests" && treasures.includes(outputMap[i][j]))
+       continue;
+     else if(highlight == "area") {
+       if(stepsBetween(userPos, {x:i,y:j}) == 9 && score > 10)
+         outputMap[i][j] = "<t style='background-color:#9ACD32'>"+outputMap[i][j]+"</t>";
+       else if(stepsBetween(userPos, {x:i,y:j}) == score-1)
+         outputMap[i][j] = "<t style='background-color:#FF0000'>"+outputMap[i][j]+"</t>";
+       // Otherwise leave map as is.
+     }
+     else
+       outputMap[i][j] = emptyBlock;
    }
   }
  }
- // Display the player:
+ if(blinded==0 && highlight != "player") {
+   for (var i = 0; i < currCre.length; i++) {
+    outputMap[currCre[i].x][currCre[i].y]=currCre[i].icon;
+   }
+ }
+ // Always display the player:
  outputMap[userPos.x][userPos.y] = getUserChar();
 
  for (var i = 0; i < mapWidth; i++) {
@@ -3796,19 +3899,29 @@ document.onkeydown = function(e) {
          // Open a help window.
          alert("Wanderer "+VERSION+"\n\n"+
                "Use arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\n"+
-               "Press 'X' or '0' to invoke the powers of your magic staff.\n"+
-               "Hold 'Ctrl' to highlight your avatar.\n\n"+
+               "Press 'X' or '0' to invoke the powers of your magic staff.\n\n"+
+               "Hold 'Ctrl' to highlight your avatar.\n"+
+               "Hold 'Alt' to highlight monsters and treasure.\n"+
+               "Hold 'Shift' to outline the nearby area in green and the furthest you could reach with your current Self in red.\n\n"+
                "Gather the '$' memories of your life, or you may fade away before you reach your closure.");
          break;
+        case 16: //Shift
+         displayMap("area");
+         break;
         case 17: //Ctrl
-         displayMap(true);
+         displayMap("player");
+         break;
+        case 18: //Alt
+         displayMap("interests");
          break;
     }
 };
 
 document.onkeyup = function(e) {
     switch (e.keyCode) {
+        case 16: //Shift
         case 17: //Ctrl
+        case 18: //Alt
          displayMap();
          break;
     }
@@ -3866,7 +3979,7 @@ function initialise(){
   base.icon = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+creatureChar.pop()+"</t>";
   base.name = "<t style='color:#"+base.icon.substr(17,6)+"'>"+getMobName(base.icon.charAt(25))+"</t>";
   base.attack = attackVerbs[r(attackVerbs.length)];
-  base.aggro = r(8)+r(8)+4;
+  base.aggro = r(10)+r(10)+10;
   base.flags = getMobFlags();
   base.behaviour = getMobBehaviour();
   creatureList.push(base);
