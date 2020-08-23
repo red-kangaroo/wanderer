@@ -1,5 +1,5 @@
 Wander/Wonder
-1
+1ti
 $5?/0-9]_
 ~,;678
 =bs!#^34
@@ -18,23 +18,18 @@ README
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
 * make sure player doesn't start in lava or in a locked treasure room
+   fixEntry ???
    floodfill the level, add teleporters to all closed-off spaces and prevent player spawning
    what about closed vaults?
 
 * stun
+   both player and mobs
 * invisibility – doesn't work against adjacent mobs, otherwise they ignore player no matter their aggro range
 * player haste – mobs only act on even turns (what about slow mobs?)
 * rage – player looses control, avatar attacks
 
-https://heyjavascript.com/field-of-view-in-javascript-using-recursive-shadow-casting/
-* lava and mobs with „light“ always visible
-
 * terrain that causes Stuck status, prevents move away with some chance
-   quicksand: yellow ,
-
-* highlight mobs + treasure (Alt)
-* highlight area 10 (green +) and score-1 (red +) away, to let the player plan their move
-* switch findPlayer to highlight=""
+   quicksand: yellow , (yellow background??)
 
 * run in direction command
 * persistent messages
@@ -56,15 +51,15 @@ https://heyjavascript.com/field-of-view-in-javascript-using-recursive-shadow-cas
 * armor
   explosions (destroy adjacent mobs and terrain, but grants no kills)
   time mastery (randomly/on damage time stop)
-  sunlight (once darkness is in, increases sight radius)
   water lily steps (immune to liquids, even beneficial effects)
   zen (no hunger and invulnerable while blind??)
   plant lordship (some effect when trampling grass, nettles and brambles)
   sludge (cap damage taken at 1, but only when Poisoned)
+  hyperspace (diagonal movement)
 * staff
-  Sunlight - 20 radius light on dark levels (even though walls, unlike the FOV); causes nearby mobs to flee (range 5?)
-  Enslavement - Mob vs mob combat
-  Polymorph - can change mobs or features
+  sunlight - 20 radius light on dark levels (even though walls, unlike the FOV); stuns all/nearby enemies (range 5??)
+  enslavement - Mob vs mob combat
+  polymorph - can change mobs or features
 * consumable: Scroll/Potion
   Convocation - blink mobs near
   Omnipotence - regenerates level
@@ -76,10 +71,14 @@ https://heyjavascript.com/field-of-view-in-javascript-using-recursive-shadow-cas
   Bloodlust - adds 10? Kills
   Dessication - removes all liquids on level
   timed bomb
+* helmets
+  * odd-numbered give extra Defense, even are magical
 
 * new generators
    r(1000)<visited: map is maze level
    r(100) <disttoorigin: map is dark level (add simple FOV)
+     https://heyjavascript.com/field-of-view-in-javascript-using-recursive-shadow-casting/
+     * lava and mobs with „light“ always visible
 * maybe refactor maps into worldData struct with map, name + other future stuff
 * maybe more decorations based on name?
    forests have alternate walls:
@@ -87,6 +86,8 @@ https://heyjavascript.com/field-of-view-in-javascript-using-recursive-shadow-cas
      8  light green leafy
      |  brown, dead tree
      %  bush
+     .  brown, tree stump
+   * vorpal and orbs can destroy trees (and grass)
    deserts with sand, quicksand
 * statue of yourself:  8
    new statues var, when >0 add that many statues to all new maps
@@ -108,8 +109,15 @@ https://www.reddit.com/r/javascript/comments/71k0nr/i_made_a_very_fast_path_find
 https://easystarjs.com/     https://github.com/prettymuchbryce/easystarjs
 
 * lava/liquids block mobs??
+   lava doesn't block mobs with flame/lavapool flags, etc.
 * add descriptions for mob abilities
 * spawn extra monsters on . OR respawn monsters on .
+
+* ranged:
+  Line (range 6)
+  Smite (range 4)
+  Blood curse (bloodied)
+  Stun
 
 * flags:
 phasing
@@ -126,7 +134,5 @@ teleport randomly
 spawn / clone self
 summon random
 dig
-explode when adjacent
-summon
 when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)

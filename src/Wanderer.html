@@ -184,7 +184,7 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","dispel","extraattack","pierce","slow","esp","boonphase","boontime","boonscore"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","disenchant","summon","panic","dodge","bloody","dispel","extraattack","pierce","slow","esp","explode","boonphase","boontime","boonscore"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
@@ -288,6 +288,37 @@ var mobBoss = {icon:"<t style='color:#8B008B'>W</t>",
                   this.x = j;
                   this.y = k;
                   msg += this.name+" disappears and suddenly reappears near you. ";
+                 }
+                } else {
+                 var x = r(3)-1;
+                 var y = r(3)-1;
+                 // We require at least two squares in given direction to be empty:
+                 if(inRangeCoords(this.x+x,this.y+y) && checkEmpty(this.x+x,this.y+y) && checkEmpty(this.x+x+x,this.y+y+y)){
+                  msg += this.name+" conjures an orb of prismatic energy. ";
+                  // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
+                  var mobOrb = {icon:"<t style='color:#800080'>*</t>",
+                                name:"<t style='color:#800080'>Prismatic Orb</t>",
+                                attack:"kamikazes",
+                                aggro:10, // Doesn't really matter.
+                                x:0, y:0,
+                                flags:["explode", {x:x,y:y}],
+                                behaviour: function(){
+                                 // Change colour randomly:
+                                 this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
+                                 // Move in one direction, then explode:
+                                 var i = currCre.indexOf(this);
+                                 if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
+                                  doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                                 } else {
+                                  msg += currCre[i].name+" explodes. ";
+                                  onExplosion(i);
+                                 }
+                                 return true;
+                                }
+                               };
+                  currCre.push(mobOrb);
+                  currCre[currCre.length-1].x = this.x+x;
+                  currCre[currCre.length-1].y = this.y+y;
                  }
                 }
                 return false;
@@ -438,6 +469,44 @@ function getMobBehaviour(){
         msg += this.name+" leaves something behind. ";
     }
     return false;
+   };
+
+  case 11:
+   return function(){
+     var x = r(3)-1;
+     var y = r(3)-1;
+     // We require at least two squares in given direction to be empty:
+     if(!r(4) && inRangeCoords(this.x+x,this.y+y) && checkEmpty(this.x+x,this.y+y) && checkEmpty(this.x+x+x,this.y+y+y)){
+      if(distanceBetween(userPos,this)<5)
+        msg += this.name+" conjures an orb of prismatic energy. ";
+      // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
+      var mobOrb = {icon:"<t style='color:#800080'>*</t>",
+                    name:"<t style='color:#800080'>Prismatic Orb</t>",
+                    attack:"kamikazes",
+                    aggro:10, // Doesn't really matter.
+                    x:0, y:0,
+                    flags:["explode", {x:x,y:y}],
+                    behaviour: function(){
+                     // Change colour randomly:
+                     this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
+                     // Move in one direction, then explode:
+                     var i = currCre.indexOf(this);
+                     if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
+                      doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                     } else {
+                      msg += currCre[i].name+" explodes. ";
+                      onExplosion(i);
+                     }
+                     return true;
+                    }
+                   };
+      currCre.push(mobOrb);
+      currCre[currCre.length-1].x = this.x+x;
+      currCre[currCre.length-1].y = this.y+y;
+      return true;
+     }
+     else
+       return false;
    };
  }
 }
@@ -858,8 +927,8 @@ function addStructure(){
      toAdd = [["WWWWWWWWWWWWWW","WWWWWW..WWWWWW"][r(2)],
        "W............W",
        "W............W",
-      ['W','.'][r(2)]+"............"+['W','.'][r(2)],
-       "W............W",
+      ['W','.','.'][r(3)]+"............"+['W','.','.'][r(3)],
+       "W..."+['i','.'][r(2)]+"........W",
        "W............W",
       ["WWWWWWWWWWWWWW","WWWWWW..WWWWWW"][r(2)],
      ];
@@ -1028,6 +1097,7 @@ function addStructure(){
      break;
 
   case 17:
+    // Temple of the RNG
     // I actually fixed the strange bugs that crop up when generating this room,
     // but then it seemed so... boring. So for this room only, please don't fix the bugs. :D
     toAdd = ["&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;",
@@ -1056,10 +1126,11 @@ function addStructure(){
       for (var i = 0; i < toAdd.length; i++) {
        toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),randTerrain[r(randTerrain.length)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
        toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
-
-       if(r(4)) toAdd[i] = toAdd[i].replace("9","i");
-       else toAdd[i] = toAdd[i].replace("9","1");
-
+       toAdd[i] = toAdd[i].replace("9","t");
+       toAdd[i] = toAdd[i].replace("6",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace("0",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace("#",randTerrain[r(randTerrain.length)]);
+       toAdd[i] = toAdd[i].replace(";",randTerrain[r(randTerrain.length)]);
        toAdd[i] = toAdd[i].replace("&",randTerrain[r(randTerrain.length)]);
        toAdd[i] = toAdd[i].replace("8",randTerrain[r(randTerrain.length)]);
       }
@@ -2515,10 +2586,13 @@ function addStructure(){
     case "s": // sludge
      currentMap[x+i][y+j] = tileSludge;
      break;
+    case "t": // random treasure
+     currentMap[x+i][y+j] = treasures[r(treasures.length-1)];
+     break;
     case "i": // minor treasure
      currentMap[x+i][y+j] = ['$','_',']',tileKey][r(4)];
      break;
-    case "1": // random treasure
+    case "1": // major treasure
      currentMap[x+i][y+j] = [tileTreasure,tileStaff,tileArmor][r(3)];
      break;
     case "2": // the End
@@ -3728,7 +3802,7 @@ function displayMap(highlight=""){
      if(blinded>0) // Blindess overrides highlighting.
        outputMap[i][j] = emptyBlock;
      else if(highlight == "interests" && treasures.includes(outputMap[i][j]))
-       continue
+       continue;
      else if(highlight == "area") {
        if(stepsBetween(userPos, {x:i,y:j}) == 9 && score > 10)
          outputMap[i][j] = "<t style='background-color:#9ACD32'>"+outputMap[i][j]+"</t>";
@@ -3905,7 +3979,7 @@ function initialise(){
   base.icon = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+creatureChar.pop()+"</t>";
   base.name = "<t style='color:#"+base.icon.substr(17,6)+"'>"+getMobName(base.icon.charAt(25))+"</t>";
   base.attack = attackVerbs[r(attackVerbs.length)];
-  base.aggro = r(8)+r(8)+4;
+  base.aggro = r(10)+r(10)+10;
   base.flags = getMobFlags();
   base.behaviour = getMobBehaviour();
   creatureList.push(base);
