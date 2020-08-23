@@ -33,7 +33,11 @@ Use 'X' or '0' to invoke the powers of your magic staff, if you have one.
 
 Hold 'Ctrl' to highlight your avatar.
 
-Use 'F11' for fullscreen mode.
+Hold 'Alt' to highlight monsters and treasure.
+
+Hold 'Shift' to outline the nearby area in green and the furthest you could reach with your current Self in red.
+
+Use 'F11' for fullscreen mode (recommended).
 
 Use 'Ctrl +' and 'Ctrl -' to adjust the size to your liking.
 
