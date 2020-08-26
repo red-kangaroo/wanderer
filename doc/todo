@@ -18,15 +18,16 @@ README
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
 * make sure player doesn't start in lava or in a locked treasure room
-   fixEntry ???
+   fixEntry // arrival vaults
    floodfill the level, add teleporters to all closed-off spaces and prevent player spawning
    what about closed vaults?
 
 * stun
    both player and mobs
-* invisibility – doesn't work against adjacent mobs, otherwise they ignore player no matter their aggro range
-* player haste – mobs only act on even turns (what about slow mobs?)
-* rage – player looses control, avatar attacks
+* invisibility - doesn't work against adjacent mobs, otherwise they ignore player no matter their aggro range,
+                 unless they have esp (but then boss should loose esp, also prevent ranged attacks against invisible player)
+* player haste - mobs only act on even turns (what about slow mobs? maybe nothing, all mobs act as slow)
+* rage - player looses control, avatar attacks until status ends
 
 * terrain that causes Stuck status, prevents move away with some chance
    quicksand: yellow , (yellow background??)
@@ -56,6 +57,7 @@ README
   plant lordship (some effect when trampling grass, nettles and brambles)
   sludge (cap damage taken at 1, but only when Poisoned)
   hyperspace (diagonal movement)
+  druidcraft (walk thru trees??)
 * staff
   sunlight - 20 radius light on dark levels (even though walls, unlike the FOV); stuns all/nearby enemies (range 5??)
   enslavement - Mob vs mob combat
@@ -93,15 +95,22 @@ README
    new statues var, when >0 add that many statues to all new maps
    +1 whenever you step on statue
    mostly just flavour, but has the potential to swamp levels
+
 * vaults:
    https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
    https://github.com/crawl/crawl/tree/master/crawl-ref/source/dat/des
+* arrival vaults?
 
 
 Mobs
 ====
-* Special effects of some attack verbs?
+* boss bold and underlined - cannot do right now, because we replace letter with charAt
+* maybe randomly spawn boss when entering new area with >1000 Self??
+
+* special effects of some attack verbs?
    Freezes: stop Aflame
+
+* AI routine
 * add A*
 https://briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated/
 https://github.com/bgrins/javascript-astar
@@ -113,12 +122,6 @@ https://easystarjs.com/     https://github.com/prettymuchbryce/easystarjs
 * add descriptions for mob abilities
 * spawn extra monsters on . OR respawn monsters on .
 
-* ranged:
-  Line (range 6)
-  Smite (range 4)
-  Blood curse (bloodied)
-  Stun
-
 * flags:
 phasing
 invulnerable to bump attacks, slow speed
@@ -126,13 +129,10 @@ antimagic - cannot be harmed with magic/when player under influence of magic
 paralysis
 stun - random movement
 haste - move faster, don't attack faster
-pull close - if player is in straight unobstructed orthogonal line, pull d4 squares closer
 
 * behaviour:
-teleport to player
-teleport randomly
-spawn / clone self
-summon random
+pull close - if player is in straight unobstructed orthogonal line, pull d4 squares closer
 dig
 when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
+ranged stun
