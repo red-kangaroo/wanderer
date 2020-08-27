@@ -1,8 +1,8 @@
 Wander/Wonder
 1ti
 $5?/0-9]_
-~,;678
-=bs!#^34
+~,;678pP
+=bs!)#^34
 
 
 https://www.w3schools.com/colors/colors_names.asp
@@ -83,24 +83,22 @@ README
      * lava and mobs with „light“ always visible
 * maybe refactor maps into worldData struct with map, name + other future stuff
 * maybe more decorations based on name?
-   forests have alternate walls:
-     4  dark green coniferous
-     8  light green leafy
-     |  brown, dead tree
-     %  bush
-     .  brown, tree stump
-   * vorpal and orbs can destroy trees (and grass)
+   forests should have alternate walls
    deserts with sand, quicksand
 * statue of yourself:  8
    new statues var, when >0 add that many statues to all new maps
    +1 whenever you step on statue
    mostly just flavour, but has the potential to swamp levels
+* terrain that spawn creatures around player, pentagram?
 
 * vaults:
    https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
    https://github.com/crawl/crawl/tree/master/crawl-ref/source/dat/des
 * arrival vaults?
 
+* soaring leap passes thru mobs and attacks them
+* cleansing water msg order
+* fix rotate
 
 Mobs
 ====
