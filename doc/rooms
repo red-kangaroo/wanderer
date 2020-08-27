@@ -1,4 +1,4 @@
-case 131:
+case 142:
  toAdd = [
 break;
 
@@ -193,139 +193,6 @@ xx8...8xx
 
 
 
-77777.77777",
-7$$$7.7$$$7",
-7$$$7.8$$$7",
-7$$$7.7$$$7",
-77877 77777",
-....   ....",
-77777 77877",
-7$$$7.7$$$7",
-7$$$8.7$$$7",
-7$$$7.7$$$7",
-77777.77777"];
-
-
-
-bbbbbbbbbbbbb",
-b'''''b'''''b",
-b'bbbbbbbbb'b",
-b'b'''b'''b'b",
-b'b'bbbbb'b'b",
-b'b'b'''b'b'b",
-bbbbb'_'bbbbb",
-b'b'b'''b'b'b",
-b'b'bbbbb'b'b",
-b'b'''b'''b'b",
-b'bbbbbbbbb'b",
-b'''''b'''''b",
-bbbbbbbbbbbbb"];
-
-
-777777777777",
-7========$$7",
-.,,,,,,,,$i7",
-7========$$7",
-777777777777"];
-
-
-   WWW.WW.WW.WWW   ",
-  WW'''''''''''WW  ",
- WW'''''''''''''WW ",
-WW'.............'WW",
-W'.......b.......'W",
-........bbb........",
-........bbb........",
-W'.......b.......'W",
-WW'.............'WW",
- WW'''''''''''''WW ",
-  WW'''''''''''WW  ",
-   WWW.WW.WW.WWW   "];
-
-
-             WWWW             ",
-       WWWWWW....WWWWWW       ",
-    WWW................WWW    ",
-  WW......................WW  ",
- W......W W........WWW......W ",
-W.....WW W WW.....W   WW.....W",
- ....W      W77877W     W.... ",
-....W        7...7       W....",
-..WW         7.t.7        WW  ",
- W           7...7            ",
-             77777            "];
-
-
-
-       !!!!!!!      ",
-     !!!!!ppp!!!    ",
-  !!!!!!!;;pppp!!!  ",
-  !ppppppp;;ppppp!  ",
- !!pppppppp;;;ppp!! ",
- !ppp;;;;ppp;;;ppp! ",
- !pp;;;;;ppp;;;;pp!!",
-!!pp;;i;;?pp;;;;ppp!",
-!ppp;;;;;ppp;;;;;pp!",
-!pp;;;;;;ppp;;;;;pp!",
-!pp;;;;;pppp;;;;;pp!",
-!pp;;;;;ppp;;;;;;pp!",
-!pp;;;;;pp;;;;;;ppp!",
-!ppp;?;;pp;;;1;;ppp!",
-!!pp;;;;pp;;;;;;pp!!",
- !ppp;;;ppp;;;;ppp! ",
- !!ppp;;;pppppppp!! ",
-  !ppppp;;ppppppp!  ",
-  !!!pppp;;!!!!!!!  ",
-    !!!ppp!!!!!     ",
-      !!!!!!!       "];
-
-
-
-  WW.WW  ",
- WW...WW ",
-WW.....WW",
-W.......W",
-....i....",
-W.......W",
-WW.....WW",
- WW...WW ",
-  WW.WW  "];
-
-
-
-   ppp...ppp   ",
-  pp;;;;;;;pp  ",
- pp;;;...;;;pp ",
- p;;;.444.;;;p ",
-pp;;.44444.;;pp",
-p;;.44   44.;;p",
-p;;.44 i 44.;;p",
-p;;.44   44.;;p",
-pp;;.44444.;;pp",
- p;;;.444.;;;p ",
- pp;;;...;;;pp ",
-  pp;;;;;;;pp  ",
-   ppp...ppp   "];
-
-
-
-  777     777  ",
- 7767777777677 ",
-77...77677...77",
-76.1..8.8..1.67",
-77...77.77...77",
- 7767766677677 ",
-  77777.77777  ",
-       .       "];
-
-
-
-
-
-
-
-
-
           @
           .
          ...
@@ -364,17 +231,17 @@ ccB.+.T.+.Bcc
       @
 
 
-  cc  c  cc  
- cc  ccc  cc  
-ccc  ccc  ccc 
-ccc ccccc ccc 
-ccccccGcccccc 
-ccGB  B  BGcc 
- ccl     lcc  
- ccll   llcc  
-  ccll llcc  
-   ccl lcc  
-    cc+cc 
+  cc  c  cc
+ cc  ccc  cc
+ccc  ccc  ccc
+ccc ccccc ccc
+ccccccGcccccc
+ccGB  B  BGcc
+ ccl     lcc
+ ccll   llcc
+  ccll llcc
+   ccl lcc
+    cc+cc
 
 
           ccc
@@ -395,66 +262,3 @@ cccccccc...G...cccccccc
          cc.cc
           c+c
           ...
-
-
-          c
-         ccc
-        ccBcc
-   cccccc...cccccc
-   cB..ccc+ccc..Bc
-   c..cc.....cc..c
-   c.c+.......+c.c
-   ccc....T....ccc
-  ccc...T...T...ccc
- cc.c...........c.cc
-ccB.+..T..T..T..+.Bcc
- cc.c...........c.cc
-  ccc...T...T...ccc
-   ccc....T....ccc
-   c.c+.......+c.c
-   c..cc.....cc..c
-   cB..ccc+ccc..Bc
-   cccccc...cccccc
-        cc.cc
-         c.c
-          @
-
-PLANTS:
-   ...
- ...d...
- .k...e.
-.........
-.j..G..f.
-.........
- .i...g.
- ...h...
-   ...
-
-
-WWWWW..WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW..WWWWW
-WWWW....WWWW$WWWW$WWWW$WWWW???WWWW???WWWW$WWWW$WWWW$WWWW....WWWW
-WWW......WW...WW...WW...WW.....WW.....WW...WW...WW...WW......WWW
-WW............................................................WW
-.......W..............W..................W..............W.......
-......WWW............WWW................WWW............WWW......
-WW...WWWWW..........WWWWW..............WWWWW..........WWWWW...WW
-WW...WWWWW...........WWW................WWW...........WWWWW...WW
-......WWW.............W..................W.............WWW......
-WW....WWW..............................................WWW....WW
-WW.....W................................................W.....WW
-W..............................77..............................W
-WW............WW..............7777..............WW............WW
-WWW....i.....WWWW.............7777.............WWWW.....i....WWW
-WW............WW..............7777..............WW............WW
-W..............................77..............................W
-WW.....W................................................W.....WW
-WW....WWW..............................................WWW....WW
-......WWW.............W..................W.............WWW......
-.....WWWWW...........WWW................WWW...........WWWWW.....
-WW...WWWWW..........WWWWW..............WWWWW..........WWWWW...WW
-WW....WWW............WWW................WWW............WWW....WW
-.......W..............W..................W..............W.......
-WW............................................................WW
-WWW......WW...WW...WW...WW.....WW.....WW...WW...WW...WW......WWW
-WWWW....WWWW$WWWW$WWWW$WWWW???WWWW???WWWW$WWWW$WWWW$WWWW....WWWW
-WWWWW..WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW..WWWWW
