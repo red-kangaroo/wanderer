@@ -165,13 +165,20 @@ var tileNettles = "<t style='color:#DC143C'>!</t>";
 var tileGrassTall = "<t style='color:#32CD32'>;</t>";
 var tileGrassShort = "<t style='color:#32CD32'>.</t>";
 var tileBloodDrop = "<t style='color:#8A0303'>.</t>";
+var tileTreeStump = "<t style='color:#A52A2A; font-weight: 900;'>.</t>";
+var tileTreeConif = "<t style='color:#006400'>4</t>";
+var tileTreeLeafy = "<t style='color:#32CD32'>8</t>";
+var tileTreeDead = "<t style='color:#A52A2A; font-weight: 900;'>|</t>";
+var tileBush = "<t style='color:#32CD32; font-weight: 900;'>%</t>";
 //var tileMacGuffin = "<t style='color:#FF00FF'>&#9959;</t>"; maybe use as summoning circle?
 var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
 var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
 
-var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles]];
-var rareTerrain = ['/','0',tileKey,'_',']',[tileSludge,tileDark,tileBlood]];
-var impassable = [wallBlock,tileGoldWall,tileDoor];
+var plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
+var plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
+var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,plants_large]];
+var rareTerrain = ['/','0','_',']',tileKey,[tileSludge,tileDark,tileBlood]];
+var impassable = [wallBlock,tileGoldWall,tileDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
 var liquids = [tileBlood,tileLava,tileSludge,tileWater];
 var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
 
@@ -996,9 +1003,7 @@ function addBoss(){
   for(var l=-5; l < 6; l++){
    if(k==0 && l==0) currentMap[userPos.x][userPos.y] = '.';
    else if(!inRangeCoords(userPos.x+k,userPos.y+l)) continue;
-   else if(distanceBetween(userPos, {x:userPos.x+k, y:userPos.y+l})==5 ||
-           (userPos.x+k)==0 || (userPos.x+k)==(mapWidth-1) ||
-           (userPos.y+l)==0 || (userPos.y+l)==(mapWidth-1))
+   else if(distanceBetween(userPos, {x:userPos.x+k, y:userPos.y+l})==5)
      currentMap[userPos.x+k][userPos.y+l] = tileLava;
    else if(currentMap[userPos.x+k][userPos.y+l]==wallBlock && distanceBetween(userPos, {x:userPos.x+k, y:userPos.y+l})<5)
      currentMap[userPos.x+k][userPos.y+l] = ',';
@@ -1020,7 +1025,6 @@ function addBoss(){
 function addStructure(){
  var toAdd = [];
  var currentLine = "";
- //TODO:
  var noMirror = false;
  var noFlip = false;
  var noRotate = false;
@@ -1051,7 +1055,7 @@ function addStructure(){
            "7......                   7.....7",
            "77 . 77                   77===77"];
  }
- else switch(r(140)) {
+ else switch(r(150)) {
   default:
    if(score > 1000){
      toAdd = ["...",
@@ -2637,6 +2641,254 @@ function addStructure(){
              "W?WW..WW?W",
              "WWWW..WWWW"];
    break;
+
+   case 131:
+    toAdd = ["77777.77777",
+             "7$$$7.7$$$7",
+             "7$$$7.8$$$7",
+             "7$$$7.7$$$7",
+             "77877 77777",
+             "....   ....",
+             "77777 77877",
+             "7$$$7.7$$$7",
+             "7$$$8.7$$$7",
+             "7$$$7.7$$$7",
+             "77777.77777"];
+   break;
+
+   case 132:
+    toAdd = ["bbbbbbbbbbbbb",
+             "b'''''b'''''b",
+             "b'bbbbbbbbb'b",
+             "b'b'''b'''b'b",
+             "b'b'bbbbb'b'b",
+             "b'b'b$'$b'b'b",
+             "bbbbb'_'bbbbb",
+             "b'b'b$'$b'b'b",
+             "b'b'bbbbb'b'b",
+             "b'b'''b'''b'b",
+             "b'bbbbbbbbb'b",
+             "b'''''b'''''b",
+             "bbbbbbbbbbbbb"];
+   break;
+
+   case 133:
+    toAdd = ["777777777777",
+             "7========$$7",
+             ".,,,,,,,,$i7",
+             "7========$$7",
+             "777777777777"];
+   break;
+
+   case 134:
+    toAdd = ["   WWW.WW.WW.WWW   ",
+             "  WW'''''''''''WW  ",
+             " WW'''''''''''''WW ",
+             "WW'.............'WW",
+             "W'.......b.......'W",
+             "........bbb........",
+             "........bbb........",
+             "W'.......b.......'W",
+             "WW'.............'WW",
+             " WW'''''''''''''WW ",
+             "  WW'''''''''''WW  ",
+             "   WWW.WW.WW.WWW   "];
+   break;
+
+   case 135:
+    toAdd = ["             WWWW             ",
+             "       WWWWWW....WWWWWW       ",
+             "    WWW................WWW    ",
+             "  WW......................WW  ",
+             " W......W W........WWW......W ",
+             "W.....WW W WW.....W   WW.....W",
+             " ....W      W77877W     W.... ",
+             "....W        7...7       W....",
+             "..WW         7i.i7        WW  ",
+             " W           7...7            ",
+             "             77777            "];
+   break;
+
+   case 136:
+    toAdd = ["       !!!!!!!      ",
+             "     !!!!!PPP!!!    ",
+             "  !!!!!!!;;PPPP!!!  ",
+             "  !PPPPPPP;;PPPPP!  ",
+             " !!PPPPPPPP;;;PPP!! ",
+             " !PPP;;;;PPP;;;PPP! ",
+             " !PP;;;;;PPP;;;;PP!!",
+             "!!PP;;i;;?PP;;;;PPP!",
+             "!PPP;;;;;PPP;;;;;PP!",
+             "!PP;;;;;;PPP;;;;;PP!",
+             "!PP;;;;;PPPP;;;;;PP!",
+             "!PP;;;;;PPP;;;;;;PP!",
+             "!PP;;;;;PP;;;;;;PPP!",
+             "!PPP;?;;PP;;;1;;PPP!",
+             "!!PP;;;;PP;;;;;;PP!!",
+             " !PPP;;;PPP;;;;PPP! ",
+             " !!PPP;;;PPPPPPPP!! ",
+             "  !PPPPP;;PPPPPPP!  ",
+             "  !!!PPPP;;!!!!!!!  ",
+             "    !!!PPP!!!!!     ",
+             "      !!!!!!!       "];
+   break;
+
+   case 137:
+    toAdd = ["  WW.WW  ",
+             " WW...WW ",
+             "WW.....WW",
+             "W.......W",
+             "....i....",
+             "W.......W",
+             "WW.....WW",
+             " WW...WW ",
+             "  WW.WW  "];
+   break;
+
+   case 138:
+    toAdd = ["   PPP...PPP   ",
+             "  PP;;;;;;;PP  ",
+             " PP;;;...;;;PP ",
+             " P;;;.444.;;;P ",
+             "PP;;.44444.;;PP",
+             "P;;.44   44.;;P",
+             "P;;.44 i 44.;;P",
+             "P;;.44   44.;;P",
+             "PP;;.44444.;;PP",
+             " P;;;.444.;;;P ",
+             " PP;;;...;;;PP ",
+             "  PP;;;;;;;PP  ",
+             "   PPP...PPP   "];
+   break;
+
+   case 139:
+    toAdd = ["  777     777  ",
+             " 7767777777677 ",
+             "77...77677...77",
+             "76.1..8.8..1.67",
+             "77...77.77...77",
+             " 7767766677677 ",
+             "  77777.77777  ",
+             "       .       "];
+   break;
+
+   case 140:
+    toAdd = ["666 333",
+             "6i6.313",
+             "666.333",
+             " ..0.. ",
+             "PPP.444",
+             "P1P.4i4",
+             "PPP 444"];
+   break;
+
+   case 141:
+    toAdd = ["          W          ",
+             "         WWW         ",
+             "        WW0WW        ",
+             "   WWWWWW$$$WWWWWW   ",
+             "   W0$$WWW3WWW$$0W   ",
+             "   W$$WW.....WW$$W   ",
+             "   W$WW.......WW$W   ",
+             "   WWW....7....WWW   ",
+             "  WWW...7...7...WWW  ",
+             " WW$W...........W$WW ",
+             "WW0$3..7.._..7..3$0WW",
+             " WW$W...........W$WW ",
+             "  WWW...7...7...WWW  ",
+             "   WWW....7....WWW   ",
+             "   W$WW.......WW$W   ",
+             "   W$$WW.....WW$$W   ",
+             "   W0$$WWW8WWW$$0W   ",
+             "   WWWWWW0.0WWWWWW   ",
+             "        WW.WW        ",
+             "         ...         ",
+             "          W          "];
+   break;
+
+   case 142:
+    toAdd = ["                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                  .W.                  ",
+             "                 ..W..                 ",
+             "                .44W4..                ",
+             "WWWWWWWWWWWWWWWWWW444WWWWWWWWWWWWWWWWWW",
+             "                ..4W44.                ",
+             "                 ..W..                 ",
+             "                  .W.                  ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   ",
+             "                   W                   "];
+   break;
+
+   case 143:
+    toAdd = ["   ppp   ",
+             " pppPppp ",
+             " pPpppPp ",
+             "ppppppppp",
+             "pPppippPp",
+             "ppppppppp",
+             " pPpppPp ",
+             " pppPppp ",
+             "   ppp   "];
+   break;
+
+   case 144:
+    toAdd = ["WWWWW..WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW..WWWWW",
+             "WWWW....WWWW$WWWW$WWWW$WWWW???WWWW???WWWW$WWWW$WWWW$WWWW....WWWW",
+             "WWW......WW...WW...WW...WW.....WW.....WW...WW...WW...WW......WWW",
+             "WW............................................................WW",
+             ".......W..............W..................W..............W.......",
+             "......WWW............WWW................WWW............WWW......",
+             "WW...WWWWW..........WWWWW..............WWWWW..........WWWWW...WW",
+             "WW...WWWWW...........WWW................WWW...........WWWWW...WW",
+             "......WWW.............W..................W.............WWW......",
+             "WW....WWW..............................................WWW....WW",
+             "WW.....W................................................W.....WW",
+             "W..............................77..............................W",
+             "WW............WW..............7777..............WW............WW",
+             "WWW....i.....WWWW.............7777.............WWWW.....i....WWW",
+             "WW............WW..............7777..............WW............WW",
+             "W..............................77..............................W",
+             "WW.....W................................................W.....WW",
+             "WW....WWW..............................................WWW....WW",
+             "......WWW.............W..................W.............WWW......",
+             ".....WWWWW...........WWW................WWW...........WWWWW.....",
+             "WW...WWWWW..........WWWWW..............WWWWW..........WWWWW...WW",
+             "WW....WWW............WWW................WWW............WWW....WW",
+             ".......W..............W..................W..............W.......",
+             "WW............................................................WW",
+             "WWW......WW...WW...WW...WW.....WW.....WW...WW...WW...WW......WWW",
+             "WWWW....WWWW$WWWW$WWWW$WWWW???WWWW???WWWW$WWWW$WWWW$WWWW....WWWW",
+             "WWWWW..WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW..WWWWW"];
+   break;
  }
 
  // Mirror, flip, rotate:
@@ -2675,6 +2927,8 @@ function addStructure(){
  var randDanger = ['^',tileLava,wallBlock][r(3)];
  var randAnnoy = [',',tileBramble,tileSludge,tileDark,tileNettles][r(5)];
  var randLiquid = liquids.sampleRec();
+ var randPlantSmall = plants_small.sampleRec();
+ var randPlantLarge = plants_large.sampleRec();
 
  for (var i = 0; i < toAdd.length; i++) {
   currentLine = toAdd[i];
@@ -2711,8 +2965,23 @@ function addStructure(){
     case "!": // thorny bramble
      currentMap[x+i][y+j] = tileBramble;
      break;
+    case ")": // nettles
+     currentMap[x+i][y+j] = tileNettles;
+     break;
     case "#": // dark smoke
      currentMap[x+i][y+j] = tileDark;
+     break;
+    case "p": // small plants
+     if(!r(10))
+       currentMap[x+i][y+j] = plants_small.sampleRec();
+     else
+       currentMap[x+i][y+j] = randPlantSmall;
+     break;
+    case "P": // large plants
+     if(!r(10))
+       currentMap[x+i][y+j] = plants_large.sampleRec();
+     else
+       currentMap[x+i][y+j] = randPlantLarge;
      break;
     case "b": // blood
      currentMap[x+i][y+j] = tileBlood;
@@ -2891,6 +3160,26 @@ function useStaff(){
    for(var i = 0; i < currCre.length; i++){
     if(distanceBetween(userPos,currCre[i])<=2) killCreature(i);
    }
+   for(var k=-1; k < 2; k++){
+    for(var l=-1; l < 2; l++){
+     if(inRangeCoords(userPos.x+k,userPos.y+l)){
+       switch(currentMap[userPos.x+k][userPos.y+l]){
+         case tileNettles:
+          currentMap[userPos.x+k][userPos.y+l] = tileBloodDrop;
+          break;
+
+         case tileGrassTall: case tileBramble: case tileBush:
+          currentMap[userPos.x+k][userPos.y+l] = tileGrassShort;
+          break;
+
+         case tileTreeConif: case tileTreeLeafy: case tileTreeDead:
+          msg += "You cut down the tree. ";
+          currentMap[userPos.x+k][userPos.y+l] = tileTreeStump;
+          break;
+       }
+     }
+    }
+   }
    break;
 
   case 6: //leaping
@@ -3062,19 +3351,34 @@ function damageCreature(i){
  }
  // Attempt to lowercase the monster, if already lowercase, kill it instead. Vorpal staff always kills.
  var injured = currCre[i].icon.replaceAt(25, currCre[i].icon.charAt(25).toLowerCase());
+ var dead = false;
  if(currCre[i].icon != injured && staff != 5){
   currCre[i].icon = injured;
   if(!r(5) || (glyph==3)){
    currCre[i].flags.push("flee");
    msg += currCre[i].name+" panics. ";
   }
- } else killCreature(i);
+ } else
+   dead = killCreature(i);
+
+ // Staff of burgeoning makes mobs slip when they fight you on grass.
+ if(!dead && staff==8){
+   if(!plants_small.includes(currentMap[currCre[i].x][currCre[i].y]))
+     return;
+   var dx = currCre[i].x - userPos.x;
+   var dy = currCre[i].y - userPos.y;
+   if(inRangeCoords(currCre[i].x+dx,currCre[i].y+dy) && checkEmpty(currCre[i].x+dx,currCre[i].y+dy)) {
+     currCre[i].x += dx;
+     currCre[i].y += dy;
+     msg += currCre[i].name+" slips on the vegetation. ";
+   }
+ }
 }
 
 function killCreature(i){
  if(currCre[i].flags.includes("dodge") && !r(2)){
   msg += currCre[i].name+" dodges your attack. ";
-  return;
+  return false;
  }
  if(currCre[i].flags.includes("lifesaved")){
   currCre[i].flags = currCre[i].flags.removeElement("lifesaved");
@@ -3091,7 +3395,7 @@ function killCreature(i){
     }
   }
 
-  return;
+  return false;
  }
 
  // A little bit of score for killing enemies:
@@ -3105,6 +3409,7 @@ function killCreature(i){
  onDeath(i);
  currCre = currCre.removeElement(currCre[i]);
  kills += 1;
+ return true;
 }
 
 function inRange(area){
@@ -3263,15 +3568,13 @@ function moveUser(x,y){
 
   // Normal movement.
   // If at edge of map, enter new map; otherwise try moving, attacking any monsters in the way.
-  userPos.x += x;
-  userPos.y += y;
-  if(!inRange(userPos)){
-   userPos.y = semiModulo(userPos.y,mapWidth);
-   userPos.x = semiModulo(userPos.x,mapWidth);
+  if(!inRangeCoords(userPos.x+x,userPos.y+y)) {
+   userPos.x = semiModulo(userPos.x+x, mapWidth);
+   userPos.y = semiModulo(userPos.y+y, mapWidth);
    newMap(x,y);
-  } else if(!tryPlayerMove(userPos.x,userPos.y)){
-   userPos.x -= x;
-   userPos.y -= y;
+ } else if(tryPlayerMove(userPos.x+x,userPos.y+y)) {
+   userPos.x += x;
+   userPos.y += y;
   }
  }
 
@@ -3562,7 +3865,7 @@ function moveUser(x,y){
      currentMap[userPos.x][userPos.y]='.';
    } else {
      msg += "You tear through the bramble. ";
-     playerTakeDamage(r(6)+distanceToOrigin());
+     playerTakeDamage(r(6)+distanceToOrigin()+2);
      currentMap[userPos.x][userPos.y]=tileGrassShort;
    }
    break;
@@ -3618,7 +3921,7 @@ function moveUser(x,y){
 
      case 3:
       msg += "Your "+armors[armor]+" is engulfed in bright blue flames. ";
-      armor += 1+distanceToOrigin();
+      armor += Math.min(1+parseInt(distanceToOrigin()/3), 5);
       msg += "The flames subside, revealing a brand new "+armors[armor]+". ";
       break;
     }
@@ -3627,6 +3930,7 @@ function moveUser(x,y){
    break;
 
   case tileMacGuffin:
+   //TODO: Amulet, Orb, Crown
    var winStuff = ["Absolution","Reconciliation","Inner Peace"];
    msg += "You have found <t style='color:#FF1493'>"+winStuff[r(winStuff.length)]+"</t>! ";
    haveWon = true;
@@ -3868,17 +4172,17 @@ function onDeath(i){
     break;
 
    case "boonphase":
-    phased += Math.min(5+kills, 100);
+    phased += Math.min(5+kills, 50);
     msg += "You absorb some essence of shadows from "+currCre[i].name+". ";
     break;
 
    case "boontime":
-    timestop += Math.min(5+kills, 100);
+    timestop += Math.min(5+kills, 50);
     msg += "You absorb some essence of time from "+currCre[i].name+". ";
     break;
 
    case "boonscore":
-    score += Math.min(5+kills, 100); // Not much at first, but snowballs if you keep killing.
+    score += Math.min(5+kills, 50); // Not much at first, but snowballs if you keep killing.
     msg += "You absorb some essence of memory from "+currCre[i].name+". ";
     break;
   }
@@ -3893,7 +4197,31 @@ function onExplosion(i){
  for(var k=-1; k < 2; k++){
   for(var l=-1; l < 2; l++){
    if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)){
-    if(currentMap[currCre[i].x+k][currCre[i].y+l]==wallBlock) currentMap[currCre[i].x+k][currCre[i].y+l] = ',';
+    // Destroy some terrain types:
+    switch (currentMap[currCre[i].x+k][currCre[i].y+l]) {
+      case tileNettles:
+       currentMap[currCre[i].x+k][currCre[i].y+l] = tileBloodDrop;
+       break;
+
+      case tileGrassTall: case tileBramble: case tileBush:
+       currentMap[currCre[i].x+k][currCre[i].y+l] = tileGrassShort;
+       break;
+
+      case tileTreeConif: case tileTreeLeafy: case tileTreeDead:
+       msg += "The tree shatters into a thousand splinters. ";
+       currentMap[currCre[i].x+k][currCre[i].y+l] = tileTreeStump;
+       break;
+
+      case wallBlock:
+       currentMap[currCre[i].x+k][currCre[i].y+l] = ',';
+       break;
+
+      case tileDark:
+       msg += "The thick smoke disperses. ";
+       currentMap[currCre[i].x+k][currCre[i].y+l] = emptyBlock;
+       break;
+    }
+    // Deal damage to the player if they get caught in the explosion:
     if(userPos.x == currCre[i].x+k && userPos.y == currCre[i].y+l){
      msg += "You are pummeled by the explosion. ";
      playerTakeDamage(10+parseInt(score/4));
@@ -3901,9 +4229,11 @@ function onExplosion(i){
    }
   }
  }
+ // Kill mobs caught in the explosion:
  for(var m = 0; m < currCre.length; m++){
   if(distanceBetween(currCre[i],currCre[m])<=2){
     if(currCre[m].flags.includes("boss")){
+      // The boss is immune, but we still stun it.
       currCre[m].flags.push("stun");
       msg += currCre[m].name+" teleports away from the explosion. ";
       var p;
