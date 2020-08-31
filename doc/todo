@@ -29,17 +29,9 @@ README
 * player haste - mobs only act on even turns (what about slow mobs? maybe nothing, all mobs act as slow)
 * rage - player looses control, avatar attacks until status ends
 
-* terrain that causes Stuck status, prevents move away with some chance
-   quicksand: yellow , (yellow background??)
-
 * run in direction command
 * persistent messages
   * message history command
-* game difficulty + New Game button ??
-   Normal
-   Causal Crybaby - 1000 Self
-* fix diagonal rivers
-
 * online scoreboard
    https://stackoverflow.com/questions/31655085/database-on-a-personal-github-page
 * select from several fonts
@@ -58,11 +50,14 @@ README
   plant lordship (some effect when trampling grass, nettles and brambles)
   sludge (cap damage taken at 1, but only when Poisoned)
   hyperspace (diagonal movement)
+  invisibility
   druidcraft (walk thru trees??)
+  fix cleansing water msg order
 * staff
   sunlight - 20 radius light on dark levels (even though walls, unlike the FOV); stuns all/nearby enemies (range 5??)
   enslavement - Mob vs mob combat
   polymorph - can change mobs or features
+  soaring leap passes thru mobs and attacks them?
 * consumable: Scroll/Potion
   Convocation - blink mobs near
   Omnipotence - regenerates level
@@ -96,16 +91,15 @@ README
    https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
    https://github.com/crawl/crawl/tree/master/crawl-ref/source/dat/des
 * arrival vaults?
-
-* soaring leap passes thru mobs and attacks them
-* cleansing water msg order
+* terrain that causes Stuck status, prevents move away with some chance
+   quicksand: yellow , (yellow background??)
 * fix rotate
+* fix diagonal rivers
 
 Mobs
 ====
 * boss bold and underlined - cannot do right now, because we replace letter with charAt
 * maybe randomly spawn boss when entering new area with >1000 Self
-* unique invulnerable and slow miniboss?
 
 * special effects of some attack verbs?
    Freezes: stop Aflame
@@ -123,10 +117,9 @@ https://easystarjs.com/     https://github.com/prettymuchbryce/easystarjs
 
 * flags:
 phasing
-invulnerable to bump attacks, slow speed
 antimagic - cannot be harmed with magic/when player under influence of magic
 paralysis
-stun - random movement
+stun player
 haste - move faster, don't attack faster
 deal damage based on score, the higher score the higher damage
 
@@ -136,9 +129,3 @@ dig
 when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
 ranged stun
-
-* onDeath
-leave $?^
-waterpool
-sludgepool
-smokepool
