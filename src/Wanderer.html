@@ -1260,7 +1260,7 @@ function addStructure(){
              "&#9608;............................^...........&#9608;",
              "&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;"];
 
-      var randTerrain = [' ','.',',','\'','^','?','$','~','0','/','7','W','=','_',';','!','#','s','b','4','3','6'];
+      var randTerrain = [' ','.',',','\'','^','?','$','~','0','/','7','W','=','_',';','!','#','s','b','4','3','6',')','p','P'];
       for (var i = 0; i < toAdd.length; i++) {
        toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),randTerrain[r(randTerrain.length)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
        toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
@@ -3053,20 +3053,22 @@ function newMap(x,y){
   fixEntry(x,y,true);
  }
  currentMap.clone2d(worldMap[worldPos.x][worldPos.y]);
+ spawnMobs();
+}
 
- // Spawn enemies:
- currCre = []; // Get rid of all creatures from old map. We don't save them, instead spawn new ones if the player returns.
- var cQ = Math.max(distanceToOrigin(), r(visited)); // How many to spawn.
- // More powerful enemies are towards the start of creatureList, so spawn more powerful enemies in later areas.
- var cHere = r(Math.max(creatureList.length-distanceToOrigin(),creatureList.length/2));
- for (var i = 0; i < cQ; i++) {
-  currCre[i] = cloneCreature(creatureList[cHere]);
-  if(!r(10)) cHere = r(creatureList.length); // Change to any enemy.
-  do {
-   currCre[i].x = r(mapWidth);
-   currCre[i].y = r(mapWidth);
-  } while(impassable.includes(currentMap[currCre[i].x][currCre[i].y]));
- }
+function spawnMobs(){
+  currCre = []; // Get rid of all creatures from old map. We don't save them, instead spawn new ones if the player returns.
+  var cQ = Math.max(distanceToOrigin(), r(visited)); // How many to spawn.
+  // More powerful enemies are towards the start of creatureList, so spawn more powerful enemies in later areas.
+  var cHere = r(Math.max(creatureList.length-distanceToOrigin(),creatureList.length/2));
+  for (var i = 0; i < cQ; i++) {
+   currCre[i] = cloneCreature(creatureList[cHere]);
+   if(!r(10)) cHere = r(creatureList.length); // Change to any enemy.
+   do {
+    currCre[i].x = r(mapWidth);
+    currCre[i].y = r(mapWidth);
+   } while(impassable.includes(currentMap[currCre[i].x][currCre[i].y]));
+  }
 }
 
 function fixEntry(a,b, showBlue){
@@ -3658,7 +3660,7 @@ function moveUser(x,y){
      break;
 
     case 5:
-     if(staff>0){
+     if(staff>0 && !r(2)){
        msg += "Your Staff"+staves[staff]+" glows dull brown for a moment and looses all its magic. ";
        staff = 0;
      } else
@@ -3964,6 +3966,10 @@ function tryMove(x,y,i){
 
   // Special attacks
   for(var j = 0; j < currCre[i].flags.length; j++){
+   // Stop if someone teleports:
+   if(distanceBetween(userPos,currCre[i])>2)
+     break;
+
    switch(currCre[i].flags[j]){
     case "agony":
      msg += "Horrible agony tears at the very core of your being. ";
@@ -4260,7 +4266,10 @@ function onExplosion(i){
 function moveCreatures(){
  for (var k = 0; k < currCre.length; k++) {
   // Check for special action:
-  if(currCre[k].behaviour()) continue;
+  if(!currCre[k].flags.includes("stun")) {
+    if(currCre[k].behaviour()) continue;
+  } else if(!r(4))
+    currCre[k].flags = currCre[k].flags.removeElement("stun");
 
   // Slow creatures only act once per two turns.
   if(currCre[k].flags.includes("slow") && (turn % 2 != 0))
@@ -4268,10 +4277,12 @@ function moveCreatures(){
 
   // Get direction to player normalized to <-1,1>.
   var dist = distanceBetween(userPos,currCre[k]);
-  var nextStep;
+  var nextStep = [];
+  var tryStep;
 
   // Pursue the player if close enough, or if the creature has ESP.
-  if(dist <= currCre[k].aggro || currCre[k].flags.includes("esp")){
+  if((dist <= currCre[k].aggro || currCre[k].flags.includes("esp")) &&
+     !currCre[k].flags.includes("stun")) {
    var dx = Math.round((userPos.x - currCre[k].x)/dist);
    var dy = Math.round((userPos.y - currCre[k].y)/dist);
 
@@ -4284,34 +4295,35 @@ function moveCreatures(){
      }
    }
 
-   nextStep = [{x: currCre[k].x+dx, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+dy}];
-   if(currCre[k].flags.includes("diagonal")){
-    nextStep.push({x: currCre[k].x+dx, y: currCre[k].y+dy});
-    nextStep.shuffle();
+   if(dx!=0) nextStep.push({x: currCre[k].x+dx, y: currCre[k].y});
+   if(dy!=0) nextStep.push({x: currCre[k].x, y: currCre[k].y+dy});
+   if(currCre[k].flags.includes("diagonal"))
+     nextStep.push({x: currCre[k].x+dx, y: currCre[k].y+dy});
+   else if(stepsBetween(userPos,currCre[k])==2 && r(5)){
+     // When one step away from player, sometimes don't move and let the player come.
+     continue;
    }
+   nextStep.shuffle();
 
-   // Move in one of possible directions, if blocked try the other:
-   var tryStep;
-   if(!r(2)) tryStep = nextStep.pop();
-   else tryStep = nextStep.shift();
-   if((tryStep.x != currCre[k].x || tryStep.y != currCre[k].y) && tryMove(tryStep.x,tryStep.y,k)){
-    doMove(tryStep.x,tryStep.y,k);
-    continue;
+   // Move in one of possible directions, if blocked try the another:
+   var moved = false;
+   while(nextStep.length>0) {
+     tryStep = nextStep.pop();
+     if(tryMove(tryStep.x,tryStep.y,k)){
+       doMove(tryStep.x,tryStep.y,k);
+       moved = true;
+       break;
+     }
    }
-   if((tryStep.x != currCre[k].x || tryStep.y != currCre[k].y) && tryMove(nextStep[0].x,nextStep[0].y,k)){
-    doMove(nextStep[0].x,nextStep[0].y,k);
-    continue;
-   }
+   if(moved) continue;
   }
 
   // Move randomly otherwise.
   nextStep = [{x: currCre[k].x+1, y: currCre[k].y},{x: currCre[k].x-1, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+1},{x: currCre[k].x, y: currCre[k].y-1}];
   if(currCre[k].flags.includes("diagonal")) nextStep.push({x: currCre[k].x+1, y: currCre[k].y+1},{x: currCre[k].x+1, y: currCre[k].y-1},{x: currCre[k].x-1, y: currCre[k].y+1},{x: currCre[k].x-1, y: currCre[k].y-1});
-  var j = r(nextStep.length);
-  if(tryMove(nextStep[j].x,nextStep[j].y,k)){
-    doMove(nextStep[j].x,nextStep[j].y,k);
-    continue;
-  }
+  tryStep = nextStep.sampleRec();
+  if(tryMove(tryStep.x,tryStep.y,k))
+    doMove(tryStep.x,tryStep.y,k);
  }
 }
 
@@ -4450,8 +4462,19 @@ document.onkeydown = function(e) {
          break;
 
         //DEBUG
-        // case 66:
+        // case 66: //B
         //  addBoss();
+        //  displayMap();
+        //  break;
+        // case 86: //V
+        //  score = 500-r(500);
+        //  visited = r(20)+2;
+        //  staff = r(staves.length);
+        //  glyph = r(glyphs.length);
+        //  armor = r(20);
+        //  keys = r(5);
+        //  kills = r(30);
+        //  spawnMobs();
         //  displayMap();
         //  break;
     }
@@ -4519,7 +4542,7 @@ function initialise(){
   base.icon = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+creatureChar.pop()+"</t>";
   base.name = "<t style='color:#"+base.icon.substr(17,6)+"'>"+getMobName(base.icon.charAt(25))+"</t>";
   base.attack = attackVerbs[r(attackVerbs.length)];
-  base.aggro = r(10)+r(10)+10;
+  base.aggro = r(10)+r(5)+4;
   base.flags = getMobFlags();
   base.behaviour = getMobBehaviour();
   creatureList.push(base);
@@ -4550,14 +4573,6 @@ function initialise(){
  newMap(0,0);
  msg += "Welcome, Wanderer. "+welcome.sampleRec()+"<br />Press '?' for help. ";
  displayMap();
-
- //DEBUG:
- // score = 200-r(100);
- // visited = r(20);
- // keys = r(3);
- // armor = r(18);
- // glyph = r(5);
- // kills = r(20);
 }
 
 initialise();

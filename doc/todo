@@ -49,6 +49,7 @@ README
    area teleport (random already visited, or anywhere?)
    explosion
    stun
+   staff break trap may also disenchant armour
 * armor
   explosions (destroy adjacent mobs and terrain, but grants no kills)
   time mastery (randomly/on damage time stop)
@@ -103,12 +104,12 @@ README
 Mobs
 ====
 * boss bold and underlined - cannot do right now, because we replace letter with charAt
-* maybe randomly spawn boss when entering new area with >1000 Self??
+* maybe randomly spawn boss when entering new area with >1000 Self
+* unique invulnerable and slow miniboss?
 
 * special effects of some attack verbs?
    Freezes: stop Aflame
 
-* AI routine
 * add A*
 https://briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated/
 https://github.com/bgrins/javascript-astar
@@ -127,6 +128,7 @@ antimagic - cannot be harmed with magic/when player under influence of magic
 paralysis
 stun - random movement
 haste - move faster, don't attack faster
+deal damage based on score, the higher score the higher damage
 
 * behaviour:
 pull close - if player is in straight unobstructed orthogonal line, pull d4 squares closer
@@ -134,3 +136,9 @@ dig
 when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
 ranged stun
+
+* onDeath
+leave $?^
+waterpool
+sludgepool
+smokepool
