@@ -59,9 +59,8 @@ var VERSION = "v2.1";
 var mapWidth = 50;
 var wallBreaks = 4; //higher reduces chance
 var worldPos = {x:0,y:0};
-var worldMap = [];
+var worldData = [];
 var currentMap = [];
-var worldName = [];
 
 // Player:
 var userPos = {x:1,y:1};
@@ -802,7 +801,7 @@ function newWorldName(){
 }
 
 function getWorldName(){
- return worldName[worldPos.x][worldPos.y];
+ return worldData[worldPos.x][worldPos.y].name;
 }
 
 function getArmorName(){
@@ -3039,24 +3038,31 @@ function addStructure(){
 
 function newMap(x,y){
  //upon exiting the map, save it, if the new map is empty, generate it, then load whatever is there
- currentMap.clone2d(worldMap[worldPos.x][worldPos.y]);
+ currentMap.clone2d(worldData[worldPos.x][worldPos.y].map);
+ while(currCre.length>0)
+   worldData[worldPos.x][worldPos.y].mobs.push(currCre.pop());
+
  worldPos.x += x;
  worldPos.y += y;
- if(worldMap[worldPos.x]==null) {
-  worldMap[worldPos.x] = [];
-  worldName[worldPos.x] = [];
- }
- if(worldMap[worldPos.x][worldPos.y]==null){
-  worldMap[worldPos.x][worldPos.y] = [];
-  worldName[worldPos.x][worldPos.y] = newWorldName();
+ if(worldData[worldPos.x]==null)
+  worldData[worldPos.x] = [];
+ if(worldData[worldPos.x][worldPos.y]==null){
+  worldData[worldPos.x][worldPos.y] = {
+    map: [],
+    name: "",
+    mobs: [],
+  };
+  worldData[worldPos.x][worldPos.y].name = newWorldName();
   generateMap();
+  spawnMobs();
   fixEntry(x,y,false);
  } else {
-  worldMap[worldPos.x][worldPos.y].clone2d(currentMap);
+  worldData[worldPos.x][worldPos.y].map.clone2d(currentMap);
   fixEntry(x,y,true);
+  while(worldData[worldPos.x][worldPos.y].mobs.length>0)
+    currCre.push(worldData[worldPos.x][worldPos.y].mobs.pop());
  }
- currentMap.clone2d(worldMap[worldPos.x][worldPos.y]);
- spawnMobs();
+ currentMap.clone2d(worldData[worldPos.x][worldPos.y].map);
 }
 
 function spawnMobs(){
@@ -4629,11 +4635,15 @@ function initialise(){
  }
 
  // Init map:
- worldMap[0] = [];
- worldMap[0][0] = [];
- worldName[0] = [];
- worldName[0][0] = newWorldName();
+ worldData[0] = [];
+ worldData[0][0] = {
+   map: [],
+   name: "",
+   mobs: [],
+ };
+ worldData[0][0].name = newWorldName();
  generateMap();
+ spawnMobs();
 
  var welcome = ["May you find that which you seek.",
                 "Strike down anyone who stands in your path.",

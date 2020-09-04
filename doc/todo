@@ -14,7 +14,6 @@ README
    https://jbt.github.io/markdown-editor/
 
 * refactor player!!!
-* refactor map
 * add descriptions of adjacent mobs and terrain
 
 * fun colors for armor
@@ -82,7 +81,6 @@ README
    r(100) <disttoorigin: map is dark level (add simple FOV)
      https://heyjavascript.com/field-of-view-in-javascript-using-recursive-shadow-casting/
      * lava and mobs with „light“ always visible
-* maybe refactor maps into worldData struct with map, name + other future stuff
 * maybe more decorations based on name?
    forests should have alternate walls
    deserts with sand, quicksand
