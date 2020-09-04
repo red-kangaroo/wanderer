@@ -50,6 +50,11 @@
 	<input type="text" name="name" placeholder="Sunny Honey Bunny">
 	<input type="submit" value="Send">
 	</form> -->
+
+  <h5>
+    Nearby:
+  </h5>
+  <p id="nearbyList"></p>
 </div>
 
 <script>
@@ -59,9 +64,8 @@ var VERSION = "v2.1";
 var mapWidth = 50;
 var wallBreaks = 4; //higher reduces chance
 var worldPos = {x:0,y:0};
-var worldMap = [];
+var worldData = [];
 var currentMap = [];
-var worldName = [];
 
 // Player:
 var userPos = {x:1,y:1};
@@ -109,7 +113,9 @@ var armors = ["<t style='color:#228B22'>Green Tunic</t>",
               "<t style='color:#C0C0C0'>Cha</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>n Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
               "<t style='color:#708090'>Hauberk</t>",
               "<t style='color:#C0C0C0'>R</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>ng Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
-              "Banded Armour","Splint Mail","Magic Cloak","Half Plate Mail","Mithril Chain Mail","Full Plate Mail","Crystal Shard Mail","Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail",
+              "Banded Armour","Splint Mail","Magic Cloak","Half Plate Mail","Mithril Chain Mail","Full Plate Mail", //TODO
+              "<t style='color:#FF1493'>Crystal</t> <t style='color:#9932CC'>Shard</t> <t style='color:#8B008B'>Mail</t>",
+              "Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail", //TODO
               "<t style='color:#FFD700'>S</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>lid G</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>ld Arm</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>ur</t>",
               "<t style='color:#8B008B'>Crystal</t> <t style='color:#9932CC'>Plate</t> <t style='color:#FF1493'>Mail</t>",
               "Nemean Lion Hide","Adamantine Armour","Powered Armour"];
@@ -156,7 +162,7 @@ var tileBlood = "<t style='background-color:#8A0303'>~</t>";
 var tileDark = "<t style='color:#696969'>#</t>";
 var tileKey = "<t style='color:#800080'>9</t>";
 var tileArmor = "<t style='color:#800080; font-weight: 900;'>]</t>"; //enchanted armor, normal is just ']'
-var tileDoor = "<t style='background-color:#8B4513; color:#FFD700;'>#</t>";
+var tileDoor = "<t style='background-color:#8B4513; color:#FFD700;'>+</t>";
 var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
 var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
 var tileTreasure = "<t style='color:#800080'>&#167;</t>";
@@ -173,11 +179,12 @@ var tileBush = "<t style='color:#32CD32; font-weight: 900;'>%</t>";
 //var tileMacGuffin = "<t style='color:#FF00FF'>&#9959;</t>"; maybe use as summoning circle?
 var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
 var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
+var tileTeleporter = "<t style='color:#00FFFF'>0</t>";
 
 var plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
 var plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
 var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,plants_large]];
-var rareTerrain = ['/','0','_',']',tileKey,[tileSludge,tileDark,tileBlood]];
+var rareTerrain = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileDark,tileBlood]];
 var impassable = [wallBlock,tileGoldWall,tileDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
 var liquids = [tileBlood,tileLava,tileSludge,tileWater];
 var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
@@ -327,14 +334,14 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
                                    attack:"kamikazes",
                                    aggro:10, // Doesn't really matter.
                                    x:0, y:0,
-                                   flags:["explode", {x:x,y:y}],
+                                   flags:[{x:x,y:y}, "explode"],
                                    behaviour: function(){
                                     // Change colour randomly:
                                     this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
                                     // Move in one direction, then explode:
                                     var i = currCre.indexOf(this);
-                                    if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
-                                     doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                                    if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
+                                     doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
                                     } else {
                                      msg += currCre[i].name+" explodes. ";
                                      onExplosion(i);
@@ -513,14 +520,14 @@ function getMobBehaviour(){
                     attack:"kamikazes",
                     aggro:10, // Doesn't really matter.
                     x:0, y:0,
-                    flags:["explode", {x:x,y:y}, "slow"],
+                    flags:[{x:x,y:y}, "explode"],
                     behaviour: function(){
                      // Change colour randomly:
                      this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
                      // Move in one direction, then explode:
                      var i = currCre.indexOf(this);
-                     if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
-                      doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                     if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
+                      doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
                      } else {
                       msg += currCre[i].name+" explodes. ";
                       onExplosion(i);
@@ -801,7 +808,7 @@ function newWorldName(){
 }
 
 function getWorldName(){
- return worldName[worldPos.x][worldPos.y];
+ return worldData[worldPos.x][worldPos.y].name;
 }
 
 function getArmorName(){
@@ -810,6 +817,47 @@ function getArmorName(){
  else armour = armors[armors.length-1] + " +" + String(armor - armors.length + 1);
  armour += glyphs[glyph];
  return armour;
+}
+
+function getTileName(tile){
+  switch (tile) {
+    case '.':            return "floor";
+    case '$':            return "memento";
+    case '/':            return "inactive lever";
+    case '\\':           return "activated lever";
+    case ']':            return "suit of armour";
+    case ',':            return "pile of rubble";
+    case '?':            return "mysterious pile";
+    case '^':            return "trap";
+    case '_':            return "holy altar";
+    //case emptyBlock:     return "ground";
+    case wallBlock:      return "wall";
+    case tileWater:      return "shallow water";
+    case tileLava:       return "lava";
+    case tileSludge:     return "toxic sludge";
+    case tileBlood:      return "pool of blood";
+    case tileDark:       return "dark smoke";
+    case tileKey:        return "key";
+    case tileArmor:      return "magic armour";
+    case tileStaff:      return "magic staff";
+    case tileDoor:       return "locked door";
+    case tileGoldWall:   return "golden wall";
+    case tileTreasure:   return "memory trove";
+    case tileBramble:    return "thorny bramble";
+    case tileNettles:    return "dread nettles";
+    case tileGrassTall:  return "tall grass";
+    case tileGrassShort: return "grass";
+    case tileBloodDrop:  return "bloodstain";
+    case tileTreeStump:  return "tree stump";
+    case tileTreeConif:  return "coniferous tree";
+    case tileTreeLeafy:  return "leafy tree";
+    case tileTreeDead:   return "dead tree";
+    case tileBush:       return "shrubbery";
+    case tileMacGuffin:  return "curious artifact";
+    case tileSecretPath: return "secret path";
+    case tileTeleporter: return "warp portal";
+    default: return false;
+  }
 }
 
 function getHint(says=""){
@@ -3022,7 +3070,9 @@ function addStructure(){
     case "9": // magic staff
      currentMap[x+i][y+j] = tileStaff;
      break;
-    // 0 already used as teleporter
+    case "0": // teleporter
+     currentMap[x+i][y+j] = tileTeleporter;
+     break;
     case " ":
       // Do nothing, so that we can leave pieces of normally generated terrain in rooms.
      //if(r(20)) currentMap[x+i][y+j] = emptyBlock;
@@ -3036,24 +3086,31 @@ function addStructure(){
 
 function newMap(x,y){
  //upon exiting the map, save it, if the new map is empty, generate it, then load whatever is there
- currentMap.clone2d(worldMap[worldPos.x][worldPos.y]);
+ currentMap.clone2d(worldData[worldPos.x][worldPos.y].map);
+ while(currCre.length>0)
+   worldData[worldPos.x][worldPos.y].mobs.push(currCre.pop());
+
  worldPos.x += x;
  worldPos.y += y;
- if(worldMap[worldPos.x]==null) {
-  worldMap[worldPos.x] = [];
-  worldName[worldPos.x] = [];
- }
- if(worldMap[worldPos.x][worldPos.y]==null){
-  worldMap[worldPos.x][worldPos.y] = [];
-  worldName[worldPos.x][worldPos.y] = newWorldName();
+ if(worldData[worldPos.x]==null)
+  worldData[worldPos.x] = [];
+ if(worldData[worldPos.x][worldPos.y]==null){
+  worldData[worldPos.x][worldPos.y] = {
+    map: [],
+    name: "",
+    mobs: [],
+  };
+  worldData[worldPos.x][worldPos.y].name = newWorldName();
   generateMap();
+  spawnMobs();
   fixEntry(x,y,false);
  } else {
-  worldMap[worldPos.x][worldPos.y].clone2d(currentMap);
+  worldData[worldPos.x][worldPos.y].map.clone2d(currentMap);
   fixEntry(x,y,true);
+  while(worldData[worldPos.x][worldPos.y].mobs.length>0)
+    currCre.push(worldData[worldPos.x][worldPos.y].mobs.pop());
  }
- currentMap.clone2d(worldMap[worldPos.x][worldPos.y]);
- spawnMobs();
+ currentMap.clone2d(worldData[worldPos.x][worldPos.y].map);
 }
 
 function spawnMobs(){
@@ -3304,6 +3361,12 @@ function playerTakeDamage(dmg,i=9999){
 
  // Proc glyphs:
  if(!r(3)){
+  if(glyph==3 && (i != 9999)){ //mortal terror
+    if(r(kills) > r(visited)){
+      currCre[i].flags.push("flee");
+      msg += currCre[i].name+" panics. ";
+    }
+  }
   if(glyph==4) teleportUser(); //displacement
   if((glyph==5) && (i != 9999)){ //retribution
    msg += "Your "+getArmorName()+" guides your hand to vengeance. ";
@@ -3403,6 +3466,7 @@ function killCreature(i){
        m = r(currCre.length);
        currCre[m].x = userPos.x+k;
        currCre[m].y = userPos.y+l;
+       currCre[m].flags.push("stun"); // Because getting surrounded in the middle of the boss fight is quite deadly.
        nbr++;
       }
      }
@@ -3494,6 +3558,7 @@ function moveUser(x,y){
  }
  if(aflame>0){
   if(glyph == 1){
+   // Armor of Brimstone
    score++;
    if(!r(5)) msg += ["Your inner flame burns bright! ","The flames refresh you. "][r(2)];
   }else{
@@ -3507,8 +3572,12 @@ function moveUser(x,y){
  if(panicked>0) panicked--;
  if(phased>0) phased--;
 
+ // Blood knight armour also refreshes you when on bloodstains:
+ if(glyph==8 && currentMap[userPos.x][userPos.y]==tileBloodDrop)
+   score++;
+
  // Handle death:
- if(score<=0){
+ if(score<0){
   if(staff == 4){
    score = 50;
    cureAll();
@@ -3531,14 +3600,14 @@ function moveUser(x,y){
                  attack:"kamikazes",
                  aggro:10, // Doesn't really matter.
                  x:0, y:0,
-                 flags:["explode", {x:x,y:y}],
+                 flags:[{x:x,y:y}, "explode"],
                  behaviour: function(){
                   // Change colour randomly:
                   this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
                   // Move in one direction, then explode:
                   var i = currCre.indexOf(this);
-                  if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
-                   doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                  if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
+                   doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
                   } else {
                    msg += currCre[i].name+" explodes. ";
                    onExplosion(i);
@@ -3707,7 +3776,7 @@ function moveUser(x,y){
    break;
 
   case '?': //random fun
-   if(!r(100)) currentMap[userPos.x][userPos.y]=['0','_','/',tileKey,']'][r(5)];
+   if(!r(100)) currentMap[userPos.x][userPos.y]=[']','_','/',tileKey,tileTeleporter][r(5)];
    else if(!r(100)) currentMap[userPos.x][userPos.y]=[tileArmor,tileStaff][r(2)];
    else currentMap[userPos.x][userPos.y]=['$','^',','][r(3)];
    msg += "You investigate the mysterious pile. ";
@@ -3749,7 +3818,7 @@ function moveUser(x,y){
    msg += "Walls crumble around you. ";
    break;
 
-  case '0': //teleporter
+  case tileTeleporter:
    if(timestop>0) break;
    msg += "You step into the portal. ";
    teleportUser();
@@ -4417,7 +4486,7 @@ function displayMap(highlight=""){
      else if(highlight == "area") {
        if(stepsBetween(userPos, {x:i,y:j}) == 9 && score > 10)
          outputMap[i][j] = "<t style='background-color:#9ACD32'>"+outputMap[i][j]+"</t>";
-       else if(stepsBetween(userPos, {x:i,y:j}) == score-1)
+       else if(stepsBetween(userPos, {x:i,y:j}) == score)
          outputMap[i][j] = "<t style='background-color:#FF0000'>"+outputMap[i][j]+"</t>";
        // Otherwise leave map as is.
      }
@@ -4464,9 +4533,43 @@ function displayMap(highlight=""){
               ((ward>0) ? "<t style='color:#DAA520'>Ward</t> " : "");
  if(states.length>0) states += "<br />";
 
+ // Create a list of nearby things:
+ var nearbyThings = [];
+ var nearbyMobList = [];
+ var nearbyTileList = [];
+ for (var i = 0; i < currCre.length; i++) {
+   if(distanceBetween(userPos,currCre[i]) <= 2){
+     if(!nearbyThings.includes(currCre[i].name)){
+       nearbyThings.push(currCre[i].name);
+       nearbyMobList.push(currCre[i].icon+"&nbsp;&nbsp;"+currCre[i].name+"<br />");
+     }
+   }
+ }
+ for(var j=-1; j < 2; j++){
+  for(var k=-1; k < 2; k++){
+   if(inRangeCoords(userPos.x+j,userPos.y+k)){
+     if(!nearbyThings.includes(currentMap[userPos.x+j][userPos.y+k])){
+       nearbyThings.push(currentMap[userPos.x+j][userPos.y+k]);
+       if(getTileName(currentMap[userPos.x+j][userPos.y+k]))
+         nearbyTileList.push(currentMap[userPos.x+j][userPos.y+k]+"&nbsp;&nbsp;"+getTileName(currentMap[userPos.x+j][userPos.y+k])+"<br />");
+     }
+   }
+  }
+ }
+ nearbyMobList.sort();
+ nearbyTileList.sort();
+ nearbyThings = "<t style='line-height: 105%;'>";
+ if(!nearbyMobList.length && !nearbyTileList.length)
+   nearbyThings += "Nothing of interest.<br />";
+ else
+   nearbyThings += nearbyMobList.join('')+nearbyTileList.join('');
+ // Tiny hack to prevent the list of nearby things from moving based on length of individual names:
+ nearbyThings += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</t>";
+
  // Print everything on screen:
  document.getElementById("mapText").innerHTML = displayString;
  document.getElementById("statusLine").innerHTML = names+"<br />"+attributes+"<br />"+equipped+"<br />"+states+msg;
+ document.getElementById("nearbyList").innerHTML = nearbyThings;
 }
 
 // Player commands:
@@ -4614,11 +4717,15 @@ function initialise(){
  }
 
  // Init map:
- worldMap[0] = [];
- worldMap[0][0] = [];
- worldName[0] = [];
- worldName[0][0] = newWorldName();
+ worldData[0] = [];
+ worldData[0][0] = {
+   map: [],
+   name: "",
+   mobs: [],
+ };
+ worldData[0][0].name = newWorldName();
  generateMap();
+ spawnMobs();
 
  var welcome = ["May you find that which you seek.",
                 "Strike down anyone who stands in your path.",
