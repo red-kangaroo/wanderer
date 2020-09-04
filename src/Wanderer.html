@@ -50,6 +50,11 @@
 	<input type="text" name="name" placeholder="Sunny Honey Bunny">
 	<input type="submit" value="Send">
 	</form> -->
+
+  <h5>
+    Nearby:
+  </h5>
+  <p id="nearbyList"></p>
 </div>
 
 <script>
@@ -108,7 +113,9 @@ var armors = ["<t style='color:#228B22'>Green Tunic</t>",
               "<t style='color:#C0C0C0'>Cha</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>n Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
               "<t style='color:#708090'>Hauberk</t>",
               "<t style='color:#C0C0C0'>R</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>ng Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
-              "Banded Armour","Splint Mail","Magic Cloak","Half Plate Mail","Mithril Chain Mail","Full Plate Mail","Crystal Shard Mail","Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail",
+              "Banded Armour","Splint Mail","Magic Cloak","Half Plate Mail","Mithril Chain Mail","Full Plate Mail", //TODO
+              "<t style='color:#FF1493'>Crystal</t> <t style='color:#9932CC'>Shard</t> <t style='color:#8B008B'>Mail</t>",
+              "Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail", //TODO
               "<t style='color:#FFD700'>S</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>lid G</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>ld Arm</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>ur</t>",
               "<t style='color:#8B008B'>Crystal</t> <t style='color:#9932CC'>Plate</t> <t style='color:#FF1493'>Mail</t>",
               "Nemean Lion Hide","Adamantine Armour","Powered Armour"];
@@ -810,6 +817,47 @@ function getArmorName(){
  else armour = armors[armors.length-1] + " +" + String(armor - armors.length + 1);
  armour += glyphs[glyph];
  return armour;
+}
+
+function getTileName(tile){
+  switch (tile) {
+    case '.':            return "floor";
+    case '$':            return "memento";
+    case '/':            return "inactive lever";
+    case '\\':           return "activated lever";
+    case ']':            return "suit of armour";
+    case ',':            return "pile of rubble";
+    case '?':            return "mysterious pile";
+    case '^':            return "trap";
+    case '_':            return "holy altar";
+    //case emptyBlock:     return "ground";
+    case wallBlock:      return "wall";
+    case tileWater:      return "shallow water";
+    case tileLava:       return "lava";
+    case tileSludge:     return "toxic sludge";
+    case tileBlood:      return "pool of blood";
+    case tileDark:       return "dark smoke";
+    case tileKey:        return "key";
+    case tileArmor:      return "magic armour";
+    case tileStaff:      return "magic staff";
+    case tileDoor:       return "locked door";
+    case tileGoldWall:   return "golden wall";
+    case tileTreasure:   return "memory trove";
+    case tileBramble:    return "thorny bramble";
+    case tileNettles:    return "dread nettles";
+    case tileGrassTall:  return "tall grass";
+    case tileGrassShort: return "grass";
+    case tileBloodDrop:  return "bloodstain";
+    case tileTreeStump:  return "tree stump";
+    case tileTreeConif:  return "coniferous tree";
+    case tileTreeLeafy:  return "leafy tree";
+    case tileTreeDead:   return "dead tree";
+    case tileBush:       return "shrubbery";
+    case tileMacGuffin:  return "curious artifact";
+    case tileSecretPath: return "secret path";
+    case tileTeleporter: return "warp portal";
+    default: return false;
+  }
 }
 
 function getHint(says=""){
@@ -4485,9 +4533,43 @@ function displayMap(highlight=""){
               ((ward>0) ? "<t style='color:#DAA520'>Ward</t> " : "");
  if(states.length>0) states += "<br />";
 
+ // Create a list of nearby things:
+ var nearbyThings = [];
+ var nearbyMobList = [];
+ var nearbyTileList = [];
+ for (var i = 0; i < currCre.length; i++) {
+   if(distanceBetween(userPos,currCre[i]) <= 2){
+     if(!nearbyThings.includes(currCre[i].name)){
+       nearbyThings.push(currCre[i].name);
+       nearbyMobList.push(currCre[i].icon+"&nbsp;&nbsp;"+currCre[i].name+"<br />");
+     }
+   }
+ }
+ for(var j=-1; j < 2; j++){
+  for(var k=-1; k < 2; k++){
+   if(inRangeCoords(userPos.x+j,userPos.y+k)){
+     if(!nearbyThings.includes(currentMap[userPos.x+j][userPos.y+k])){
+       nearbyThings.push(currentMap[userPos.x+j][userPos.y+k]);
+       if(getTileName(currentMap[userPos.x+j][userPos.y+k]))
+         nearbyTileList.push(currentMap[userPos.x+j][userPos.y+k]+"&nbsp;&nbsp;"+getTileName(currentMap[userPos.x+j][userPos.y+k])+"<br />");
+     }
+   }
+  }
+ }
+ nearbyMobList.sort();
+ nearbyTileList.sort();
+ nearbyThings = "<t style='line-height: 105%;'>";
+ if(!nearbyMobList.length && !nearbyTileList.length)
+   nearbyThings += "Nothing of interest.<br />";
+ else
+   nearbyThings += nearbyMobList.join('')+nearbyTileList.join('');
+ // Tiny hack to prevent the list of nearby things from moving based on length of individual names:
+ nearbyThings += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</t>";
+
  // Print everything on screen:
  document.getElementById("mapText").innerHTML = displayString;
  document.getElementById("statusLine").innerHTML = names+"<br />"+attributes+"<br />"+equipped+"<br />"+states+msg;
+ document.getElementById("nearbyList").innerHTML = nearbyThings;
 }
 
 // Player commands:

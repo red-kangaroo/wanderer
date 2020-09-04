@@ -14,8 +14,6 @@ README
    https://jbt.github.io/markdown-editor/
 
 * refactor player!!!
-* add descriptions of adjacent mobs and terrain
-
 * fun colors for armor
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
