@@ -156,7 +156,7 @@ var tileBlood = "<t style='background-color:#8A0303'>~</t>";
 var tileDark = "<t style='color:#696969'>#</t>";
 var tileKey = "<t style='color:#800080'>9</t>";
 var tileArmor = "<t style='color:#800080; font-weight: 900;'>]</t>"; //enchanted armor, normal is just ']'
-var tileDoor = "<t style='background-color:#8B4513; color:#FFD700;'>#</t>";
+var tileDoor = "<t style='background-color:#8B4513; color:#FFD700;'>+</t>";
 var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
 var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
 var tileTreasure = "<t style='color:#800080'>&#167;</t>";
@@ -173,11 +173,12 @@ var tileBush = "<t style='color:#32CD32; font-weight: 900;'>%</t>";
 //var tileMacGuffin = "<t style='color:#FF00FF'>&#9959;</t>"; maybe use as summoning circle?
 var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
 var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
+var tileTeleporter = "<t style='color:#00FFFF'>0</t>";
 
 var plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
 var plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
 var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,plants_large]];
-var rareTerrain = ['/','0','_',']',tileKey,[tileSludge,tileDark,tileBlood]];
+var rareTerrain = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileDark,tileBlood]];
 var impassable = [wallBlock,tileGoldWall,tileDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
 var liquids = [tileBlood,tileLava,tileSludge,tileWater];
 var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
@@ -327,14 +328,14 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
                                    attack:"kamikazes",
                                    aggro:10, // Doesn't really matter.
                                    x:0, y:0,
-                                   flags:["explode", {x:x,y:y}],
+                                   flags:[{x:x,y:y}, "explode"],
                                    behaviour: function(){
                                     // Change colour randomly:
                                     this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
                                     // Move in one direction, then explode:
                                     var i = currCre.indexOf(this);
-                                    if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
-                                     doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                                    if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
+                                     doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
                                     } else {
                                      msg += currCre[i].name+" explodes. ";
                                      onExplosion(i);
@@ -513,14 +514,14 @@ function getMobBehaviour(){
                     attack:"kamikazes",
                     aggro:10, // Doesn't really matter.
                     x:0, y:0,
-                    flags:["explode", {x:x,y:y}, "slow"],
+                    flags:[{x:x,y:y}, "explode"],
                     behaviour: function(){
                      // Change colour randomly:
                      this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
                      // Move in one direction, then explode:
                      var i = currCre.indexOf(this);
-                     if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
-                      doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                     if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
+                      doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
                      } else {
                       msg += currCre[i].name+" explodes. ";
                       onExplosion(i);
@@ -3022,7 +3023,9 @@ function addStructure(){
     case "9": // magic staff
      currentMap[x+i][y+j] = tileStaff;
      break;
-    // 0 already used as teleporter
+    case "0": // teleporter
+     currentMap[x+i][y+j] = tileTeleporter;
+     break;
     case " ":
       // Do nothing, so that we can leave pieces of normally generated terrain in rooms.
      //if(r(20)) currentMap[x+i][y+j] = emptyBlock;
@@ -3304,6 +3307,12 @@ function playerTakeDamage(dmg,i=9999){
 
  // Proc glyphs:
  if(!r(3)){
+  if(glyph==3 && (i != 9999)){ //mortal terror
+    if(r(kills) > r(visited)){
+      currCre[i].flags.push("flee");
+      msg += currCre[i].name+" panics. ";
+    }
+  }
   if(glyph==4) teleportUser(); //displacement
   if((glyph==5) && (i != 9999)){ //retribution
    msg += "Your "+getArmorName()+" guides your hand to vengeance. ";
@@ -3403,6 +3412,7 @@ function killCreature(i){
        m = r(currCre.length);
        currCre[m].x = userPos.x+k;
        currCre[m].y = userPos.y+l;
+       currCre[m].flags.push("stun"); // Because getting surrounded in the middle of the boss fight is quite deadly.
        nbr++;
       }
      }
@@ -3494,6 +3504,7 @@ function moveUser(x,y){
  }
  if(aflame>0){
   if(glyph == 1){
+   // Armor of Brimstone
    score++;
    if(!r(5)) msg += ["Your inner flame burns bright! ","The flames refresh you. "][r(2)];
   }else{
@@ -3507,8 +3518,12 @@ function moveUser(x,y){
  if(panicked>0) panicked--;
  if(phased>0) phased--;
 
+ // Blood knight armour also refreshes you when on bloodstains:
+ if(glyph==8 && currentMap[userPos.x][userPos.y]==tileBloodDrop)
+   score++;
+
  // Handle death:
- if(score<=0){
+ if(score<0){
   if(staff == 4){
    score = 50;
    cureAll();
@@ -3531,14 +3546,14 @@ function moveUser(x,y){
                  attack:"kamikazes",
                  aggro:10, // Doesn't really matter.
                  x:0, y:0,
-                 flags:["explode", {x:x,y:y}],
+                 flags:[{x:x,y:y}, "explode"],
                  behaviour: function(){
                   // Change colour randomly:
                   this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
                   // Move in one direction, then explode:
                   var i = currCre.indexOf(this);
-                  if(tryMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i)){
-                   doMove(this.x+this.flags[1].x,this.y+this.flags[1].y,i);
+                  if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
+                   doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
                   } else {
                    msg += currCre[i].name+" explodes. ";
                    onExplosion(i);
@@ -3707,7 +3722,7 @@ function moveUser(x,y){
    break;
 
   case '?': //random fun
-   if(!r(100)) currentMap[userPos.x][userPos.y]=['0','_','/',tileKey,']'][r(5)];
+   if(!r(100)) currentMap[userPos.x][userPos.y]=[']','_','/',tileKey,tileTeleporter][r(5)];
    else if(!r(100)) currentMap[userPos.x][userPos.y]=[tileArmor,tileStaff][r(2)];
    else currentMap[userPos.x][userPos.y]=['$','^',','][r(3)];
    msg += "You investigate the mysterious pile. ";
@@ -3749,7 +3764,7 @@ function moveUser(x,y){
    msg += "Walls crumble around you. ";
    break;
 
-  case '0': //teleporter
+  case tileTeleporter:
    if(timestop>0) break;
    msg += "You step into the portal. ";
    teleportUser();
@@ -4417,7 +4432,7 @@ function displayMap(highlight=""){
      else if(highlight == "area") {
        if(stepsBetween(userPos, {x:i,y:j}) == 9 && score > 10)
          outputMap[i][j] = "<t style='background-color:#9ACD32'>"+outputMap[i][j]+"</t>";
-       else if(stepsBetween(userPos, {x:i,y:j}) == score-1)
+       else if(stepsBetween(userPos, {x:i,y:j}) == score)
          outputMap[i][j] = "<t style='background-color:#FF0000'>"+outputMap[i][j]+"</t>";
        // Otherwise leave map as is.
      }

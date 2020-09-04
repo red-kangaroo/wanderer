@@ -14,6 +14,9 @@ README
    https://jbt.github.io/markdown-editor/
 
 * refactor player!!!
+* refactor map
+* add descriptions of adjacent mobs and terrain
+
 * fun colors for armor
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
@@ -54,8 +57,9 @@ README
   druidcraft (walk thru trees??)
   fix cleansing water msg order
 * staff
-  sunlight - 20 radius light on dark levels (even though walls, unlike the FOV); stuns all/nearby enemies (range 5??)
-  enslavement - Mob vs mob combat
+  holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
+               adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
+  enslavement - Mob vs mob combat (as above?)
   polymorph - can change mobs or features
   soaring leap passes thru mobs and attacks them?
 * consumable: Scroll/Potion
@@ -68,7 +72,8 @@ README
   Genocide - remove all currCre
   Bloodlust - adds 10? Kills
   Dessication - removes all liquids on level
-  timed bomb
+  timed bomb - maybe spawns mobs that explode immediately, but also gives timestop
+  shadows - 333 turns of phasing
 * helmets
   * odd-numbered give extra Defense, even are magical
 
@@ -98,22 +103,17 @@ README
 
 Mobs
 ====
-* boss bold and underlined - cannot do right now, because we replace letter with charAt
-* maybe randomly spawn boss when entering new area with >1000 Self
+* mobBoulder, maybe once persistent currCre is a thing
+   immune to most attacks, instead pushed back
+   onDeath leaves rubble
+   behaviour when on liquid, plugs the pit, leaving just a .
 
 * special effects of some attack verbs?
    Freezes: stop Aflame
-
-* add A*
-https://briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated/
-https://github.com/bgrins/javascript-astar
-https://www.reddit.com/r/javascript/comments/71k0nr/i_made_a_very_fast_path_finding_library_what_do/
-https://easystarjs.com/     https://github.com/prettymuchbryce/easystarjs
-
 * lava/liquids block mobs??
    lava doesn't block mobs with flame/lavapool flags, etc.
 * add descriptions for mob abilities
-* spawn extra monsters on . OR respawn monsters on .
+* spawn extra monsters on . OR respawn monsters on . (blood drops?)
 
 * flags:
 phasing
@@ -129,3 +129,15 @@ dig
 when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
 ranged stun
+jump over adjacent player
+
+Not Now
+=======
+* boss bold and underlined - cannot do right now, because we replace letter with charAt
+* simplify mobOrb (not now, something is buggy)
+
+* add A* (maybe not, current AI is dangerous enough?)
+https://briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated/
+https://github.com/bgrins/javascript-astar
+https://www.reddit.com/r/javascript/comments/71k0nr/i_made_a_very_fast_path_finding_library_what_do/
+https://easystarjs.com/     https://github.com/prettymuchbryce/easystarjs
