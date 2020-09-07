@@ -22,8 +22,6 @@ README
    floodfill the level, add teleporters to all closed-off spaces and prevent player spawning
    what about closed vaults?
 
-* stun
-   both player and mobs
 * invisibility - doesn't work against adjacent mobs, otherwise they ignore player no matter their aggro range,
                  unless they have esp (but then boss should loose esp, also prevent ranged attacks against invisible player)
 * player haste - mobs only act on even turns (what about slow mobs? maybe nothing, all mobs act as slow)
@@ -40,8 +38,6 @@ README
 * traps
    area teleport (random already visited, or anywhere?)
    explosion
-   stun
-   staff break trap may also disenchant armour
 * armor
   explosions (destroy adjacent mobs and terrain, but grants no kills)
   time mastery (randomly/on damage time stop)
@@ -54,11 +50,12 @@ README
   druidcraft (walk thru trees??)
   fix cleansing water msg order
 * staff
+  pure chaos - in radius 2 changes all tiles and mobs
   holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
                adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
   enslavement - Mob vs mob combat (as above?)
   polymorph - can change mobs or features
-  soaring leap passes thru mobs and attacks them?
+  soaring leap passes thru mobs and attacks them
 * consumable: Scroll/Potion
   Convocation - blink mobs near
   Omnipotence - regenerates level
@@ -99,6 +96,12 @@ README
 
 Mobs
 ====
+* adjacent mobs follow player between levels
+* prevent boss spawn when boss already present?
+* passive attacks
+* add cause of death msg
+   Overwhelmed by XXX
+
 * mobBoulder, maybe once persistent currCre is a thing
    immune to most attacks, instead pushed back
    onDeath leaves rubble
@@ -112,20 +115,18 @@ Mobs
 * spawn extra monsters on . OR respawn monsters on . (blood drops?)
 
 * flags:
-phasing
 antimagic - cannot be harmed with magic/when player under influence of magic
 paralysis
-stun player
 haste - move faster, don't attack faster
 deal damage based on score, the higher score the higher damage
 
 * behaviour:
 pull close - if player is in straight unobstructed orthogonal line, pull d4 squares closer
-dig
 when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
-ranged stun
+ranged stun/confusion
 jump over adjacent player
+reach attack
 
 Not Now
 =======
