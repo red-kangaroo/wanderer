@@ -143,9 +143,11 @@ var glyphDesc = ["will dull the blows of your enemies",
 var aflame = 0;
 var blinded = 0;
 var bloodied = 0;
+var confused = 0;
 var phased = 0;
 var panicked = 0;
 var poisoned = 0;
+var stunned = 0;
 var timestop = 0;
 var ward = 0;
 
@@ -159,7 +161,10 @@ var tileWater = "<t style='background-color:#1E90FF'>~</t>";
 var tileLava = "<t style='background-color:#FF4500'>~</t>";
 var tileSludge = "<t style='background-color:#00FF00'>~</t>";
 var tileBlood = "<t style='background-color:#8A0303'>~</t>";
+var tileQuicksand = "<t style='background-color:#FFFF66; color:#DAA520;'>,</t>";
 var tileDark = "<t style='color:#696969'>#</t>";
+var tileConfGas = "<t style='color:#FF1493'>#</t>";
+var tileStunGas = "<t style='color:#FFFF00; font-weight: 900;'>#</t>";
 var tileKey = "<t style='color:#800080'>9</t>";
 var tileArmor = "<t style='color:#800080; font-weight: 900;'>]</t>"; //enchanted armor, normal is just ']'
 var tileDoor = "<t style='background-color:#8B4513; color:#FFD700;'>+</t>";
@@ -172,7 +177,7 @@ var tileGrassTall = "<t style='color:#32CD32'>;</t>";
 var tileGrassShort = "<t style='color:#32CD32'>.</t>";
 var tileBloodDrop = "<t style='color:#8A0303'>.</t>";
 var tileTreeStump = "<t style='color:#A52A2A; font-weight: 900;'>.</t>";
-var tileTreeConif = "<t style='color:#006400'>4</t>";
+var tileTreeConif = "<t style='color:#006400; font-weight: 900;'>4</t>";
 var tileTreeLeafy = "<t style='color:#32CD32'>8</t>";
 var tileTreeDead = "<t style='color:#A52A2A; font-weight: 900;'>|</t>";
 var tileBush = "<t style='color:#32CD32; font-weight: 900;'>%</t>";
@@ -181,12 +186,13 @@ var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
 var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
 var tileTeleporter = "<t style='color:#00FFFF'>0</t>";
 
+var impassable = [wallBlock,tileGoldWall,tileDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
+var liquids = [tileBlood,tileLava,tileQuicksand,tileSludge,tileWater];
+var gases = [tileDark,tileConfGas,tileStunGas];
 var plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
 var plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
-var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,plants_large]];
-var rareTerrain = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileDark,tileBlood]];
-var impassable = [wallBlock,tileGoldWall,tileDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
-var liquids = [tileBlood,tileLava,tileSludge,tileWater];
+var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,tileQuicksand,plants_large]];
+var rareTerrain = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileBlood,gases]];
 var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
 
 var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".split('');
@@ -198,7 +204,7 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","toxicpool","waterpool","smoke","disenchant","convoke","panic","dodge","bloody","dispel","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","boonphase","boontime","boonscore","dropscore","droppile","droptrap"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","smoke","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","dropscore","droppile","droptrap","confother","confgas","stunother","stungas"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
@@ -209,42 +215,21 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
                flags: ["diagonal","regen","lifesaved","esp","dodge","boss"],
                behaviour: function(){
                 var i = currCre.indexOf(this);
+                var j;
+                var k;
                 // Change randomly:
                 this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
                 this.attack = attackVerbs[r(attackVerbs.length)];
 
-                // Summon monsters:
-                if(!r(20)){
-                 var j = this.x + r(3)-1;
-                 var k = this.y + r(3)-1;
-
-                 if(inRangeCoords(j,k) && checkEmpty(j,k)){
-                  currCre.push(creatureList[r(creatureList.length/2)]);
-                  currCre[currCre.length-1].x = j;
-                  currCre[currCre.length-1].y = k;
-                  msg += this.name+" speaks a Word of Summoning. "+currCre[currCre.length-1].name+" appears out of thin air. ";
-                  return true;
-                 }
-                }
-
                 // Handle panicked boss:
                 if(this.flags.includes("flee")){
                  if(distanceBetween(userPos,currCre[i])<2 && !r(4)){
-                  var j;
-                  var k;
-                  do {
-                   j = r(mapWidth);
-                   k = r(mapWidth);
-                  } while(!checkEmpty(j,k));
-                  this.x = j;
-                  this.y = k;
-                  msg += this.name+" teleports away. ";
-                  return true;
-                 }
-                 else if(distanceBetween(userPos,currCre[i])>=2 && !r(3)){
-                  this.flags = this.flags.removeElement("flee");
-                  msg += this.name+" calms down. ";
-                  return true;
+                   teleportMob(i);
+                   return true;
+                 } else if(distanceBetween(userPos,currCre[i])>=2 && !r(3)){
+                   this.flags = this.flags.removeElement("flee");
+                   msg += this.name+" calms down. ";
+                   return true;
                  }
                 }
 
@@ -255,11 +240,16 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
 
                  switch(r(15)){
                   case 0:
-                   msg += "Unimaginable agony tears at the very core of your being. ";
-                   score = parseInt(score/2);
+                   msg += ["Half-forgotten","Repressed","Unwanted"][r(3)]+" memories stir deep in your mind. ";
+                   confused += r(10)+5;
                   break;
 
-                  case 1: case 2: case 3:
+                  case 1:
+                   msg += "You feel unsteady. ";
+                   stunned += r(kills)+5;
+                  break;
+
+                  case 2: case 3:
                    msg += "You are enveloped in hellfire. ";
                    aflame += r(visited)+r(visited)+r(visited);
                   break;
@@ -294,7 +284,7 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
                    break;
 
                   case 13:
-                   for(var k=-1; k < 2; k++){
+                   for(k=-1; k < 2; k++){
                     for(var l=-1; l < 2; l++){
                      if(inRangeCoords(this.x+k,this.y+l)){
                        // I will rather make doubly sure we're not checking outside the map's borders.
@@ -308,8 +298,8 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
                  }
                 } else if(!r(4) && !this.flags.includes("flee")){
                  // Teleport near the player.
-                 var j = userPos.x + r(3)-1;
-                 var k = userPos.y + r(3)-1;
+                 j = userPos.x + r(3)-1;
+                 k = userPos.y + r(3)-1;
                  if(checkEmpty(j,k) && inRangeCoords(j,k) && (j != 0 || k != 0)){
                   currentMap[this.x][this.y] = '^';
                   this.x = j;
@@ -321,7 +311,7 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
                     msg += this.name+" smites you. ";
                     playerTakeDamage(r(10)+visited,i);
                     return true;
-                  } else {
+                  } else if(!r(2)) {
                     var x = r(3)-1;
                     var y = r(3)-1;
                     // We require at least two squares in given direction to be empty:
@@ -352,8 +342,18 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
                      currCre.push(mobOrb);
                      currCre[currCre.length-1].x = this.x+x;
                      currCre[currCre.length-1].y = this.y+y;
+                    }
+                  } else {
+                    j = this.x + r(3)-1;
+                    k = this.y + r(3)-1;
+                    // Check adjacent square where we want to summon:
+                    if(inRangeCoords(j,k) && checkEmpty(j,k)){
+                      currCre.push(cloneCreature(creatureList[r(creatureList.length/2)]));
+                      currCre[currCre.length-1].x = j;
+                      currCre[currCre.length-1].y = k;
+                      msg += this.name+" speaks a Word of Summoning. "+currCre[currCre.length-1].name+" appears out of thin air. ";
+                    }
                   }
-                 }
                 }
                 return false;
                }
@@ -552,7 +552,7 @@ function getMobBehaviour(){
      var j = this.x + r(3)-1;
      var k = this.y + r(3)-1;
      if(inRangeCoords(j,k) && checkEmpty(j,k)){
-      currCre.push(creatureList.sampleRec());
+      currCre.push(cloneCreature(creatureList.sampleRec()));
       currCre[currCre.length-1].x = j;
       currCre[currCre.length-1].y = k;
       if(distanceBetween(userPos,this)<10)
@@ -643,6 +643,36 @@ function getMobBehaviour(){
      }
      return false;
    };
+
+  case 19:
+   return function(){
+    if(!r(4) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileConfGas;
+      if(distanceBetween(userPos,this)<10)
+        msg += this.name+" breathes out noxious fumes. ";
+    }
+    return false;
+   };
+
+  case 20:
+   return function(){
+    if(!r(4) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileStunGas;
+      if(distanceBetween(userPos,this)<10)
+        msg += this.name+" breathes out fetid fumes. ";
+    }
+    return false;
+   };
+
+  case 21:
+   return function(){
+    if(!r(6) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileQuicksand;
+      if(distanceBetween(userPos,this)<10)
+        msg += this.name+" brings about a miniature sandstorm. ";
+    }
+    return false;
+   };
  }
 }
 
@@ -687,6 +717,7 @@ function getUserChar(){
    colour = '#000000';
    bkg = 'background-color:#8A0303; ';
  }
+ else if(currentMap[userPos.x][userPos.y] == tileQuicksand) bkg = 'background-color:#FFFF66; ';
 
  return "<t style='"+bkg+"color:"+colour+"; font-weight: 900;'>@</t>";
 }
@@ -836,7 +867,10 @@ function getTileName(tile){
     case tileLava:       return "lava";
     case tileSludge:     return "toxic sludge";
     case tileBlood:      return "pool of blood";
+    case tileQuicksand:  return "quicksand";
     case tileDark:       return "dark smoke";
+    case tileConfGas:    return "noxious fumes";
+    case tileStunGas:    return "fetid odour";
     case tileKey:        return "key";
     case tileArmor:      return "magic armour";
     case tileStaff:      return "magic staff";
@@ -957,7 +991,7 @@ function addRiver(){
  var lastMove = 0;
 
  var liquid = tileWater;
- if(r(visited)>20 || !r(100)) liquid = [tileLava, [tileSludge, tileBlood]].sampleRec();
+ if(r(visited)>20 || !r(100)) liquid = [tileLava, [tileSludge, tileBlood, tileQuicksand]].sampleRec();
 
  switch(r(2)){
   case 0: //across
@@ -1018,18 +1052,8 @@ function addLake(){
 
  var liquid = emptyBlock; // Just to make sure we don't accidentaly make undefined lake.
  if(r(visited)>20) liquid = tileLava;
- else {
-  switch(r(14)){
-   default: liquid = tileWater; break;
-   case 0: liquid = ','; break;
-   case 1: liquid = tileGrassTall; break;
-   case 2: liquid = tileBramble; break;
-   case 3: liquid = tileNettles; break;
-   case 4: liquid = tileSludge; break;
-   case 5: liquid = tileDark; break;
-   case 6: liquid = tileBlood; break;
-  }
- }
+ else
+   liquid = [tileWater,[',',tileGrassTall,tileBramble,tileNettles,tileSludge,tileBlood,tileQuicksand,tileDark,tileConfGas,tileStunGas]].sampleRec();
 
  while(stepsTaken<500 && stepsFailed<500){
   currentMap[currStep.x][currStep.y] = liquid;
@@ -1055,6 +1079,8 @@ function addBoss(){
      currentMap[userPos.x+k][userPos.y+l] = tileLava;
    else if(currentMap[userPos.x+k][userPos.y+l]==wallBlock && distanceBetween(userPos, {x:userPos.x+k, y:userPos.y+l})<5)
      currentMap[userPos.x+k][userPos.y+l] = ',';
+   else if(currentMap[userPos.x+k][userPos.y+l]=='/')
+     currentMap[userPos.x+k][userPos.y+l] = '^';
 
    if(checkEmpty(userPos.x+k,userPos.y+l)) bossSpace.push([k,l]);
   }
@@ -1073,12 +1099,18 @@ function addBoss(){
 function addStructure(){
  var toAdd = [];
  var currentLine = "";
+ // Individual rooms can be flagged not to be randomly mirrored/flipped/etc.
  var noMirror = false;
  var noFlip = false;
  var noRotate = false;
+ // Declare random mob 'c' for rooms of specific type of monsters here, so we can
+ // set it for individual rooms. Varied mobs 'm' and 'M' are not completely
+ // random, so no need to have them prepared before actually generating the room.
+ var randMob = creatureList.sampleRec();
 
  //The winning place:
  if((r(visited)>20) && (r(distanceToOrigin())>=10) && (r(kills)>20)){
+  //TODO: Add some mobs in there.
   toAdd = ["77===77                   77===77",
            "7.....7                   7.....7",
            "=.....777777777777777777777.....=",
@@ -1103,7 +1135,7 @@ function addStructure(){
            "7......                   7.....7",
            "77 . 77                   77===77"];
  }
- else switch(r(150)) {
+ else switch(r(180)) {
   default:
    if(score > 1000){
      toAdd = ["...",
@@ -1112,7 +1144,7 @@ function addStructure(){
    } else {
      toAdd = [["WWWWWWWWWWWWWW","WWWWWW..WWWWWW"][r(2)],
        "W............W",
-       "W............W",
+       "W........"+['m','.'][r(2)]+"...W",
       ['W','.','.'][r(3)]+"............"+['W','.','.'][r(3)],
        "W..."+['i','.'][r(2)]+"........W",
        "W............W",
@@ -1308,7 +1340,7 @@ function addStructure(){
              "&#9608;............................^...........&#9608;",
              "&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;"];
 
-      var randTerrain = [' ','.',',','\'','^','?','$','~','0','/','7','W','=','_',';','!','#','s','b','4','3','6',')','p','P'];
+      var randTerrain = [' ','.',',','\'','^','?','$','~','0','/','7','W','=','_',';','!','#','s','b','q','4','3','6',')','p','P','%','m','M','c'];
       for (var i = 0; i < toAdd.length; i++) {
        toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),randTerrain[r(randTerrain.length)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
        toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
@@ -2937,6 +2969,413 @@ function addStructure(){
              "WWWW....WWWW$WWWW$WWWW$WWWW???WWWW???WWWW$WWWW$WWWW$WWWW....WWWW",
              "WWWWW..WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW..WWWWW"];
    break;
+
+   case 145:
+    toAdd = ["  ;;PPPP;;   ",
+             " ;;P;;;;P;;  ",
+             ";;P;;;~;;P;; ",
+             ";P;;PP~~;P$;;",
+             ";;;P~~i~~P;;;",
+             ";;$P;~~PP;;P;",
+             " ;;P;;~~;;P;;",
+             "  ;;P;;;;P;; ",
+             "   ;;PPPP;;  "];
+   break;
+
+   case 146:
+    toAdd = [" 7777777777777777777",
+             " 7'7pppipppppppippp7",
+             ".8'7pipppipppipppip7",
+             " 7'7pppippptpppippp7",
+             ".8'8;ipppipppipppip7",
+             " 7'7pppipppppppippp7",
+             ".8'7pipppipppipppip7",
+             " 7'7pppipppppppippp7",
+             " 7777777777777777777"];
+   break;
+
+   case 147:
+    toAdd = ["    W.W    ",
+             "    W.W    ",
+             "    W.W    ",
+             "   WW.WW   ",
+             "WWWW###WWWW",
+             "....#i#....",
+             "WWWW###WWWW",
+             "   WW.WW   ",
+             "    W.W    ",
+             "    W.W    ",
+             "    W.W    "];
+   break;
+
+   case 148:
+    toAdd = ["   7 7   ",
+             " 7PP3PP7 ",
+             " PP;);PP ",
+             "7P;););P7",
+             " 3);1;)3 ",
+             "7P;););P7",
+             " PP;);PP ",
+             " 7PP3PP7 ",
+             "   7 7   "];
+   break;
+
+   case 149:
+    toAdd = ["        77777        ",
+             "        7$$$7        ",
+             "        7$i$7        ",
+             "        7$$$7        ",
+             "        77877        ",
+             "          .          ",
+             "                     ",
+             "    3333      PPPP   ",
+             "    3$$3      P$$P   ",
+             "    3$$3      P$$P   ",
+             "    3333      PPPP   ",
+             "                     ",
+             "          _          ",
+             "6666             4444",
+             "6??6             4??4",
+             "6??6             4??4",
+             "6666             4444"];
+   break;
+
+   case 150:
+    toAdd = [" W  WWWWWWWWWW    ",
+             "WW  WW WWWiWWWPWW ",
+             "  ' W$$$W$$$W$$$WW",
+             " '' W$9$P$$$=$$$0W",
+             "WW..W$$$W$$$W$$$WW",
+             "WW..WW8WWW8WWW3WWW",
+             "W44.............6W",
+             "W44444..........6W",
+             "WWW4WWW8WWW8WW..WW",
+             "WW44$W$$$W$$$W..WW",
+             "W44$$=$$$P$]$W.'' ",
+             "WW$$$W$$$W$$$W'   ",
+             "WWWiWWW WWW WW' WW",
+             " WWWWWWWWWWWWW  W "];
+   break;
+
+   case 151:
+    toAdd = ["      .      ",
+             "   W3W8W3W   ",
+             "  WW##.##WW  ",
+             " WW#..7..#WW ",
+             " 3#.7.).7.#3 ",
+             " W#..)))..#W ",
+             ".8.7))1))7.8.",
+             " W#..)))..#W ",
+             " 3#.7.).7.#3 ",
+             " WW#..7..#WW ",
+             "  WW##.##WW  ",
+             "   W3W8W3W   ",
+             "      .      "];
+   break;
+
+   case 152:
+    toAdd = ["    WWWWW        ",
+             "    W...W        ",
+             "    W.i.W        ",
+             "    W...W        ",
+             "WW WW...WW WW    ",
+             "W....6 .....W    ",
+             " .... 6 ....     ",
+             "W......6....W    ",
+             "WW WWWWW6WWWWW WW",
+             "    W....6......W",
+             "     .... 6 .... ",
+             "    W..... 6....W",
+             "    WW WW...WW WW",
+             "        W...W    ",
+             "        W.i.W    ",
+             "        W...W    ",
+             "        WWWWW    "];
+   break;
+
+   case 153:
+    toAdd = ["  WWWWWWW..         ",
+             " WWWWWWW ...WWWWWWW ",
+             " WW$$..WW... WWWWWWW",
+             " WW$$WsWW...WW4444WW",
+             " WW.WWssWW..WW4714WW",
+             " WW.sssss..WW44774WW",
+             " WWWWssWW...8.4444WW",
+             " W WWWWW....WW4MWWWW",
+             " ....W.. 66 .WWWWW W",
+             "........6666...W....",
+             "....W...6666........",
+             "W WWWWW. 66 ..W.... ",
+             "WWWW$$WW....WWWWW W ",
+             "WW$cc..8...WWbbWWWW ",
+             "WW$77c.WW..8.bbb.WW ",
+             "WWc]7cWW..WWbbWWmWW ",
+             "WWcc$$WW...WWbW5mWW ",
+             "WWWWWWW ...WWbbmmWW ",
+             " WWWWWWW... WWWWWWW ",
+             "         ..WWWWWWW  "];
+   break;
+
+   case 154:
+    toAdd = ["            WWWWWWWWWWW  ",
+             "            W%%.%W%...W  ",
+             "           WW.%.%%%.%.WWW",
+             "         WWW..%..%..%....",
+             "         W%..%%%.%.%%%.P.",
+             "         W$%%%W%$..%W%...",
+             "         Wi%.%%WWWWWWW   ",
+             "   WWWWWWW%%.%iW         ",
+             "...%W%.%$%W%%%$W         ",
+             ".P.%%%.%.%%%..%W         ",
+             "....%..%..%..WWW         ",
+             "WWW.%.%%%.%.WW           ",
+             "  W.%.%W%.%%W            ",
+             "  WWWWWWWWWWW            "];
+   break;
+
+   case 155:
+    toAdd = ["          777          ",
+             "         77$77         ",
+             "        77$$$77        ",
+             "       77sssss77       ",
+             "77777777sss7sss77777777",
+             "7$$$$$$sssssssss$$$$$$7",
+             "777$$ssss7sss7ssss$$777",
+             "  777ssssss$ssssss777  ",
+             "    777sss$t$sss777    ",
+             "  777ssssss$ssssss777  ",
+             "777$$ssss7sss7ssss$$777",
+             "7$$$$$$sssssssss$$$$$$7",
+             "77777777sss7sss77777777",
+             "       77sssss77       ",
+             "        77sss77        ",
+             "         77?77         ",
+             "          787          ",
+             "          ...          "];
+   break;
+
+   case 156:
+    toAdd = ["  WW44W44WW  ",
+             " WW44WWW44WW ",
+             "WWW$$WWW$$WWW",
+             "WWW$WWWWW$WWW",
+             "WWWWWW_WWWWWW",
+             "WW$c66M66c$WW",
+             " WW?66.66?WW ",
+             " WW??...??WW ",
+             "  WW??.??WW  ",
+             "   WW?.?WW   ",
+             "    WW8WW    ",
+             "      .      "];
+   break;
+
+   case 157:
+    toAdd = ["      7      ",
+             "     777     ",
+             "    77577    ",
+             "   77$$$77   ",
+             "  777787777  ",
+             " 77$7.m.7$77 ",
+             "779$8.=.8$]77",
+             " 77$7...7$77 ",
+             "  777787777  ",
+             "   77=.=77   ",
+             "    77.77    ",
+             "     7.7     ",
+             "      .      "];
+   break;
+
+   case 158:
+    toAdd = ["          ;          ",
+             "          ;          ",
+             "         ;;;         ",
+             "         ;!;         ",
+             "        ;;!;;        ",
+             "       ;;!!!;;       ",
+             "      ;;!!;!!;;      ",
+             "     ;;!!;;;!!;;     ",
+             "    ;;!P;;);;P!;;    ",
+             "  ;;;!!;;)$);;!!;;;  ",
+             ";;;!!!;;)$_$);;!!!;;;",
+             "  ;;;!!;;)$);;!!;;;  ",
+             "    ;;!P;;);;P!;;    ",
+             "     ;;!!;;;!!;;     ",
+             "      ;;!!;!!;;      ",
+             "       ;;!!!;;       ",
+             "        ;;!;;        ",
+             "         ;!;         ",
+             "         ;;;         ",
+             "          ;          ",
+             "          ;          "];
+   break;
+
+   case 159:
+    toAdd = [" 77777777 ",
+             "77......77",
+             "7$.=..=.$7",
+             "7$$=..=$$7",
+             "7$$=..=$$7",
+             "7$$=..=$$7",
+             "777=44=777",
+             "  7=44=7  ",
+             "  444444  ",
+             "  7====7  "];
+   break;
+
+   case 160:
+    toAdd = ["777777777",
+             "71$$$$$17",
+             "7ccc)ccc7",
+             "7..)M)..7",
+             "7c.....c7",
+             "777787777",
+             "777bbb777",
+             "77b'''b77",
+             " 77'''77 ",
+             "  7b'b7  "];
+   break;
+
+   case 161:
+    toAdd = ["      ~~~~      ",
+             "   ~~~~~~~~~~   ",
+             "  ~~~7~~~~7~~~  ",
+             " ~~~~~~~~~~~~~~ ",
+             " ~~7~~7777~~7~~ ",
+             " ~~~~~8$$7~~~~~ ",
+             "~~7~777$$787~7~~",
+             "~~~~7$i==$$7~~~~",
+             "~~~~7$$==i$7~~~~",
+             "~~7~787$$777~7~~",
+             " ~~~~~7$$8~~~~~ ",
+             " ~~7~~7777~~7~~ ",
+             " ~~~~~~~~~~~~~~ ",
+             "  ~~~7~~~~7~~~  ",
+             "   ~~~~~~~~~~   ",
+             "      ~~~~      "];
+   break;
+
+   case 162:
+    toAdd = ["  .WWWWWWWWWW.  ",
+             " .............. ",
+             "..$..........$..",
+             "W....666666....W",
+             "W..6666666666..W",
+             "W..6666666666..W",
+             "W....666666....W",
+             "..$..........$..",
+             " .............. ",
+             "  .WWWWWWWWWW.  "];
+   break;
+
+   case 163:
+    toAdd = ["WWW...WWW",
+             "WW..)..WW",
+             "W..)))..W",
+             "..)...)..",
+             ".))._.)).",
+             "..)...)..",
+             "W..)))..W",
+             "WW..)..WW",
+             "WWW...WWW"];
+   break;
+
+   case 164:
+    toAdd = ["7777.7777",
+             "7#######7",
+             "7#78777#7",
+             "7#71718#7",
+             ".#77777#.",
+             "7#81717#7",
+             "7#77787#7",
+             "7#######7",
+             "7777.7777"];
+   break;
+
+   case 165:
+    toAdd = ["WWWWWWWWWWWWWW",
+             "?$?$?$WW$?$?$?",
+             "WWWWWWWWWWWWWW",
+             "?$?$?$WW$?$?$?",
+             "WWWWWWWWWWWWWW",
+             "?$?$?$WW$?$?$?",
+             "WWWWWWWWWWWWWW",
+             "?$?$?$WW$?$?$?",
+             "WWWWWWWWWWWWWW"];
+   break;
+
+   case 166:
+    toAdd = [" PPPPP   PPPPP ",
+             "PP;p;PP PP;;;PP",
+             "P;;;;;P P;;p;;P",
+             "P;;;;p;;;;;;;;P",
+             "P;p;;;PPP;;;;;P",
+             "PP;;;PP$PPp;;PP",
+             "  P;PP$$$PP;P  ",
+             "  P;PP$$$PP;P  ",
+             "PP;;;PP$PP;;;PP",
+             "P;;p;;PPP;;;p;P",
+             "P;;;;;;;;;p;;;P",
+             "P;;;p;P P;;;;;P",
+             "PP;;;PP PP;;;PP",
+             " PPPPP   PPPPP "];
+   break;
+
+   case 167:
+    toAdd = ["WWWWWW.WWWWWWW",
+             "WWW........WWW",
+             "WW...6666...WW",
+             "W...666666...W",
+             "....66ii66....",
+             "W...666666...W",
+             "WW...6666...WW",
+             "WWW........WWW",
+             "WWWWWWW.WWWWWW"];
+   break;
+
+   case 168:
+    toAdd = ["    !    ",
+             "   !;!   ",
+             "  !;);!  ",
+             " !;)!);! ",
+             "!;)!1!);!",
+             " !;)!);! ",
+             "  !;);!  ",
+             "   !;!   ",
+             "    !    "];
+   break;
+
+   case 169:
+    toAdd = [" WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW ",
+             " .?...?...?...?...?...?...?...? ",
+             "================================",
+             " ?..?...?...?...?...?...?...?.. ",
+             " WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW "];
+   break;
+
+   case 170:
+    toAdd = ["    676    ",
+             "   67_76   ",
+             "  67.6.76  ",
+             " 67$...$76 ",
+             "67$$787$$76",
+             " 7777.7777 "];
+   break;
+
+   case 171:
+    toAdd = [" 7777777 ",
+             " 7]75797 ",
+             "778787877",
+             "77$$$$$77",
+             "77$$$$$77",
+             "777877777",
+             "7$$$7$$$7",
+             "7$i$8$$$7",
+             "7$$$7$$$7",
+             "777778777",
+             " 77$$$77 ",
+             " 7778777 ",
+             "   ...   "];
+   break;
  }
 
  // Mirror, flip, rotate:
@@ -2972,10 +3411,11 @@ function addStructure(){
  }
 
  // Defined here to make it consistent for each room.
- var randDanger = ['^',tileLava,wallBlock][r(3)];
- var randAnnoy = [',',tileBramble,tileSludge,tileDark,tileNettles][r(5)];
+ var randDanger = ['^',tileLava,tileSludge,wallBlock].sampleRec();
+ var randAnnoy = [',',tileBramble,tileNettles,tileDark,tileConfGas,tileStunGas,tileQuicksand].sampleRec();
+ var randGas = gases.sampleRec();
  var randLiquid = liquids.sampleRec();
- var randPlantSmall = plants_small.sampleRec();
+ var randPlantSmall = plants_small[r(plants_small.length-1)];
  var randPlantLarge = plants_large.sampleRec();
 
  for (var i = 0; i < toAdd.length; i++) {
@@ -3016,8 +3456,11 @@ function addStructure(){
     case ")": // nettles
      currentMap[x+i][y+j] = tileNettles;
      break;
-    case "#": // dark smoke
-     currentMap[x+i][y+j] = tileDark;
+    case "#": // gases
+     currentMap[x+i][y+j] = randGas;
+     break;
+    case "%": // random plants
+     currentMap[x+i][y+j] = [plants_small,plants_large].sampleRec();
      break;
     case "p": // small plants
      if(!r(10))
@@ -3031,11 +3474,17 @@ function addStructure(){
      else
        currentMap[x+i][y+j] = randPlantLarge;
      break;
+    case "|": // dead tree or wooden wall?
+     currentMap[x+i][y+j] = tileTreeDead;
+     break;
     case "b": // blood
      currentMap[x+i][y+j] = tileBlood;
      break;
     case "s": // sludge
      currentMap[x+i][y+j] = tileSludge;
+     break;
+    case "q": // quicksand
+     currentMap[x+i][y+j] = tileQuicksand;
      break;
     case "t": // random treasure
      currentMap[x+i][y+j] = treasures[r(treasures.length-1)];
@@ -3047,6 +3496,7 @@ function addStructure(){
      currentMap[x+i][y+j] = [tileTreasure,tileStaff,tileArmor][r(3)];
      break;
     case "2": // the End
+     // TODO: Use this for consumables, tileMacGuffin can be some letter.
      currentMap[x+i][y+j] = tileMacGuffin;
      break;
     case "3": // random danger
@@ -3074,9 +3524,25 @@ function addStructure(){
      currentMap[x+i][y+j] = tileTeleporter;
      break;
     case " ":
-      // Do nothing, so that we can leave pieces of normally generated terrain in rooms.
-     //if(r(20)) currentMap[x+i][y+j] = emptyBlock;
-     //else currentMap[x+i][y+j] = terrain[r(terrain)];
+     // Do nothing, so that we can leave pieces of normally generated terrain in rooms.
+     break;
+    case "m": // random mob
+     currCre.push(cloneCreature(creatureList.sampleRec()));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = '.';
+     break;
+    case "M": // uppercase mob
+     currCre.push(cloneCreature(creatureList[r(parseInt(creatureList.length/2))]));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = '.';
+     break;
+    case "c": // pre-defined mob
+     currCre.push(cloneCreature(randMob));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = '.';
      break;
     }
    }
@@ -3114,7 +3580,6 @@ function newMap(x,y){
 }
 
 function spawnMobs(){
-  currCre = []; // Get rid of all creatures from old map. We don't save them, instead spawn new ones if the player returns.
   var cQ = Math.max(distanceToOrigin(), r(visited)); // How many to spawn.
   // More powerful enemies are towards the start of creatureList, so spawn more powerful enemies in later areas.
   var cHere = r(Math.max(creatureList.length-distanceToOrigin(),creatureList.length/2));
@@ -3167,10 +3632,25 @@ function addUser(){
 
 function teleportUser(){
  msg += "You teleport. ";
- do{
+ do {
   userPos.x = r(mapWidth);
   userPos.y = r(mapWidth);
- }while(!checkEmpty(userPos.x,userPos.y));
+ } while(!checkEmpty(userPos.x,userPos.y));
+}
+
+function teleportMob(i){
+  if(distanceBetween(userPos,currCre[i])<10)
+    msg += currCre[i].name+" disappears. ";
+  var p;
+  var q;
+  do {
+    p = r(mapWidth);
+    q = r(mapWidth);
+  } while(!checkEmpty(p,q));
+  currCre[i].x = p;
+  currCre[i].y = q;
+  if(distanceBetween(userPos,currCre[i])<10)
+    msg += currCre[i].name+" reappears. ";
 }
 
 function useStaff(){
@@ -3185,7 +3665,14 @@ function useStaff(){
  score -= 10;
  msg += "You channel the magical energies. ";
 
- switch(staff){
+ var powerWord;
+ if(confused>0){
+   powerWord = r(staves.length);
+   msg += "You mispronounce the Word of Power! ";
+ } else
+   powerWord = staff;
+
+ switch(powerWord){
   default:
    msg += "Nothing happens. ";
    break;
@@ -3289,12 +3776,20 @@ function cureAll(){
   blinded = 0;
   cured = true;
  }
+ if(confused>0){
+  confused = 0;
+  cured = true;
+ }
  if(panicked>0){
   panicked = 0;
   cured = true;
  }
  if(poisoned>0){
   poisoned = 0;
+  cured = true;
+ }
+ if(stunned>0){
+  stunned = 0;
   cured = true;
  }
 
@@ -3356,7 +3851,7 @@ function playerTakeDamage(dmg,i=9999){
    // Armor piercing monster attack:
    if(currCre[i].flags.includes("pierce")) resist = 0;
  }
- if(bloodied>0) dmg += kills; // Extra damage when bloodied.
+ if(bloodied>0) dmg += r(kills); // Extra damage when bloodied.
  score -= Math.max(1, dmg-resist);
 
  // Proc glyphs:
@@ -3400,12 +3895,16 @@ function tryPlayerMove(x,y){
  if(currentMap[x][y]==tileDoor && keys > 0) return true;
 
  // Handle phasing, otherwise check impassable terrain.
- if(phased>0) return true;
+ if(phased>0 && currentMap[x][y] != tileGoldWall) return true;
  return !impassable.includes(currentMap[x][y]);
 }
 
 function damageCreature(i){
- msg += "You strike "+currCre[i].name+". ";
+ if(stunned>0 && !r(3)){
+   msg += "You miss "+currCre[i].name+". ";
+   return;
+ } else
+   msg += "You strike "+currCre[i].name+". ";
  if(currCre[i].flags.includes("invulnerable")) {
    msg += currCre[i].name+" ignores your attack. ";
    return;
@@ -3414,7 +3913,7 @@ function damageCreature(i){
    msg += currCre[i].name+" is standing outside of time! ";
    return;
  }
- if(phased>0 && !r(3)){
+ if((phased>0 || currCre[i].flags.includes("phase")) && !r(3)){
    msg += "Your attack phases right through "+currCre[i].name+". ";
    return;
  }
@@ -3472,16 +3971,24 @@ function killCreature(i){
      }
     }
     if(nbr>0) msg += "Monsters suddenly appear all around you. ";
+    teleportMob(i);
   }
 
   return false;
  }
 
  // A little bit of score for killing enemies:
- score += 10;
- if(glyph==8 && bloodied>0){ // blood knight armour
-   score += 10+r(10);
-   msg += "You drain the lifeblood of "+currCre[i].name+". ";
+ if(staff!=5)
+   score += 10;
+ if(glyph==8){ // blood knight armour
+   if(bloodied>0){
+     score += 10+r(10);
+     msg += "You drain the lifeblood of "+currCre[i].name+". ";
+   } else {
+     bloodied += r(4);
+     if(bloodied>0)
+       msg += "You are splashed with the lifeblood of "+currCre[i].name+". ";
+   }
  }
 
  msg += currCre[i].name+" dies. ";
@@ -3562,23 +4069,57 @@ function moveUser(x,y){
    score++;
    if(!r(5)) msg += ["Your inner flame burns bright! ","The flames refresh you. "][r(2)];
   }else{
-   if(!r(2)) score -= r(aflame);
+   if(!r(2)) score -= Math.min(r(aflame), 50); // Damage based on duration left and capped at 50.
    if(!r(2)) msg += "You burn! ";
   }
   aflame--;
  }
  if(blinded>0) blinded--;
+ if(confused>0){
+   // Swap direction of movement:
+   x = -x;
+   y = -y;
+   confused--;
+ }
  if(bloodied>0) bloodied--;
  if(panicked>0) panicked--;
- if(phased>0) phased--;
+ if(phased>0){
+   phased--;
+   // Warn player when phasing will run out soon.
+   if(phased == 10)
+     msg += "The ethereal shadows are starting to fade away. ";
+   if(phased == 5)
+     msg += "You are about to phase back in. ";
+ }
+ if(stunned>0){
+   // Randomize direction of movement:
+   if(!r(3)){
+     if(!r(2)){
+       x = [-1,1][r(2)];
+       y = 0;
+     } else {
+       x = 0;
+       y = [-1,1][r(2)];
+     }
+     msg += "You stumble. ";
+   }
+   stunned--;
+ }
 
  // Blood knight armour also refreshes you when on bloodstains:
  if(glyph==8 && currentMap[userPos.x][userPos.y]==tileBloodDrop)
    score++;
+ // Quicksand can prevent moving away:
+ if(currentMap[userPos.x][userPos.y]==tileQuicksand && r(5) && !phased && !leap){
+   if(x!=0 || y!=0)
+     msg += ["You are stuck! ","The quicksand clings to your legs too strongly. ","The quicksand holds you in place. ","You cannot move. ",""].sampleRec();
+   x = 0;
+   y = 0;
+ }
 
  // Handle death:
  if(score<0){
-  if(staff == 4){
+  if(staff==4){
    score = 50;
    cureAll();
    msg += "Your Staff"+staves[staff]+" shatters in a wave of life-giving energy. You feel reinvigorated. ";
@@ -3695,10 +4236,10 @@ function moveUser(x,y){
   case '^': //trap
    msg += "You step on a pressure plate. ";
    if(timestop>0){
-     msg += "It doesn't seem to be working. ";
+     msg += "It seems to be stuck in time. ";
      break;
    }
-   switch(r(9)){
+   switch(r(15)){
     case 0:
      if(r(visited)>10){
       aflame += r(30)+r(30)+3;
@@ -3745,9 +4286,9 @@ function moveUser(x,y){
      if(staff>0 && !r(2)){
        msg += "Your Staff"+staves[staff]+" glows dull brown for a moment and looses all its magic. ";
        staff = 0;
-     } else
-       msg += "Nothing seems to happen. ";
-     break;
+       break;
+     }
+     //fallthrough
 
     case 6: //convocation
      var m;
@@ -3768,9 +4309,38 @@ function moveUser(x,y){
        msg += "You hear a distant growl. ";
      break;
 
+    case 7:
+     msg += "You are surrounded by noxious gas. ";
+     confused += r(50)+r(50)+5;
+     break;
+
+    case 8:
+     msg += "You are surrounded by fetid odour. ";
+     stunned += r(50)+r(50)+5;
+     break;
+
+    case 9:
+     if(glyph>0 && !r(2)){
+       msg += "Your "+getArmorName()+" glows dull brown for a moment and looses all its magic. ";
+       glyph = 0;
+       break;
+     }
+     //fallthrough
+
+    case 10:
+     var trapTerrain = [tileSludge,tileBlood,tileQuicksand,tileDark,tileConfGas,tileStunGas,tileBramble,tileNettles].sampleRec();
+     msg += "Your surroundings are blasted with transformative magic. ";
+     for(var k=-1; k < 2; k++){
+      for(var l=-1; l < 2; l++){
+       if(inRangeCoords(userPos.x+k,userPos.y+l) && !impassable.includes(currentMap[userPos.x+k][userPos.y+l]))
+         currentMap[userPos.x+k][userPos.y+l] = trapTerrain;
+      }
+     }
+     break;
+
     default:
-     playerTakeDamage(r(10)+visited);
      msg += "A quarrel shoots out and hits you. ";
+     playerTakeDamage(r(10)+visited);
      break;
    }
    break;
@@ -3783,7 +4353,10 @@ function moveUser(x,y){
    break;
 
   case '/': //lever
-   if(timestop>0) break;
+   if(timestop>0){
+     msg += "The lever cannot be activated with the mechanisms stuck in time. ";
+     break;
+   }
    msg += "The lever clicks as you turn it. ";
    currentMap[userPos.x][userPos.y]='\\';
    // Create boss arena:
@@ -3797,10 +4370,9 @@ function moveUser(x,y){
        msg += ["You hear a distant rumble coming close, but then it subsides. ",
                "You feel a strange presence watching you intently. ",
                "You sense a mysterious force brush past you. "].sampleRec();
-   }
-   // Hint:
-   if(!r(10))
+   } else if(!r(10))
      getHint("You hear a grinding voice saying: \"");
+
    // Create secret paths:
    var q = r(10)+1;
    var testX = 0;
@@ -3907,6 +4479,19 @@ function moveUser(x,y){
    blinded += r(4)+1;
    break;
 
+  case tileConfGas:
+   if(!r(4))
+     msg += ["What was that? ","What's happening? ","You can't seem to think straight. "][r(3)];
+   if(!confused) confused += 10;
+   confused += r(10);
+   break;
+
+  case tileStunGas:
+   if(!r(4))
+     msg += "You feel unsteady. ";
+   stunned += r(20)+2;
+   break;
+
   case tileBlood:
    if(glyph==8 && !r(10)) // blood knight armour
      msg += ["What's that smell? The sweet blood! It's enough to make a man sick. ",
@@ -3925,6 +4510,7 @@ function moveUser(x,y){
    break;
 
   case ',': //rubble
+   if(phased>0) break;
    var stumbleStep = {x: userPos.x + r(3)-1, y: userPos.y + r(3)-1};
    if(inRange(stumbleStep) && checkEmpty(stumbleStep.x,stumbleStep.y)){
      userPos.x = stumbleStep.x;
@@ -4005,7 +4591,7 @@ function moveUser(x,y){
 
      case 3:
       msg += "Your "+armors[armor]+" is engulfed in bright blue flames. ";
-      armor += Math.min(1+parseInt(distanceToOrigin()/3), 5);
+      armor += Math.min(1+r(distanceToOrigin()), 5);
       msg += "The flames subside, revealing a brand new "+armors[armor]+". ";
       break;
     }
@@ -4076,6 +4662,16 @@ function tryMove(x,y,i){
     case "blind":
      msg += "Your eyes! You cannot see! ";
      blinded += r(10)+1;
+     break;
+
+    case "confother":
+     msg += ["Half-forgotten","Repressed","Unwanted"][r(3)]+" memories stir deep in your mind. ";
+     confused += r(50)+5;
+     break;
+
+    case "stunother":
+     msg += "You feel unsteady. ";
+     stunned += r(kills)+10;
      break;
 
     case "panic":
@@ -4171,28 +4767,47 @@ function tryMove(x,y,i){
      if(ward>0) ward=0;
      break;
 
+    case "extend":
+     aflame *= 2;
+     blinded *= 2;
+     bloodied *= 2;
+     confused *= 2;
+     panicked *= 2;
+     poisoned *= 2;
+     stunned *= 2;
+     msg += "You feel much worse than before. ";
+     break;
+
     case "extraattack":
      msg += currCre[i].name+" "+currCre[i].attack+" you. ";
      playerTakeDamage(r(10)+visited,i);
      break;
 
     case "teleself":
-     var j;
-     var k;
-     do {
-      j = r(mapWidth);
-      k = r(mapWidth);
-     } while(!checkEmpty(j,k));
-     currCre[i].x = j;
-     currCre[i].y = k;
-     msg += currCre[i].name+" teleports away. ";
+     teleportMob(i);
      break;
    }
   }
 
   return true; // Won't move, but will stop the mobs turn.
  }
- return (inRangeCoords(x,y) && checkEmpty(x,y));
+
+ if(!inRangeCoords(x,y))
+   return false;
+ if(!checkEmpty(x,y)){
+   if(currentMap[x][y]==wallBlock){
+     if(currCre[i].flags.includes("phase"))
+       return true;
+     else if(currCre[i].flags.includes("dig")){
+       currentMap[x][y] = [emptyBlock,'.',','][r(3)];
+       if(distanceBetween(userPos,currCre[i])<10)
+         msg += currCre[i].name+" tears down the wall. ";
+       return true;
+     }
+   }
+   return false;
+ }
+ return true;
 }
 
 function doMove(x,y,i){
@@ -4248,6 +4863,16 @@ function onDeath(i){
     msg += currCre[i].name+" bleeds an endless torrent of water. ";
     break;
 
+   case "sandpool":
+    for(k=-1; k < 2; k++){
+     for(l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l) && !impassable.includes(currentMap[currCre[i].x+k][currCre[i].y+l]))
+        currentMap[currCre[i].x+k][currCre[i].y+l] = tileQuicksand;
+     }
+    }
+    msg += currCre[i].name+" disintegrates into a flood of sand. ";
+    break;
+
    case "smoke":
     for(k=-1; k < 2; k++){
      for(l=-1; l < 2; l++){
@@ -4256,6 +4881,26 @@ function onDeath(i){
      }
     }
     msg += currCre[i].name+" disappears into a billowing cloud of heavy smoke. ";
+    break;
+
+   case "confgas":
+    for(k=-1; k < 2; k++){
+     for(l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l) && currentMap[currCre[i].x+k][currCre[i].y+l]==emptyBlock)
+        currentMap[currCre[i].x+k][currCre[i].y+l] = tileConfGas;
+     }
+    }
+    msg += currCre[i].name+" discorporates into a cloud of noxious fumes. ";
+    break;
+
+   case "stungas":
+    for(k=-1; k < 2; k++){
+     for(l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l) && currentMap[currCre[i].x+k][currCre[i].y+l]==emptyBlock)
+        currentMap[currCre[i].x+k][currCre[i].y+l] = tileStunGas;
+     }
+    }
+    msg += currCre[i].name+" dissolves into horrid stench. ";
     break;
 
    case "boss":
@@ -4286,11 +4931,8 @@ function onDeath(i){
       }
      }
     }
-    msg += "With its dying breath, "+currCre[i].name+" speak a Word of Revenge. ";
-    if(nbr>0)
-      msg += "Monsters suddenly appear all around you. ";
-    else
-      msg += "Nothing seems to happen. ";
+    msg += currCre[i].name+" lets out a horrific screech. ";
+    if(nbr>0) msg += "Monsters suddenly appear all around you. ";
     break;
 
    case "boonphase":
@@ -4356,8 +4998,8 @@ function onExplosion(i){
        currentMap[currCre[i].x+k][currCre[i].y+l] = ',';
        break;
 
-      case tileDark:
-       msg += "The thick smoke disperses. ";
+      case tileDark: case tileConfGas: case tileStunGas:
+       msg += "The vapours disperse. ";
        currentMap[currCre[i].x+k][currCre[i].y+l] = emptyBlock;
        break;
     }
@@ -4526,9 +5168,11 @@ function displayMap(highlight=""){
  var states = ((aflame>0) ? "<t style='color:#FF4500'>Aflame</t> " : "") +
               ((blinded>0) ? "<t style='background-color:#000000; color:#FFFFFF;'>Blind</t> " : "") + // white on black
               ((bloodied>0) ? "<t style='color:#8A0303'>Bloodied</t> " : "") +
+              ((confused>0) ? "<t style='color:#FF1493'>Confused</t> " : "") +
               ((panicked>0) ? "<t style='color:#DC143C'>Panicked</t> " : "") +
               ((phased>0) ? "<t style='color:#4B0082'>Phasing</t> " : "") +
               ((poisoned>0) ? "<t style='color:#90EE90'>Poisoned</t> " : "") +
+              ((stunned>0) ? "<t style='background-color:#FFFF00'>Stun</t> " : "") +
               ((timestop>0) ? "<t style='color:#00BFFF'>Time Stop</t> " : "") +
               ((ward>0) ? "<t style='color:#DAA520'>Ward</t> " : "");
  if(states.length>0) states += "<br />";
