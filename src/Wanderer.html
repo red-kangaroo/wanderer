@@ -161,6 +161,7 @@ var tileWater = "<t style='background-color:#1E90FF'>~</t>";
 var tileLava = "<t style='background-color:#FF4500'>~</t>";
 var tileSludge = "<t style='background-color:#00FF00'>~</t>";
 var tileBlood = "<t style='background-color:#8A0303'>~</t>";
+var tileQuicksand = "<t style='background-color:#FFFF66; color:#DAA520;'>,</t>";
 var tileDark = "<t style='color:#696969'>#</t>";
 var tileConfGas = "<t style='color:#FF1493'>#</t>";
 var tileStunGas = "<t style='color:#FFFF00; font-weight: 900;'>#</t>";
@@ -186,11 +187,11 @@ var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
 var tileTeleporter = "<t style='color:#00FFFF'>0</t>";
 
 var impassable = [wallBlock,tileGoldWall,tileDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
-var liquids = [tileBlood,tileLava,tileSludge,tileWater];
+var liquids = [tileBlood,tileLava,tileQuicksand,tileSludge,tileWater];
 var gases = [tileDark,tileConfGas,tileStunGas];
 var plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
 var plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
-var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,plants_large]];
+var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,tileQuicksand,plants_large]];
 var rareTerrain = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileBlood,gases]];
 var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
 
@@ -203,7 +204,7 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","toxicpool","waterpool","smoke","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","dropscore","droppile","droptrap","confother","confgas","stunother","stungas"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","smoke","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","dropscore","droppile","droptrap","confother","confgas","stunother","stungas"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
@@ -347,7 +348,7 @@ var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
                     k = this.y + r(3)-1;
                     // Check adjacent square where we want to summon:
                     if(inRangeCoords(j,k) && checkEmpty(j,k)){
-                      currCre.push(creatureList[r(creatureList.length/2)]);
+                      currCre.push(cloneCreature(creatureList[r(creatureList.length/2)]));
                       currCre[currCre.length-1].x = j;
                       currCre[currCre.length-1].y = k;
                       msg += this.name+" speaks a Word of Summoning. "+currCre[currCre.length-1].name+" appears out of thin air. ";
@@ -551,7 +552,7 @@ function getMobBehaviour(){
      var j = this.x + r(3)-1;
      var k = this.y + r(3)-1;
      if(inRangeCoords(j,k) && checkEmpty(j,k)){
-      currCre.push(creatureList.sampleRec());
+      currCre.push(cloneCreature(creatureList.sampleRec()));
       currCre[currCre.length-1].x = j;
       currCre[currCre.length-1].y = k;
       if(distanceBetween(userPos,this)<10)
@@ -662,6 +663,16 @@ function getMobBehaviour(){
     }
     return false;
    };
+
+  case 21:
+   return function(){
+    if(!r(6) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileQuicksand;
+      if(distanceBetween(userPos,this)<10)
+        msg += this.name+" brings about a miniature sandstorm. ";
+    }
+    return false;
+   };
  }
 }
 
@@ -706,6 +717,7 @@ function getUserChar(){
    colour = '#000000';
    bkg = 'background-color:#8A0303; ';
  }
+ else if(currentMap[userPos.x][userPos.y] == tileQuicksand) bkg = 'background-color:#FFFF66; ';
 
  return "<t style='"+bkg+"color:"+colour+"; font-weight: 900;'>@</t>";
 }
@@ -855,6 +867,7 @@ function getTileName(tile){
     case tileLava:       return "lava";
     case tileSludge:     return "toxic sludge";
     case tileBlood:      return "pool of blood";
+    case tileQuicksand:  return "quicksand";
     case tileDark:       return "dark smoke";
     case tileConfGas:    return "noxious fumes";
     case tileStunGas:    return "fetid odour";
@@ -978,7 +991,7 @@ function addRiver(){
  var lastMove = 0;
 
  var liquid = tileWater;
- if(r(visited)>20 || !r(100)) liquid = [tileLava, [tileSludge, tileBlood]].sampleRec();
+ if(r(visited)>20 || !r(100)) liquid = [tileLava, [tileSludge, tileBlood, tileQuicksand]].sampleRec();
 
  switch(r(2)){
   case 0: //across
@@ -1040,7 +1053,7 @@ function addLake(){
  var liquid = emptyBlock; // Just to make sure we don't accidentaly make undefined lake.
  if(r(visited)>20) liquid = tileLava;
  else
-   liquid = [tileWater,[',',tileGrassTall,tileBramble,tileNettles,tileSludge,tileBlood,tileDark,tileConfGas,tileStunGas]].sampleRec();
+   liquid = [tileWater,[',',tileGrassTall,tileBramble,tileNettles,tileSludge,tileBlood,tileQuicksand,tileDark,tileConfGas,tileStunGas]].sampleRec();
 
  while(stepsTaken<500 && stepsFailed<500){
   currentMap[currStep.x][currStep.y] = liquid;
@@ -1086,9 +1099,14 @@ function addBoss(){
 function addStructure(){
  var toAdd = [];
  var currentLine = "";
+ // Individual rooms can be flagged not to be randomly mirrored/flipped/etc.
  var noMirror = false;
  var noFlip = false;
  var noRotate = false;
+ // Declare random mob 'c' for rooms of specific type of monsters here, so we can
+ // set it for individual rooms. Varied mobs 'm' and 'M' are not completely
+ // random, so no need to have them prepared before actually generating the room.
+ var randMob = creatureList.sampleRec();
 
  //The winning place:
  if((r(visited)>20) && (r(distanceToOrigin())>=10) && (r(kills)>20)){
@@ -2986,10 +3004,10 @@ function addStructure(){
 
  // Defined here to make it consistent for each room.
  var randDanger = ['^',tileLava,tileSludge,wallBlock].sampleRec();
- var randAnnoy = [',',tileBramble,tileNettles,tileDark,tileConfGas,tileStunGas].sampleRec();
+ var randAnnoy = [',',tileBramble,tileNettles,tileDark,tileConfGas,tileStunGas,tileQuicksand].sampleRec();
  var randGas = gases.sampleRec();
  var randLiquid = liquids.sampleRec();
- var randPlantSmall = plants_small.sampleRec();
+ var randPlantSmall = plants_small[r(plants_small.length-1)];
  var randPlantLarge = plants_large.sampleRec();
 
  for (var i = 0; i < toAdd.length; i++) {
@@ -3033,6 +3051,9 @@ function addStructure(){
     case "#": // gases
      currentMap[x+i][y+j] = randGas;
      break;
+    case "%": // random plants
+     currentMap[x+i][y+j] = [plants_small,plants_large].sampleRec();
+     break;
     case "p": // small plants
      if(!r(10))
        currentMap[x+i][y+j] = plants_small.sampleRec();
@@ -3045,11 +3066,17 @@ function addStructure(){
      else
        currentMap[x+i][y+j] = randPlantLarge;
      break;
+    case "|": // dead tree or wooden wall?
+     currentMap[x+i][y+j] = tileTreeDead;
+     break;
     case "b": // blood
      currentMap[x+i][y+j] = tileBlood;
      break;
     case "s": // sludge
      currentMap[x+i][y+j] = tileSludge;
+     break;
+    case "q": // quicksand
+     currentMap[x+i][y+j] = tileQuicksand;
      break;
     case "t": // random treasure
      currentMap[x+i][y+j] = treasures[r(treasures.length-1)];
@@ -3061,6 +3088,7 @@ function addStructure(){
      currentMap[x+i][y+j] = [tileTreasure,tileStaff,tileArmor][r(3)];
      break;
     case "2": // the End
+     // TODO: Use this for consumables, tileMacGuffin can be some letter.
      currentMap[x+i][y+j] = tileMacGuffin;
      break;
     case "3": // random danger
@@ -3088,9 +3116,25 @@ function addStructure(){
      currentMap[x+i][y+j] = tileTeleporter;
      break;
     case " ":
-      // Do nothing, so that we can leave pieces of normally generated terrain in rooms.
-     //if(r(20)) currentMap[x+i][y+j] = emptyBlock;
-     //else currentMap[x+i][y+j] = terrain[r(terrain)];
+     // Do nothing, so that we can leave pieces of normally generated terrain in rooms.
+     break;
+    case "m": // random mob
+     currCre.push(cloneCreature(creatureList.sampleRec()));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = '.';
+     break;
+    case "M": // uppercase mob
+     currCre.push(cloneCreature(creatureList[r(parseInt(creatureList.length/2))]));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = '.';
+     break;
+    case "c": // pre-defined mob
+     currCre.push(cloneCreature(randMob));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = '.';
      break;
     }
    }
@@ -3128,7 +3172,6 @@ function newMap(x,y){
 }
 
 function spawnMobs(){
-  currCre = []; // Get rid of all creatures from old map. We don't save them, instead spawn new ones if the player returns.
   var cQ = Math.max(distanceToOrigin(), r(visited)); // How many to spawn.
   // More powerful enemies are towards the start of creatureList, so spawn more powerful enemies in later areas.
   var cHere = r(Math.max(creatureList.length-distanceToOrigin(),creatureList.length/2));
@@ -3400,7 +3443,7 @@ function playerTakeDamage(dmg,i=9999){
    // Armor piercing monster attack:
    if(currCre[i].flags.includes("pierce")) resist = 0;
  }
- if(bloodied>0) dmg += kills; // Extra damage when bloodied.
+ if(bloodied>0) dmg += r(kills); // Extra damage when bloodied.
  score -= Math.max(1, dmg-resist);
 
  // Proc glyphs:
@@ -3444,7 +3487,7 @@ function tryPlayerMove(x,y){
  if(currentMap[x][y]==tileDoor && keys > 0) return true;
 
  // Handle phasing, otherwise check impassable terrain.
- if(phased>0) return true;
+ if(phased>0 && currentMap[x][y] != tileGoldWall) return true;
  return !impassable.includes(currentMap[x][y]);
 }
 
@@ -3529,9 +3572,15 @@ function killCreature(i){
  // A little bit of score for killing enemies:
  if(staff!=5)
    score += 10;
- if(glyph==8 && bloodied>0){ // blood knight armour
-   score += 10+r(10);
-   msg += "You drain the lifeblood of "+currCre[i].name+". ";
+ if(glyph==8){ // blood knight armour
+   if(bloodied>0){
+     score += 10+r(10);
+     msg += "You drain the lifeblood of "+currCre[i].name+". ";
+   } else {
+     bloodied += r(4);
+     if(bloodied>0)
+       msg += "You are splashed with the lifeblood of "+currCre[i].name+". ";
+   }
  }
 
  msg += currCre[i].name+" dies. ";
@@ -3626,7 +3675,14 @@ function moveUser(x,y){
  }
  if(bloodied>0) bloodied--;
  if(panicked>0) panicked--;
- if(phased>0) phased--;
+ if(phased>0){
+   phased--;
+   // Warn player when phasing will run out soon.
+   if(phased == 10)
+     msg += "The ethereal shadows are starting to fade away. ";
+   if(phased == 5)
+     msg += "You are about to phase back in. ";
+ }
  if(stunned>0){
    // Randomize direction of movement:
    if(!r(3)){
@@ -3645,6 +3701,13 @@ function moveUser(x,y){
  // Blood knight armour also refreshes you when on bloodstains:
  if(glyph==8 && currentMap[userPos.x][userPos.y]==tileBloodDrop)
    score++;
+ // Quicksand can prevent moving away:
+ if(currentMap[userPos.x][userPos.y]==tileQuicksand && r(5) && !phased && !leap){
+   if(x!=0 || y!=0)
+     msg += ["You are stuck! ","The quicksand clings to your legs too strongly. ","The quicksand holds you in place. ","You cannot move. ",""].sampleRec();
+   x = 0;
+   y = 0;
+ }
 
  // Handle death:
  if(score<0){
@@ -3768,7 +3831,7 @@ function moveUser(x,y){
      msg += "It seems to be stuck in time. ";
      break;
    }
-   switch(r(14)){
+   switch(r(15)){
     case 0:
      if(r(visited)>10){
       aflame += r(30)+r(30)+3;
@@ -3856,9 +3919,20 @@ function moveUser(x,y){
      }
      //fallthrough
 
+    case 10:
+     var trapTerrain = [tileSludge,tileBlood,tileQuicksand,tileDark,tileConfGas,tileStunGas,tileBramble,tileNettles].sampleRec();
+     msg += "Your surroundings are blasted with transformative magic. ";
+     for(var k=-1; k < 2; k++){
+      for(var l=-1; l < 2; l++){
+       if(inRangeCoords(userPos.x+k,userPos.y+l) && !impassable.includes(currentMap[userPos.x+k][userPos.y+l]))
+         currentMap[userPos.x+k][userPos.y+l] = trapTerrain;
+      }
+     }
+     break;
+
     default:
-     playerTakeDamage(r(10)+visited);
      msg += "A quarrel shoots out and hits you. ";
+     playerTakeDamage(r(10)+visited);
      break;
    }
    break;
@@ -4379,6 +4453,16 @@ function onDeath(i){
      }
     }
     msg += currCre[i].name+" bleeds an endless torrent of water. ";
+    break;
+
+   case "sandpool":
+    for(k=-1; k < 2; k++){
+     for(l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l) && !impassable.includes(currentMap[currCre[i].x+k][currCre[i].y+l]))
+        currentMap[currCre[i].x+k][currCre[i].y+l] = tileQuicksand;
+     }
+    }
+    msg += currCre[i].name+" disintegrates into a flood of sand. ";
     break;
 
    case "smoke":

@@ -1,8 +1,4 @@
 Wander/Wonder
-1ti
-$5?/0-9]_
-~,;678pP
-=bs!)#^34
 
 
 https://www.w3schools.com/colors/colors_names.asp
@@ -68,6 +64,9 @@ README
   Dessication - removes all liquids on level
   timed bomb - maybe spawns mobs that explode immediately, but also gives timestop
   shadows - 333 turns of phasing
+  escapism - tele
+  distilled love - cure + score+50
+  purity - cure + change all liquids on level to water
 * helmets
   * odd-numbered give extra Defense, even are magical
 
@@ -89,10 +88,11 @@ README
    https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
    https://github.com/crawl/crawl/tree/master/crawl-ref/source/dat/des
 * arrival vaults?
-* terrain that causes Stuck status, prevents move away with some chance
-   quicksand: yellow , (yellow background??)
 * fix rotate
 * fix diagonal rivers
+
+* msg()
+* add consumables to i, plus can be declared as 2
 
 Mobs
 ====
@@ -119,6 +119,8 @@ antimagic - cannot be harmed with magic/when player under influence of magic
 paralysis
 haste - move faster, don't attack faster
 deal damage based on score, the higher score the higher damage
+invisible until >=2 squares away
+swap with player on attack
 
 * behaviour:
 pull close - if player is in straight unobstructed orthogonal line, pull d4 squares closer
