@@ -87,7 +87,8 @@ var staves = ["",
               " of <t style='color:#000000; font-style: italic;'>Vor</t><t style='color:#282828; font-style: italic;'>pal </t><t style='color:#484848; font-style: italic;'>Sha</t><t style='color:#686868; font-style: italic;'>rpn</t><t style='color:#808080; font-style: italic;'>ess</t>",
               " of <t style='font-style: italic;'>Soa r i&nbsp;&nbsp;n&nbsp;&nbsp;&nbsp;g</t> Leap",
               " of <t style='color:#800080'>C</t><t style='color:#FF1493'>o</t><t style='color:#800080'>njuration</t>",
-              " of <t style='color:#006400'>Bur</t><t style='color:#32CD32'>g</t><t style='color:#006400'>eonin</t><t style='color:#32CD32'>g</t>",];
+              " of <t style='color:#006400'>Bur</t><t style='color:#32CD32'>g</t><t style='color:#006400'>eonin</t><t style='color:#32CD32'>g</t>",
+              " of <t style='color:#"+Math.random().toString(16).substr(2,6)+"'>P</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>u</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>r</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>e</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'> C</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>h</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>a</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>o</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>s</t>",];
 var staffDesc = ["with no enchantment can whack your enemies good, but unfortunately lacks magical powers",
                  "may open ephemeral bridges to faraway locations",
                  "can momentarily remove you from the flow of time, rendering all monsters and mechanisms frozen and unable to affect you",
@@ -96,7 +97,8 @@ var staffDesc = ["with no enchantment can whack your enemies good, but unfortuna
                  "will shred your enemies in a single strike",
                  "will allow you to cover great distances in a single stride, avoiding many obstacles in the way",
                  "can materialize the volatile energies of raw magic",
-                 "may call forth the forces of Nature to pave your path",];
+                 "may call forth the forces of Nature to pave your path",
+                 "will alter your surroundings in unpredictable ways",];
 
 var armor = 0;
 var armors = ["<t style='color:#228B22'>Green Tunic</t>",
@@ -192,7 +194,8 @@ var gases = [tileDark,tileConfGas,tileStunGas];
 var plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
 var plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
 var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,tileQuicksand,plants_large]];
-var rareTerrain = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileBlood,gases]];
+var terrain_rare = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileBlood,gases]];
+var terrain_any = [emptyBlock,wallBlock,'.',',','?','^',tileWater,tileLava,tileSludge,tileBlood,tileQuicksand,tileDark,tileConfGas,tileStunGas,tileGoldWall,tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileBloodDrop,tileTreeStump,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush,tileSecretPath,tileTeleporter,['$','/',[']','_',tileKey,emptyBlock,wallBlock]]];
 var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
 
 var creatureChar = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&@".split('');
@@ -204,7 +207,7 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","smoke","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","dropscore","droppile","droptrap","confother","confgas","stunother","stungas"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","smoke","chaos","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","dropscore","droppile","droptrap","confother","confgas","stunother","stungas"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>B</t>",
@@ -963,7 +966,7 @@ function generateMap(){
    // add terrain
    if (currentMap[i][j]!=wallBlock){
     if (!r(1000) && r(distanceToOrigin())) {
-     currentMap[i][j] = rareTerrain.sampleRec();
+     currentMap[i][j] = terrain_rare.sampleRec();
     }
     //else if(!r(Math.max(30-distanceToOrigin()))) {
     else if(!r(Math.max(Math.abs(25-distanceToOrigin()), 4)) || chanceTerrain) {
@@ -1340,7 +1343,7 @@ function addStructure(){
              "&#9608;............................^...........&#9608;",
              "&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;"];
 
-      var randTerrain = [' ','.',',','\'','^','?','$','~','0','/','7','W','=','_',';','!','#','s','b','q','4','3','6',')','p','P','%','m','M','c'];
+      var randTerrain = [' ','.',',','\'','^','?','$','~','0','/','7','W','=','_',';','!','#','d','f','n','s','b','q','4','3','6',')','p','P','%','m','M','c','x'];
       for (var i = 0; i < toAdd.length; i++) {
        toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),randTerrain[r(randTerrain.length)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
        toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
@@ -3376,6 +3379,15 @@ function addStructure(){
              " 7778777 ",
              "   ...   "];
    break;
+
+   case 172:
+    toAdd = ["  xx  ",
+             " xxxx ",
+             "xxxxxx",
+             "xxxxxx",
+             " xxxx ",
+             "  xx  "];
+   break;
  }
 
  // Mirror, flip, rotate:
@@ -3441,8 +3453,18 @@ function addStructure(){
     case "'": // bloody floor
      currentMap[x+i][y+j] = tileBloodDrop;
      break;
+    case "S": // secret path
+     currentMap[x+i][y+j] = tileSecretPath;
+     break;
+    // case "+": // normal door
+    case "x": // completely random tile
+     currentMap[x+i][y+j] = terrain_any.sampleRec();
+     break;
     case "-":
      currentMap[x+i][y+j] = tileKey;
+     break;
+    case "[": // normal armor
+     currentMap[x+i][y+j] = ']';
      break;
     case "]": // enchanted armor
      currentMap[x+i][y+j] = tileArmor;
@@ -3458,6 +3480,15 @@ function addStructure(){
      break;
     case "#": // gases
      currentMap[x+i][y+j] = randGas;
+     break;
+    case "d": // smoke
+     currentMap[x+i][y+j] = tileDark;
+     break;
+    case "f": // confusion gas
+     currentMap[x+i][y+j] = tileConfGas;
+     break;
+    case "n": // stun gas
+     currentMap[x+i][y+j] = tileStunGas;
      break;
     case "%": // random plants
      currentMap[x+i][y+j] = [plants_small,plants_large].sampleRec();
@@ -3756,6 +3787,30 @@ function useStaff(){
         currCre[m].x += dx;
         currCre[m].y += dy;
         msg += currCre[m].name+" is pushed away by the rapidly growing vegetation. ";
+      }
+    }
+   }
+   break;
+
+  case 9: //chaos
+   msg += "You are surrounded by a storm of primordial chaos. ";
+   for(var k=-3; k < 4; k++){
+    for(var l=-3; l < 4; l++){
+      if(k==0 && l==0)
+        currentMap[userPos.x+k][userPos.y+l] = emptyBlock;
+      else if(inRangeCoords(userPos.x+k,userPos.y+l) && distanceBetween(userPos,{x:userPos.x+k,y:userPos.y+l})<=3)
+        currentMap[userPos.x+k][userPos.y+l] = terrain_any.sampleRec();
+    }
+   }
+   for(var m = 0; m < currCre.length; m++){
+    if(distanceBetween(userPos,currCre[m])<=3){
+      if(currCre[m].flags.includes("boss")){
+        msg += currCre[m].name+" shrugs off the magic. ";
+      } else {
+        var newMob = cloneCreature(creatureList.sampleRec());
+        newMob.x = currCre[m].x;
+        newMob.y = currCre[m].y;
+        currCre[m] = newMob;
       }
     }
    }
@@ -4901,6 +4956,16 @@ function onDeath(i){
      }
     }
     msg += currCre[i].name+" dissolves into horrid stench. ";
+    break;
+
+   case "chaos":
+    for(k=-1; k < 2; k++){
+     for(l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l))
+        currentMap[currCre[i].x+k][currCre[i].y+l] = terrain_any.sampleRec();
+     }
+    }
+    msg += currCre[i].name+" explodes in a multicoloured blast of magic. ";
     break;
 
    case "boss":
