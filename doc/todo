@@ -46,11 +46,9 @@ README
   druidcraft (walk thru trees??)
   fix cleansing water msg order
 * staff
-  pure chaos - in radius 2 changes all tiles and mobs
   holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
                adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
   enslavement - Mob vs mob combat (as above?)
-  polymorph - can change mobs or features
   soaring leap passes thru mobs and attacks them
 * consumable: Scroll/Potion
   Convocation - blink mobs near
@@ -67,6 +65,7 @@ README
   escapism - tele
   distilled love - cure + score+50
   purity - cure + change all liquids on level to water
+  logrus
 * helmets
   * odd-numbered give extra Defense, even are magical
 
