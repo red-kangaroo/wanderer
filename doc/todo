@@ -82,6 +82,7 @@ README
    +1 whenever you step on statue
    mostly just flavour, but has the potential to swamp levels
 * terrain that spawn creatures around player, pentagram?
+* unlocked doors
 
 * vaults:
    https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
@@ -119,15 +120,14 @@ paralysis
 haste - move faster, don't attack faster
 deal damage based on score, the higher score the higher damage
 invisible until >=2 squares away
-swap with player on attack
 
 * behaviour:
 pull close - if player is in straight unobstructed orthogonal line, pull d4 squares closer
 when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
-ranged stun/confusion
-jump over adjacent player
 reach attack
+fix shooting
+create ice blocks (blue X, stay in place, worthless)
 
 Not Now
 =======
