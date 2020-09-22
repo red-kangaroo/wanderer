@@ -24,8 +24,6 @@ README
 * rage - player looses control, avatar attacks until status ends
 
 * run in direction command
-* persistent messages
-  * message history command
 * online scoreboard
    https://stackoverflow.com/questions/31655085/database-on-a-personal-github-page
 * select from several fonts
@@ -44,7 +42,6 @@ README
   hyperspace (diagonal movement)
   invisibility
   druidcraft (walk thru trees??)
-  fix cleansing water msg order
 * staff
   holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
                adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
@@ -90,9 +87,9 @@ README
 * arrival vaults?
 * fix rotate
 * fix diagonal rivers
-
-* msg()
-* add consumables to i, plus can be declared as 2
+* add X as iceblock spawn + water
+* add m to that large room
+* add consumables to i, plus can be declared as 2; move MacGuffin to something other
 
 Mobs
 ====

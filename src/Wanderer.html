@@ -67,6 +67,12 @@ var worldPos = {x:0,y:0};
 var worldData = [];
 var currentMap = [];
 
+// Messages:
+var msg = "";
+var msgLog = [];
+var msgNbrToShow = 5; // Number of messages to display.
+var msgTurnsToShow = 10; // How many turns back should the messages be displayed.
+
 // Player:
 var userPos = {x:1,y:1};
 var userName = "Nobody";
@@ -405,7 +411,6 @@ var mobNames = {
   'z': ["Zealotry","Zilch","Zit"],
 };
 var mobSelves = ["Self-Abnegation","Self-Absorption","Self-Abuse","Self-Aggrandizement","Self-Censorship","Self-Complacency","Self-Conceit","Self-Congratulation","Self-Contempt","Self-Contradiction","Self-Criticism","Self-Deceit","Self-Defeat","Self-Defilement","Self-Delusion","Self-Denial","Self-Deprecation","Self-Discrimination","Self-Disgust","Self-Doubt","Self-Flattery","Self-Gratification","Self-Guilt","Self-Harm","Self-Hatred","Self-Importance","Self-Incrimination","Self-Indulgence","Self-Justification","Self-Loathing","Self-Love","Self-Obsession","Self-Pity","Self-Praise","Self-Recrimination","Self-Reproach","Self-Sabotage","Self-Sacrifice","Self-Satisfaction"];
-var msg = "";
 
 function getMobBehaviour(){
  switch(r(200)){
@@ -939,9 +944,9 @@ function getHint(says=""){
               "You cannot fix it anymore.",
               "Why did you do it?",
               "Why them?",
-              "Seek the levers once your Self glows again. ",
+              "Seek the levers once your Self glows again.",
               "Conquering your inner demons brings a certain boon.",
-              "Water will not harm you, Wanderer. ",
+              "Water will not harm you, Wanderer.",
               "Have you lost your way?",
               "You might never be the same again...",
               "May you find that which you seek.",
@@ -3891,7 +3896,11 @@ function cureAll(){
   cured = true;
  }
 
- if(cured) msg += "Your afflictions are lifted. ";
+ if(cured){
+   if(glyph==2 && currentMap[userPos.x][userPos.y]==tileWater)
+     msg += "Your armour glows with soft blue light. ";
+   msg += "Your afflictions are lifted. ";
+ }
  return cured;
 }
 
@@ -3919,7 +3928,7 @@ function playerTakeDamage(dmg,i=9999){
  if(bloodied>0) dmg += r(kills); // Extra damage when bloodied.
  dmg = Math.max(1, dmg-resist);
  score -= dmg;
- msg += "["+String(dmg)+" dmg] ";
+ msg += "["+((dmg > Math.max(10, score/10)) ? "<t style='color:#FF0000'>"+String(dmg)+"</t> " : String(dmg))+" dmg] ";
 
  // Proc glyphs:
  if(!r(3)){
@@ -4121,7 +4130,19 @@ function moveUser(x,y){
   displayMap();
   return;
  }
- // Clear messages for next turn:
+ // Update message log and clear messages for next turn:
+ if(msg != ""){
+   if(msgLog.length > 1 && msg == msgLog[msgLog.length-1].msg){
+     // Join same messages and update their turn number:
+     msgLog[msgLog.length-1].turn = turn;
+     msgLog[msgLog.length-1].times += 1;
+   } else if(!msg.includes('F5')) // Do not log game-end messages, they can stay fresh on screen.
+     msgLog.push({
+       msg: msg,
+       turn: turn,
+       times: 1,
+     });
+ }
  msg = "";
 
  // Hunger and status effects:
@@ -4131,7 +4152,7 @@ function moveUser(x,y){
   poisoned--;
  }
  if(aflame>0){
-  if(glyph == 1){
+  if(glyph==1){
    // Armor of Brimstone
    score++;
    if(!r(5)) msg += ["Your inner flame burns bright! ","The flames refresh you. "][r(2)];
@@ -4140,7 +4161,7 @@ function moveUser(x,y){
     var dmg = Math.min(r(aflame), 50);
     score -= dmg;
     if(dmg>0)
-      msg += "You burn! ["+String(dmg)+" dmg] ";
+      msg += "You burn! ["+((dmg > Math.max(10, score/10)) ? "<t style='color:#FF0000'>"+String(dmg)+"</t> " : String(dmg))+" dmg] ";
   } else if(!r(2))
     msg += "You burn! ";
   aflame--;
@@ -4191,9 +4212,9 @@ function moveUser(x,y){
  // Handle death:
  if(score<0){
   if(staff==4){
+   msg += "Your Staff"+staves[staff]+" shatters in a wave of life-giving energy. You feel reinvigorated. ";
    score = 50;
    cureAll();
-   msg += "Your Staff"+staves[staff]+" shatters in a wave of life-giving energy. You feel reinvigorated. ";
    staff = 0;
   }else{
    msg = "You fade away...<br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Better luck next life!<br />Press 'F5' to play again.";
@@ -4435,6 +4456,7 @@ function moveUser(x,y){
      if(!r(2) && userPos.x>4 && userPos.x<(mapWidth-6) && userPos.y>4 && userPos.y<(mapWidth-6)){
        msg += "Suddenly, you feel a mysterious force tear a piece of your soul away. ";
        score = parseInt(score/2);
+       msg += "[<t style='color:#FF0000'>"+String(score)+"</t> dmg] "; // Halved, so display the half as damage.
        addBoss();
        break;
      } else
@@ -4518,10 +4540,8 @@ function moveUser(x,y){
    break;
 
   case tileWater:
-   if(glyph == 2){ //cleansing
-    if(cureAll())
-      msg += "Your armour glows with soft blue light. ";
-   }
+   if(glyph==2) //cleansing
+     cureAll();
    else if(aflame>0){
     aflame = 0;
     msg += "You no longer burn. ";
@@ -4675,6 +4695,11 @@ function moveUser(x,y){
    var winStuff = ["Absolution","Reconciliation","Inner Peace"];
    msg += "You have found <t style='color:#FF1493'>"+winStuff[r(winStuff.length)]+"</t>! ";
    haveWon = true;
+   msgLog.push({
+     msg: msg,
+     turn: turn,
+     times: 1,
+   });
    break;
 
   default:
@@ -4713,6 +4738,7 @@ function tryMove(x,y,i){
     case "agony":
      msg += "Horrible agony tears at the very core of your being. ";
      score = parseInt(score/2);
+     msg += "[<t style='color:#FF0000'>"+String(score)+"</t> dmg] "; // Halved, so display the half as damage.
      break;
 
     case "flame":
@@ -5231,14 +5257,16 @@ function getFinalScore(){
 function displayMap(highlight=""){
  var displayString = "";
  var outputMap = [];
+ var i;
+ var j;
 
  // Clone the map for output, then add monster symbols to it:
  currentMap.clone2d(outputMap);
  if(blinded>0 || highlight != ""){
   // If blind, we only display the player. Highlighting can display the player,
   // mobs and treasures, or outline of nearby/furthest reachable area.
-  for (var i = 0; i < mapWidth; i++) {
-   for (var j = 0; j < mapWidth; j++) {
+  for (i = 0; i < mapWidth; i++) {
+   for (j = 0; j < mapWidth; j++) {
      if(blinded>0) // Blindess overrides highlighting.
        outputMap[i][j] = emptyBlock;
      else if(highlight == "interests" && treasures.includes(outputMap[i][j]))
@@ -5256,14 +5284,14 @@ function displayMap(highlight=""){
   }
  }
  if(blinded==0 && highlight != "player") {
-   for (var i = 0; i < currCre.length; i++) {
+   for (i = 0; i < currCre.length; i++) {
     outputMap[currCre[i].x][currCre[i].y]=currCre[i].icon;
    }
  }
  // Always display the player:
  outputMap[userPos.x][userPos.y] = getUserChar();
 
- for (var i = 0; i < mapWidth; i++) {
+ for (i = 0; i < mapWidth; i++) {
   displayString += outputMap[i].join("")+"<br />";
  }
 
@@ -5299,7 +5327,7 @@ function displayMap(highlight=""){
  var nearbyThings = [];
  var nearbyMobList = [];
  var nearbyTileList = [];
- for (var i = 0; i < currCre.length; i++) {
+ for (i = 0; i < currCre.length; i++) {
    if(distanceBetween(userPos,currCre[i]) <= 2){
      if(!nearbyThings.includes(currCre[i].name)){
        nearbyThings.push(currCre[i].name);
@@ -5330,9 +5358,19 @@ function displayMap(highlight=""){
  // Tiny hack to prevent the list of nearby things from moving based on length of individual names:
  nearbyThings += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</t>";
 
+ // Prepare messages:
+ var messages = (msg=="") ? "<t style='color:#686868'>" : msg+"<br /><t style='color:#686868'>";
+ for (i = msgLog.length-1; i > msgLog.length-msgNbrToShow-1 && i >= 0; i--){
+   if(msgLog[i].turn < turn-msgTurnsToShow) break; // Don't display too old messages.
+   messages += msgLog[i].msg;
+   if(msgLog[i].times > 1) messages += "x"+String(msgLog[i].times);
+   messages += "<br />";
+ }
+ messages += "</t>";
+
  // Print everything on screen:
  document.getElementById("mapText").innerHTML = displayString;
- document.getElementById("statusLine").innerHTML = names+"<br />"+attributes+"<br />"+equipped+"<br />"+states+msg;
+ document.getElementById("statusLine").innerHTML = names+"<br />"+attributes+"<br />"+equipped+"<br />"+states+messages;
  document.getElementById("nearbyList").innerHTML = nearbyThings;
 }
 
@@ -5383,6 +5421,17 @@ document.onkeydown = function(e) {
                "Hold 'Shift' to outline the nearby area in green and the furthest you could reach with your current Self in red.\n\n"+
                "Gather the '$' memories of your life, or you may fade away before you reach your closure.");
          break;
+        case 77: //M
+         document.getElementById("mapText").innerHTML = "Message history. Press Esc to dismiss.";
+         var messages = "Turn<br />";
+         messages += (msg=="") ? "" : String(turn).padStart(4,'.')+'&nbsp;&nbsp;'+msg.replace('<br />','<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')+"<br />";
+         for (var i = msgLog.length-1; i >= 0; i--){
+           messages += String(msgLog[i].turn).padStart(4,'.')+'&nbsp;&nbsp;'+msgLog[i].msg.replace('<br />','<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+           if(msgLog[i].times > 1) messages += "x"+String(msgLog[i].times);
+           messages += "<br />";
+         }
+         document.getElementById("statusLine").innerHTML = messages;
+         break;
         case 16: //Shift
          displayMap("area");
          break;
@@ -5391,6 +5440,9 @@ document.onkeydown = function(e) {
          break;
         case 18: //Alt
          displayMap("interests");
+         break;
+        case 27: //Esc
+         displayMap();
          break;
 
         //DEBUG
