@@ -84,7 +84,6 @@ README
    +1 whenever you step on statue
    mostly just flavour, but has the potential to swamp levels
 * terrain that spawn creatures around player, pentagram?
-* unlocked doors
 
 * vaults:
    https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
@@ -92,11 +91,7 @@ README
 * arrival vaults?
 * fix rotate
 * fix diagonal rivers
-* add X as iceblock spawn + water
 * add m to that large room
-* add mob+$, mob+t
-T&
-* add consumables to i, plus can be declared as 2; move MacGuffin to something other
 
 Mobs
 ====
@@ -133,7 +128,9 @@ when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
 reach attack
 fix shooting
-create ice blocks (blue X, stay in place, worthless)
+create ice blocks
+jump close from afar
+jump kick attack
 
 Not Now
 =======

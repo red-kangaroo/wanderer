@@ -167,12 +167,14 @@ var tileLava = "<t style='background-color:#FF4500'>~</t>";
 var tileSludge = "<t style='background-color:#00FF00'>~</t>";
 var tileBlood = "<t style='background-color:#8A0303'>~</t>";
 var tileQuicksand = "<t style='background-color:#FFFF66; color:#DAA520;'>,</t>";
-var tileDark = "<t style='color:#696969'>#</t>";
+var tileIce = "<t style='background-color:#00BFFF; color:#FFFFFF;'>.</t>";
+var tileBlindGas = "<t style='color:#696969'>#</t>";
 var tileConfGas = "<t style='color:#FF1493'>#</t>";
 var tileStunGas = "<t style='color:#FFFF00; font-weight: 900;'>#</t>";
 var tileKey = "<t style='color:#800080'>9</t>";
 var tileArmor = "<t style='color:#800080; font-weight: 900;'>]</t>"; //enchanted armor, normal is just ']'
-var tileDoor = "<t style='background-color:#8B4513; color:#FFD700;'>+</t>";
+var tileMobDoor = "<t style='background-color:#8B4513'>+</t>";
+var tileGoldDoor = "<t style='background-color:#8B4513; color:#FFD700;'>+</t>";
 var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
 var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
 var tileTreasure = "<t style='color:#800080'>&#167;</t>";
@@ -191,14 +193,14 @@ var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
 var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
 var tileTeleporter = "<t style='color:#00FFFF'>0</t>";
 
-var impassable = [wallBlock,tileGoldWall,tileDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
+var impassable = [wallBlock,tileGoldWall,tileGoldDoor,tileMobDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
 var liquids = [tileBlood,tileLava,tileQuicksand,tileSludge,tileWater];
-var gases = [tileDark,tileConfGas,tileStunGas];
+var gases = [tileBlindGas,tileConfGas,tileStunGas];
 var plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
 var plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
 var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,tileQuicksand,plants_large]];
 var terrain_rare = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileBlood,gases]];
-var terrain_any = [emptyBlock,wallBlock,'.',',','?','^',tileWater,tileLava,tileSludge,tileBlood,tileQuicksand,tileDark,tileConfGas,tileStunGas,tileGoldWall,tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileBloodDrop,tileTreeStump,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush,tileSecretPath,tileTeleporter,['$','/',[']','_',tileKey,emptyBlock,wallBlock]]];
+var terrain_any = [emptyBlock,wallBlock,'.',',','?','^',tileWater,tileLava,tileSludge,tileBlood,tileQuicksand,tileIce,tileBlindGas,tileConfGas,tileStunGas,tileGoldWall,tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileBloodDrop,tileTreeStump,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush,tileSecretPath,tileTeleporter,['$','/',[']','_',tileKey,emptyBlock,wallBlock]]];
 var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
 
 var creatureChar = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWYZ&&@@".split('');
@@ -210,7 +212,7 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","flingback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","smoke","chaos","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","dropscore","droppile","droptrap","worthless","confother","confgas","stunother","stungas","swap","jumpover"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","flingback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","icepool","smoke","chaos","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","dropscore","droppile","droptrap","worthless","confother","confgas","stunother","stungas","swap","jumpover"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>X</t>",
@@ -379,6 +381,14 @@ var mobBoss = {icon:"<t style='color:#8B008B'>X</t>",
                 return false;
                }
               };
+var mobIceBlock = {icon:"<t style='color:#00FFFF'>X</t>",
+                   name:"<t style='color:#00FFFF'>Ice Block</t>",
+                   attack:"freezes",
+                   aggro:0,
+                   x:0,y:0,
+                   flags: ["worthless","slow"],
+                   behaviour: function(){ return true; } // Ice block sits in place and does nothing.
+                  };
 var mobNames = {
   'a': ["Abortion","Abuse","Accusation","Addiction","Adversity","Aggression","Agony","Alienation","Anger","Anguish","Animosity","Annoyance","Anxiety","Apathy","Arrogance","Avarice"],
   'b': ["Bedlam","Betrayal","Bias","Bigotry","Bitterness","Blame","Blasphemy","Blemish","Boredom","Bravado","Browbeat"],
@@ -478,7 +488,7 @@ function getMobBehaviour(){
   case 6:
    return function(){
     if(!r(4) && currentMap[this.x][this.y] == emptyBlock){
-      currentMap[this.x][this.y] = tileDark;
+      currentMap[this.x][this.y] = tileBlindGas;
       if(distanceBetween(userPos,this)<10)
         msg += this.name+" breathes out dark fumes. ";
     }
@@ -713,6 +723,16 @@ function getMobBehaviour(){
      }
      return false;
    };
+
+  case 24:
+   return function(){
+    if(!r(2) && currentMap[this.x][this.y] == emptyBlock){
+      currentMap[this.x][this.y] = tileIce;
+      if(distanceBetween(userPos,this)<10)
+        msg += this.name+" freezes the ground. ";
+    }
+    return false;
+   };
  }
 }
 
@@ -756,6 +776,7 @@ function getUserChar(){
    bkg = 'background-color:#8A0303; ';
  }
  else if(currentMap[userPos.x][userPos.y] == tileQuicksand) bkg = 'background-color:#FFFF66; ';
+ else if(currentMap[userPos.x][userPos.y] == tileIce) bkg = 'background-color:#00BFFF; ';
 
  return "<t style='"+bkg+"color:"+colour+"; font-weight: 900;'>@</t>";
 }
@@ -906,13 +927,15 @@ function getTileName(tile){
     case tileSludge:     return "toxic sludge";
     case tileBlood:      return "pool of blood";
     case tileQuicksand:  return "quicksand";
-    case tileDark:       return "dark smoke";
+    case tileIce:        return "ice";
+    case tileBlindGas:   return "dark smoke";
     case tileConfGas:    return "noxious fumes";
     case tileStunGas:    return "fetid odour";
     case tileKey:        return "key";
     case tileArmor:      return "magic armour";
     case tileStaff:      return "magic staff";
-    case tileDoor:       return "locked door";
+    case tileMobDoor:    return "heavy stone door";
+    case tileGoldDoor:   return "locked door";
     case tileGoldWall:   return "golden wall";
     case tileTreasure:   return "memory trove";
     case tileBramble:    return "thorny bramble";
@@ -1029,7 +1052,7 @@ function addRiver(){
  var lastMove = 0;
 
  var liquid = tileWater;
- if(r(visited)>20 || !r(100)) liquid = [tileLava, [tileSludge, tileBlood, tileQuicksand]].sampleRec();
+ if(r(visited)>20 || !r(100)) liquid = [tileLava,[tileSludge,tileBlood,tileQuicksand,tileIce]].sampleRec();
 
  switch(r(2)){
   case 0: //across
@@ -1091,7 +1114,7 @@ function addLake(){
  var liquid = emptyBlock; // Just to make sure we don't accidentaly make undefined lake.
  if(r(visited)>20) liquid = tileLava;
  else
-   liquid = [tileWater,[',',tileGrassTall,tileBramble,tileNettles,tileSludge,tileBlood,tileQuicksand,tileDark,tileConfGas,tileStunGas]].sampleRec();
+   liquid = [tileWater,[',',tileGrassTall,tileBramble,tileNettles,tileSludge,tileBlood,tileIce,tileQuicksand,tileBlindGas,tileConfGas,tileStunGas]].sampleRec();
 
  while(stepsTaken<500 && stepsFailed<500){
   currentMap[currStep.x][currStep.y] = liquid;
@@ -1151,14 +1174,14 @@ function addStructure(){
   //TODO: Add some mobs in there.
   toAdd = ["77===77                   77===77",
            "7.....7                   7.....7",
-           "=.....777777777777777777777.....=",
-           "=......^.................^......=",
-           "=.....777777777787777777777.....=",
+           "=.mmm.777777777777777777777.mmm.=",
+           "=.mMm..^.................^..mMm.=",
+           "=.mmm.777777777787777777777.mmm.=",
            "7.....7WWWWWWWW7.7WWWWWWWW7.....7",
            "777.777WWWWWW7778777WWWWWW777.777",
            "  7.7WWWWWWWW7555557WWWWWWWW7.7  ",
            "  7.7WWWWWWWW=55555=WWWWWWWW7.7  ",
-           "  7.7WWWWWWWW=55255=WWWWWWWW7.7  ",
+           "  7.7WWWWWWWW=55@55=WWWWWWWW7.7  ",
            "  7.7WWWWWWWW=55555=WWWWWWWW7 .  ",
            "  7^7WWWWWWWW7555557WWWWWWWW7^7  ",
            "  7.7WWWWWWWW77===77WWWWWWWW7... ",
@@ -1167,9 +1190,9 @@ function addStructure(){
            "  7.7  WWWWWWWWWWWWWWWWWWWWW7..  ",
            "777.77  WWWWWWWWWWWWWWWWWW777.777",
            "7.... .WWWWWWWWWWWWWWWWWWW7.....7",
-           ". ... .77777777777777777777.....=",
-           " .. ............................=",
-           "7... .777777777777777777777.....=",
+           ". ... .77777777777777777777.mmm.=",
+           " .. ........................mMm.=",
+           "7... .777777777777777777777.mmm.=",
            "7......                   7.....7",
            "77 . 77                   77===77"];
  }
@@ -1378,7 +1401,7 @@ function addStructure(){
              "&#9608;............................^...........&#9608;",
              "&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;"];
 
-      var randTerrain = [' ','.',',','\'','^','?','$','~','0','/','7','W','=','_',';','!','#','d','f','n','s','b','q','4','3','6',')','p','P','%','m','M','c','x'];
+      var randTerrain = "i2[$?7.':S;!)pP%~,6/0=bsq#dfn^34xmMaAc&X".split('');
       for (var i = 0; i < toAdd.length; i++) {
        toAdd[i] = toAdd[i].replaceAt(r(toAdd[i].length),randTerrain[r(randTerrain.length)]); // Here comes the bug we're keeping, the replaceAt() breaks the hex code for walls into a string of characters.
        toAdd[i] = toAdd[i].replace(/&#9608;/g,"W");
@@ -3188,7 +3211,7 @@ function addStructure(){
              "       77sssss77       ",
              "        77sss77        ",
              "         77?77         ",
-             "          787          ",
+             "          7.7          ",
              "          ...          "];
    break;
 
@@ -3469,7 +3492,7 @@ function addStructure(){
 
  // Defined here to make it consistent for each room.
  var randDanger = ['^',tileLava,tileSludge,wallBlock].sampleRec();
- var randAnnoy = [',',tileBramble,tileNettles,tileDark,tileConfGas,tileStunGas,tileQuicksand].sampleRec();
+ var randAnnoy = [',',tileBramble,tileNettles,tileBlindGas,tileConfGas,tileStunGas,tileQuicksand].sampleRec();
  var randGas = gases.sampleRec();
  var randLiquid = liquids.sampleRec();
  var randPlantSmall = plants_small[r(plants_small.length-1)];
@@ -3498,10 +3521,15 @@ function addStructure(){
     case "'": // bloody floor
      currentMap[x+i][y+j] = tileBloodDrop;
      break;
+    case ":": // ice floor
+     currentMap[x+i][y+j] = tileIce;
+     break;
     case "S": // secret path
      currentMap[x+i][y+j] = tileSecretPath;
      break;
-    // case "+": // normal door
+    case "+": // normal door
+     currentMap[x+i][y+j] = tileMobDoor;
+     break;
     case "x": // completely random tile
      currentMap[x+i][y+j] = terrain_any.sampleRec();
      break;
@@ -3527,7 +3555,7 @@ function addStructure(){
      currentMap[x+i][y+j] = randGas;
      break;
     case "d": // smoke
-     currentMap[x+i][y+j] = tileDark;
+     currentMap[x+i][y+j] = tileBlindGas;
      break;
     case "f": // confusion gas
      currentMap[x+i][y+j] = tileConfGas;
@@ -3553,6 +3581,9 @@ function addStructure(){
     case "|": // dead tree or wooden wall?
      currentMap[x+i][y+j] = tileTreeDead;
      break;
+    case "T": // normal tree
+     currentMap[x+i][y+j] = [tileTreeLeafy,tileTreeConif][r(2)];
+     break;
     case "b": // blood
      currentMap[x+i][y+j] = tileBlood;
      break;
@@ -3565,15 +3596,12 @@ function addStructure(){
     case "t": // random treasure
      currentMap[x+i][y+j] = treasures[r(treasures.length-1)];
      break;
+    case "2": // TODO: magic item
     case "i": // minor treasure
      currentMap[x+i][y+j] = ['$','_',']',tileKey][r(4)];
      break;
     case "1": // major treasure
      currentMap[x+i][y+j] = [tileTreasure,tileStaff,tileArmor][r(3)];
-     break;
-    case "2": // the End
-     // TODO: Use this for consumables, tileMacGuffin can be some letter.
-     currentMap[x+i][y+j] = tileMacGuffin;
      break;
     case "3": // random danger
      currentMap[x+i][y+j] = randDanger;
@@ -3591,7 +3619,7 @@ function addStructure(){
      currentMap[x+i][y+j] = tileGoldWall;
      break;
     case "8": // locked door
-     currentMap[x+i][y+j] = tileDoor;
+     currentMap[x+i][y+j] = tileGoldDoor;
      break;
     case "9": // magic staff
      currentMap[x+i][y+j] = tileStaff;
@@ -3614,11 +3642,38 @@ function addStructure(){
      currCre[currCre.length-1].y = y+j;
      currentMap[x+i][y+j] = '.';
      break;
+    case "a": // random mob + treasure
+     currCre.push(cloneCreature(creatureList.sampleRec()));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = '$';
+     break;
+    case "A": // uppercase mob + treasure
+     currCre.push(cloneCreature(creatureList[r(parseInt(creatureList.length/2))]));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = treasures[r(treasures.length-1)];
+     break;
     case "c": // pre-defined mob
      currCre.push(cloneCreature(randMob));
      currCre[currCre.length-1].x = x+i;
      currCre[currCre.length-1].y = y+j;
      currentMap[x+i][y+j] = '.';
+     break;
+    case "&": // demon
+     currCre.push(cloneCreature(creatureList[0]));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = emptyBlock;
+     break;
+    case "X": // ice block
+     currCre.push(cloneCreature(mobIceBlock));
+     currCre[currCre.length-1].x = x+i;
+     currCre[currCre.length-1].y = y+j;
+     currentMap[x+i][y+j] = [tileWater,tileIce][r(2)];
+     break;
+    case "@": // the End
+     currentMap[x+i][y+j] = tileMacGuffin;
      break;
     }
    }
@@ -3964,8 +4019,18 @@ function tryPlayerMove(x,y){
   }
  }
 
- // Check if player has keys for opening doors:
- if(currentMap[x][y]==tileDoor && keys > 0) return true;
+ // Only allow the player to walk through heavy door with no adjacent mobs:
+ if(currentMap[x][y]==tileMobDoor){
+   for (i = 0; i < currCre.length; i++) {
+     if(stepsBetween(userPos,currCre[i])<=1){
+       msg += "You cannot haul the heavy door open while "+currCre[i].name+" is so close. ";
+       return false;
+     }
+   }
+   return true;
+ }
+ // Check if player has keys for opening golden doors:
+ if(currentMap[x][y]==tileGoldDoor && keys > 0) return true;
 
  // Handle phasing, otherwise check impassable terrain.
  if(phased>0 && currentMap[x][y] != tileGoldWall) return true;
@@ -4195,8 +4260,8 @@ function moveUser(x,y){
    stunned--;
  }
 
- // Blood knight armour also refreshes you when on bloodstains:
- if(glyph==8 && currentMap[userPos.x][userPos.y]==tileBloodDrop)
+ // Blood knight armour also refreshes you when on blood(stains):
+ if(glyph==8 && (currentMap[userPos.x][userPos.y]==tileBlood || currentMap[userPos.x][userPos.y]==tileBloodDrop))
    score++;
  // Quicksand can prevent moving away:
  if(currentMap[userPos.x][userPos.y]==tileQuicksand && r(5) && !phased && !leap){
@@ -4417,7 +4482,7 @@ function moveUser(x,y){
      //fallthrough
 
     case 10:
-     var trapTerrain = [tileSludge,tileBlood,tileQuicksand,tileDark,tileConfGas,tileStunGas,tileBramble,tileNettles].sampleRec();
+     var trapTerrain = [tileSludge,tileBlood,tileQuicksand,tileBlindGas,tileConfGas,tileStunGas,tileBramble,tileNettles].sampleRec();
      msg += "Your surroundings are blasted with transformative magic. ";
      for(var k=-1; k < 2; k++){
       for(var l=-1; l < 2; l++){
@@ -4492,7 +4557,7 @@ function moveUser(x,y){
    keys += 1;
    break;
 
-  case tileDoor:
+  case tileGoldDoor:
    if(keys > 0){
      msg += "You unlock and open the door. ";
      keys -= 1;
@@ -4561,7 +4626,7 @@ function moveUser(x,y){
    poisoned += r(10)+distanceToOrigin();
    break;
 
-  case tileDark:
+  case tileBlindGas:
    if(!r(4))
      msg += "The dense smoke stings your eyes. ";
    blinded += r(4)+1;
@@ -4685,6 +4750,28 @@ function moveUser(x,y){
     }
    }
    currentMap[userPos.x][userPos.y]=emptyBlock;
+   break;
+
+  case tileIce:
+   if(timestop>0) break;
+   if(aflame>0){
+     msg += "The ice under your feet thaws. ";
+     currentMap[userPos.x][userPos.y]=tileWater;
+   } else {
+     // Move player in direction until blocked.
+     var slipped = 0;
+     if(x!=0 || y!=0){
+       // Don't jump in place forever. ;)
+       while(inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y) &&
+             currentMap[userPos.x][userPos.y]==tileIce){
+        userPos.x += x;
+        userPos.y += y;
+        slipped += 1;
+       }
+     }
+     if(slipped>1) msg += "You slip on the ice! ";
+     else if(slipped==1) msg += "You slip on the ice. ";
+   }
    break;
 
   case tileMacGuffin:
@@ -4999,11 +5086,21 @@ function onDeath(i){
     msg += currCre[i].name+" disintegrates into a flood of sand. ";
     break;
 
+   case "icepool":
+    for(k=-1; k < 2; k++){
+     for(l=-1; l < 2; l++){
+      if(inRangeCoords(currCre[i].x+k,currCre[i].y+l) && !impassable.includes(currentMap[currCre[i].x+k][currCre[i].y+l]))
+        currentMap[currCre[i].x+k][currCre[i].y+l] = tileIce;
+     }
+    }
+    msg += currCre[i].name+" freezes everything around. ";
+    break;
+
    case "smoke":
     for(k=-1; k < 2; k++){
      for(l=-1; l < 2; l++){
       if(inRangeCoords(currCre[i].x+k,currCre[i].y+l) && currentMap[currCre[i].x+k][currCre[i].y+l]==emptyBlock)
-        currentMap[currCre[i].x+k][currCre[i].y+l] = tileDark;
+        currentMap[currCre[i].x+k][currCre[i].y+l] = tileBlindGas;
      }
     }
     msg += currCre[i].name+" disappears into a billowing cloud of heavy smoke. ";
@@ -5134,7 +5231,7 @@ function onExplosion(i){
        currentMap[currCre[i].x+k][currCre[i].y+l] = ',';
        break;
 
-      case tileDark: case tileConfGas: case tileStunGas:
+      case tileBlindGas: case tileConfGas: case tileStunGas:
        msg += "The vapours disperse. ";
        currentMap[currCre[i].x+k][currCre[i].y+l] = emptyBlock;
        break;
