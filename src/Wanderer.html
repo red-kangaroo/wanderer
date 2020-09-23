@@ -21,15 +21,13 @@
   }
   </style>
 
-<div id="game-window" style="position:relative;">
+<div id="game-window" style="position:relative; max-width: 60%;">
   <p id="mapText"></p>
   <p id="statusLine"></p>
 </div>
 
 <div id="additional-info" style="position:absolute; top: 0px; right: 5px; max-width: 40%;">
-  <!-- <h3>
-    Wanderer v2.1
-  </h3>
+  <h3>Wanderer v2.1</h3>
 	<p>
     There are so many worlds to explore, but only so much of you left...
   </br></br>
@@ -44,17 +42,16 @@
     to your liking.
   </br></br>
     Press <code>?</code> for game help.
-  </p> -->
+  </p>
 
 	<!-- <form method="GET">
 	<input type="text" name="name" placeholder="Sunny Honey Bunny">
 	<input type="submit" value="Send">
 	</form> -->
 
-  <h5>
-    Nearby:
-  </h5>
+  <h5>Nearby:</h5>
   <p id="nearbyList"></p>
+  <p id="msgWindow"></p>
 </div>
 
 <script>
@@ -4124,12 +4121,6 @@ function semiModulo(a,b){
 
 // Main loop
 function moveUser(x,y){
- // Do nothing but display win message if the player already won:
- if(haveWon){
-  msg = "<t style='color:#FF1493'>You win!</t><br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Maybe there is a meaning to everything, after all.<br />Press 'F5' to play again.";
-  displayMap();
-  return;
- }
  // Update message log and clear messages for next turn:
  if(msg != ""){
    if(msgLog.length > 1 && msg == msgLog[msgLog.length-1].msg){
@@ -4145,6 +4136,12 @@ function moveUser(x,y){
  }
  msg = "";
 
+ // Do nothing but display win message if the player already won:
+ if(haveWon){
+  msg = "<t style='color:#FF1493'>You win!</t><br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Maybe there is a meaning to everything, after all.<br />Press 'F5' to play again.";
+  displayMap();
+  return;
+ }
  // Hunger and status effects:
  score--;
  if(poisoned>0){
@@ -4695,11 +4692,6 @@ function moveUser(x,y){
    var winStuff = ["Absolution","Reconciliation","Inner Peace"];
    msg += "You have found <t style='color:#FF1493'>"+winStuff[r(winStuff.length)]+"</t>! ";
    haveWon = true;
-   msgLog.push({
-     msg: msg,
-     turn: turn,
-     times: 1,
-   });
    break;
 
   default:
@@ -5260,6 +5252,10 @@ function displayMap(highlight=""){
  var i;
  var j;
 
+ // Check if we didn't hide the right div:
+ if(document.getElementById("additional-info").style.display == 'none')
+   document.getElementById("additional-info").style.display = 'initial';
+
  // Clone the map for output, then add monster symbols to it:
  currentMap.clone2d(outputMap);
  if(blinded>0 || highlight != ""){
@@ -5321,7 +5317,6 @@ function displayMap(highlight=""){
               ((stunned>0) ? "<t style='background-color:#FFFF00'>Stun</t> " : "") +
               ((timestop>0) ? "<t style='color:#00BFFF'>Time Stop</t> " : "") +
               ((ward>0) ? "<t style='color:#DAA520'>Ward</t> " : "");
- if(states.length>0) states += "<br />";
 
  // Create a list of nearby things:
  var nearbyThings = [];
@@ -5360,18 +5355,21 @@ function displayMap(highlight=""){
 
  // Prepare messages:
  var messages = (msg=="") ? "<t style='color:#686868'>" : msg+"<br /><t style='color:#686868'>";
- for (i = msgLog.length-1; i > msgLog.length-msgNbrToShow-1 && i >= 0; i--){
-   if(msgLog[i].turn < turn-msgTurnsToShow) break; // Don't display too old messages.
-   messages += msgLog[i].msg;
-   if(msgLog[i].times > 1) messages += "x"+String(msgLog[i].times);
-   messages += "<br />";
+ if(!msg.includes('F5')){
+   for (i = msgLog.length-1; i > msgLog.length-msgNbrToShow-1 && i >= 0; i--){
+     if(msgLog[i].turn < turn-msgTurnsToShow) break; // Don't display too old messages.
+     messages += msgLog[i].msg;
+     if(msgLog[i].times > 1) messages += "x"+String(msgLog[i].times);
+     messages += "<br />";
+   }
  }
  messages += "</t>";
 
  // Print everything on screen:
  document.getElementById("mapText").innerHTML = displayString;
- document.getElementById("statusLine").innerHTML = names+"<br />"+attributes+"<br />"+equipped+"<br />"+states+messages;
+ document.getElementById("statusLine").innerHTML = names+"<br />"+attributes+"<br />"+equipped+"<br />"+states;
  document.getElementById("nearbyList").innerHTML = nearbyThings;
+ document.getElementById("msgWindow").innerHTML = messages;
 }
 
 // Player commands:
@@ -5416,10 +5414,12 @@ document.onkeydown = function(e) {
          alert("Wanderer "+VERSION+"\n\n"+
                "Use arrow keys, numpad keys, 'WASD' or 'HJKL' to move. Space, '.' or '5' waits a turn.\n"+
                "Press 'X' or '0' to invoke the powers of your magic staff.\n\n"+
+               "Press 'M' for message history.\n"+
                "Hold 'Ctrl' to highlight your avatar.\n"+
                "Hold 'Alt' to highlight monsters and treasure.\n"+
                "Hold 'Shift' to outline the nearby area in green and the furthest you could reach with your current Self in red.\n\n"+
                "Gather the '$' memories of your life, or you may fade away before you reach your closure.");
+         displayMap();
          break;
         case 77: //M
          document.getElementById("mapText").innerHTML = "Message history. Press Esc to dismiss.";
@@ -5431,6 +5431,8 @@ document.onkeydown = function(e) {
            messages += "<br />";
          }
          document.getElementById("statusLine").innerHTML = messages;
+         // Clear so that we don't have messages twice next to each other.
+         document.getElementById("additional-info").style.display = 'none';
          break;
         case 16: //Shift
          displayMap("area");

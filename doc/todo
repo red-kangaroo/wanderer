@@ -8,6 +8,9 @@ README
 * story/very short lore?
 * preview:
    https://jbt.github.io/markdown-editor/
+* put the description into a collapsible:
+   https://www.w3schools.com/howto/howto_js_collapsible.asp
+* change keys for special display to something that doesn't interfere with browser shortcuts?
 
 * refactor player!!!
 * fun colors for armor
@@ -41,6 +44,7 @@ README
   sludge (cap damage taken at 1, but only when Poisoned)
   hyperspace (diagonal movement)
   invisibility
+  swiftness / haste
   druidcraft (walk thru trees??)
 * staff
   holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
@@ -49,6 +53,7 @@ README
   soaring leap passes thru mobs and attacks them
 * consumable: Scroll/Potion
   Convocation - blink mobs near
+  tele adjacent away
   Omnipotence - regenerates level
   Incantation of Rushing Waters - generate random lake centered on avatar
    * allow_weird_liquids
@@ -89,6 +94,8 @@ README
 * fix diagonal rivers
 * add X as iceblock spawn + water
 * add m to that large room
+* add mob+$, mob+t
+T&
 * add consumables to i, plus can be declared as 2; move MacGuffin to something other
 
 Mobs
@@ -103,6 +110,8 @@ Mobs
    immune to most attacks, instead pushed back
    onDeath leaves rubble
    behaviour when on liquid, plugs the pit, leaving just a .
+* crystal growth
+   as ice block but procreates
 
 * special effects of some attack verbs?
    Freezes: stop Aflame

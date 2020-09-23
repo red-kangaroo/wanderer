@@ -41,6 +41,8 @@ Use 'F11' for fullscreen mode (recommended).
 
 Use 'Ctrl +' and 'Ctrl -' to adjust the size to your liking.
 
+Press 'M' for message history.
+
 Press '?' in-game for more help.
 ```
 
