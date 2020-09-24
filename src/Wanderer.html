@@ -98,9 +98,9 @@ var staffDesc = ["with no enchantment can whack your enemies good, but unfortuna
                  "may reveal concealed corridors and crevices in nearby walls",
                  "can cleanse your body of all ills, or even save your life",
                  "will shred your enemies in a single strike",
-                 "will allow you to cover great distances in a single stride, avoiding many obstacles in the way",
+                 "will propel you through the air, avoiding many obstacles or enemies in the way",
                  "can materialize the volatile energies of raw magic",
-                 "may call forth the forces of Nature to pave your path",
+                 "may call forth the forces of Nature to pave your path and bewilder your foes",
                  "will alter your surroundings in unpredictable ways",];
 
 var armor = 0;
@@ -137,12 +137,12 @@ var glyphs = ["",
 var glyphDesc = ["will dull the blows of your enemies",
                  "shall nourish your Self when fed radiant, everburning fire",
                  "will let you wash away your ailments",
-                 "shall strike fear in your foes",
+                 "shall strike fear in your foes and keep your own horrors at bay",
                  "may provide an ephemeral bridge away from peril",
                  "will make you answer violence with violence",
                  "can shield you from harm",
                  "may shroud you in intangible shadows",
-                 "will make you hunger for the lifeblood of your foes",];
+                 "will let you sustain your Self with the lifeblood of your foes",];
 
 // Status effects:
 var aflame = 0;
@@ -420,7 +420,7 @@ var mobNames = {
 var mobSelves = ["Self-Abnegation","Self-Absorption","Self-Abuse","Self-Aggrandizement","Self-Censorship","Self-Complacency","Self-Conceit","Self-Congratulation","Self-Contempt","Self-Contradiction","Self-Criticism","Self-Deceit","Self-Defeat","Self-Defilement","Self-Delusion","Self-Denial","Self-Deprecation","Self-Discrimination","Self-Disgust","Self-Doubt","Self-Flattery","Self-Gratification","Self-Guilt","Self-Harm","Self-Hatred","Self-Importance","Self-Incrimination","Self-Indulgence","Self-Justification","Self-Loathing","Self-Love","Self-Obsession","Self-Pity","Self-Praise","Self-Recrimination","Self-Reproach","Self-Sabotage","Self-Sacrifice","Self-Satisfaction"];
 
 function getMobBehaviour(){
- switch(r(200)){
+ switch(r(300)){
   //TODO: more behaviours
   default:
    return function(){ return false; };
@@ -760,6 +760,7 @@ function getMobName(letter){
 function getUserChar(){
  var colour = 'red';
  if(poisoned>0) colour = '#90EE90';
+ else if(confused>0) colour = '#FF1493';
  else if(phased>0) colour = '#4B0082';
  else if(timestop>0) colour = '#00BFFF';
  else if(ward>0) colour = '#DAA520';
@@ -775,8 +776,16 @@ function getUserChar(){
    colour = '#000000';
    bkg = 'background-color:#8A0303; ';
  }
+ else if(currentMap[userPos.x][userPos.y] == tileIce){
+   bkg = 'background-color:#00BFFF; ';
+   if(colour == '#00BFFF')
+     colour = 'red';
+ }
  else if(currentMap[userPos.x][userPos.y] == tileQuicksand) bkg = 'background-color:#FFFF66; ';
- else if(currentMap[userPos.x][userPos.y] == tileIce) bkg = 'background-color:#00BFFF; ';
+ else if(currentMap[userPos.x][userPos.y] == wallBlock && phased>0){
+   colour = '#FFFFFF';
+   bkg = 'background-color:#000000; ';
+ }
 
  return "<t style='"+bkg+"color:"+colour+"; font-weight: 900;'>@</t>";
 }
@@ -1171,7 +1180,6 @@ function addStructure(){
 
  //The winning place:
  if((r(visited)>20) && (r(distanceToOrigin())>=10) && (r(kills)>20)){
-  //TODO: Add some mobs in there.
   toAdd = ["77===77                   77===77",
            "7.....7                   7.....7",
            "=.mmm.777777777777777777777.mmm.=",
@@ -2128,17 +2136,17 @@ function addStructure(){
    break;
 
   case 78:
-   toAdd = ["WWWWWWWWWWW",
-            "W....i....W",
-            "W.$......$W",
-            "W......7777",
-            "W^.$.$.===7",
-            ".^======1.8",
-            "W^.....===7",
-            "W..$.$.7777",
-            "W.......$.W",
-            "W...$.....W",
-            "WWWWWWWWWWW"];
+   toAdd = ["WWWWWWWWWWW ",
+            "W....i....W ",
+            "W.$......$W ",
+            "W......7777 ",
+            "W^.$.$.===7 ",
+            ".^======1.8.",
+            "W^.....===7 ",
+            "W..$.$.7777 ",
+            "W.......$.W ",
+            "W...$.....W ",
+            "WWWWWWWWWWW "];
    break;
 
   case 79:
@@ -3003,31 +3011,31 @@ function addStructure(){
 
    case 144:
     toAdd = ["WWWWW..WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW..WWWWW",
-             "WWWW....WWWW$WWWW$WWWW$WWWW???WWWW???WWWW$WWWW$WWWW$WWWW....WWWW",
-             "WWW......WW...WW...WW...WW.....WW.....WW...WW...WW...WW......WWW",
-             "WW............................................................WW",
-             ".......W..............W..................W..............W.......",
+             "WWWW....WWWWaWWWWaWWWWaWWWWaaaWWWWaaaWWWWaWWWWaWWWWaWWWW....WWWW",
+             "WWW......WW...WW...WW...WW.....WW.....WW...WW...WW...WW..m...WWW",
+             "WW..m.........................................................WW",
+             ".......W....m.........W.....m............W....m.........W.......",
              "......WWW............WWW................WWW............WWW......",
              "WW...WWWWW..........WWWWW..............WWWWW..........WWWWW...WW",
-             "WW...WWWWW...........WWW................WWW...........WWWWW...WW",
-             "......WWW.............W..................W.............WWW......",
-             "WW....WWW..............................................WWW....WW",
+             "WW...WWWWW...........WWW................WWW......m....WWWWW...WW",
+             "......WWW........m....W........m.........W.............WWW...m..",
+             "WW....WWW.....................M........................WWW....WW",
              "WW.....W................................................W.....WW",
-             "W..............................77..............................W",
+             "WM........m...............M....77.............................MW",
+             "WW...m........WW..............7777..M..m........WW........m...WW",
+             "WWW....A.....WWWW..m..........7777.............WWWW.....A....WWW",
              "WW............WW..............7777..............WW............WW",
-             "WWW....i.....WWWW.............7777.............WWWW.....i....WWW",
-             "WW............WW..............7777..............WW............WW",
-             "W..............................77..............................W",
-             "WW.....W................................................W.....WW",
-             "WW....WWW..............................................WWW....WW",
-             "......WWW.............W..................W.............WWW......",
+             "WM..........................M..77.............................MW",
+             "WW.....W..................m.......M....m................W.....WW",
+             "WW....WWW.........................................m....WWW....WW",
+             "......WWW.....m.......W............m.....W.............WWW..m...",
              ".....WWWWW...........WWW................WWW...........WWWWW.....",
              "WW...WWWWW..........WWWWW..............WWWWW..........WWWWW...WW",
-             "WW....WWW............WWW................WWW............WWW....WW",
-             ".......W..............W..................W..............W.......",
-             "WW............................................................WW",
-             "WWW......WW...WW...WW...WW.....WW.....WW...WW...WW...WW......WWW",
-             "WWWW....WWWW$WWWW$WWWW$WWWW???WWWW???WWWW$WWWW$WWWW$WWWW....WWWW",
+             "WW....WWW............WWW.........m......WWW...mm.......WWW....WW",
+             "....m..W..m...........W..................W..............W.......",
+             "WW.........................m..................................WW",
+             "WWW......WW...WW...WW...WW.....WW.....WW...WW...WW...WW...m..WWW",
+             "WWWW....WWWWaWWWWaWWWWaWWWWaaaWWWWaaaWWWWaWWWWaWWWWaWWWW....WWWW",
              "WWWWW..WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW..WWWWW"];
    break;
 
@@ -3045,13 +3053,13 @@ function addStructure(){
 
    case 146:
     toAdd = [" 7777777777777777777",
-             " 7'7pppipppppppippp7",
-             ".8'7pipppipppipppip7",
-             " 7'7pppippptpppippp7",
-             ".8'8;ipppipppipppip7",
-             " 7'7pppipppppppippp7",
-             ".8'7pipppipppipppip7",
-             " 7'7pppipppppppippp7",
+             " 7b7???a???1???a???7",
+             ".8b7?a1??a???a???a?7",
+             " 7b7???a???t???a???7",
+             ".8b8'a???a???a???a?7",
+             " 7b7???a???????a??17",
+             ".8b7?a???a???a???a?7",
+             " 7b7???a??????1a???7",
              " 7777777777777777777"];
    break;
 
@@ -4321,23 +4329,37 @@ function moveUser(x,y){
 
   orb = false;
  } else {
-  // Handle soaring leap staff:
+  // Handle soaring leap:
   if(leap){
-   // Move player in direction until blocked.
+   // Move player in direction until blocked by terrain. Any mobs in the way are
+   // attacked and passed through.
    var leaped = 0;
-   if(x!=0 || y!=0){
-     // Don't jump in place forever. ;)
-     while(inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
-      userPos.x += x;
-      userPos.y += y;
-      leaped += 1;
+   msg += "@@"; // Workaround to make sure we include the "You leap!" message before any attack messages.
+   if(x!=0 || y!=0){ // Don't jump in place forever. ;)
+     while(inRangeCoords(userPos.x+x,userPos.y+y) && !impassable.includes(currentMap[userPos.x+x][userPos.y+y])) {
+       for (var i = 0; i < currCre.length; i++) {
+        if(currCre[i].x==userPos.x+x && currCre[i].y==userPos.y+y){
+          if(!inRangeCoords(userPos.x+x+x,userPos.y+y+y) || impassable.includes(currentMap[userPos.x+x+x][userPos.y+y+y])){
+            // Move the creature a square back if we would otherwise land in the same space as it.
+            currCre[i].x -= x;
+            currCre[i].y -= y;
+          }
+          if(!panicked)
+            damageCreature(i);
+          else
+            msg += "You soar right past "+currCre[i].name+". ";
+        }
+       }
+       userPos.x += x;
+       userPos.y += y;
+       leaped += 1;
      }
    }
 
-   if(leaped>1) msg += "You leap! ";
-   else if(leaped==1) msg += "You jump. ";
+   if(leaped>1) msg = msg.replace("@@","You leap! ");
+   else if(leaped==1) msg = msg.replace("@@","You jump. ");
    else {
-     msg += "You balk at the leap. ";
+     msg = msg.replace("@@","You balk at the leap. ");
      // Refund cost of unused magic:
      score += 10;
    }

@@ -14,6 +14,7 @@ README
 
 * refactor player!!!
 * fun colors for armor
+* hints
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
 * make sure player doesn't start in lava or in a locked treasure room
@@ -45,12 +46,12 @@ README
   hyperspace (diagonal movement)
   invisibility
   swiftness / haste
+  cowardice - extra armor and haste when Panicked
   druidcraft (walk thru trees??)
 * staff
   holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
                adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
   enslavement - Mob vs mob combat (as above?)
-  soaring leap passes thru mobs and attacks them
 * consumable: Scroll/Potion
   Convocation - blink mobs near
   tele adjacent away
@@ -97,7 +98,6 @@ Mobs
 ====
 * adjacent mobs follow player between levels
 * prevent boss spawn when boss already present?
-* passive attacks
 * add cause of death msg
    Overwhelmed by XXX
 
@@ -105,7 +105,8 @@ Mobs
    immune to most attacks, instead pushed back
    onDeath leaves rubble
    behaviour when on liquid, plugs the pit, leaving just a .
-* crystal growth
+* mobCrystal
+   crystal growth
    as ice block but procreates
 
 * special effects of some attack verbs?
@@ -114,6 +115,11 @@ Mobs
    lava doesn't block mobs with flame/lavapool flags, etc.
 * add descriptions for mob abilities
 * spawn extra monsters on . OR respawn monsters on . (blood drops?)
+
+* passive attacks:
+bloody X bleed
+counter
+stun
 
 * flags:
 antimagic - cannot be harmed with magic/when player under influence of magic
