@@ -105,25 +105,36 @@ var staffDesc = ["with no enchantment can whack your enemies good, but unfortuna
 
 var armor = 0;
 var armors = ["<t style='color:#228B22'>Green Tunic</t>",
-              "<t style='color:#696969'>Fur</t> <t style='color:#8B4513'>Cloak</t>",
+              "<t style='color:#696969; font-weight: 900;'>Fur</t> <t style='color:#8B4513'>Cloak</t>",
               "<t style='color:#D2B48C'>Pa</t><t style='color:#A52A2A'>dd</t><t style='color:#D2B48C'>e</t><t style='color:#A52A2A'>d</t><t style='color:#D2B48C'> Jacket</t>",
-              "<t style='color:#8B4513'>Leather Jacket</t>",
-              "<t style='color:#A52A2A'>Leather Armour</t>",
+              "<t style='color:#8B4513'>Leather J</t><t style='color:#A52A2A'>ac</t><t style='color:#8B4513'>ket</t>",
+              "<t style='color:#A52A2A'>Leather Arm</t><t style='color:#8B4513'>ou</t><t style='color:#A52A2A'>r</t>",
               "<t style='color:#A52A2A'>Qu</t><t style='color:#696969'>i</t><t style='color:#A52A2A'>lted Leather Armour</t>",
               "<t style='color:#A52A2A'>Stu</t><t style='color:#282828'>dd</t><t style='color:#A52A2A'>e</t><t style='color:#282828'>d</t><t style='color:#A52A2A'> Leather Armour</t>",
-              "Chitin Cuirass","Brigandine", //TODO
+              "<t style='color:#CD5C5C'>Ch</t><t style='color:#F08080'>i</t><t style='color:#CD5C5C'>t</t><t style='color:#F08080'>i</t><t style='color:#CD5C5C'>n Cu</t><t style='color:#F08080'>i</t><t style='color:#CD5C5C'>rass</t>",
+              "<t style='color:#8B4513'>Bri</t><t style='color:#282828'>g</t><t style='color:#8B4513'>an</t><t style='color:#282828'>d</t><t style='color:#8B4513'>ine</t>",
               "<t style='color:#C0C0C0'>Cha</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>n Sh</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>rt</t>",
-              "Bulletproof Vest","Scale Mail", //TODO
+              "<t style='color:#282828'>Bu</t><t style='color:#686868'>ll</t><t style='color:#282828'>etpr</t><t style='color:#686868'>oo</t><t style='color:#282828'>f Vest</t>",
+              "<t style='color:#484848'>Sc</t><t style='color:#686868'>a</t><t style='color:#484848'>le Ma</t><t style='color:#282828'>i</t><t style='color:#484848'>l</t>",
               "<t style='color:#A52A2A'>Ironb</t><t style='color:#C0C0C0'>a</t><t style='color:#A52A2A'>rk Bre</t><t style='color:#C0C0C0'>a</t><t style='color:#A52A2A'>stpl</t><t style='color:#C0C0C0'>a</t><t style='color:#A52A2A'>te</t>",
               "<t style='color:#C0C0C0'>Cha</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>n Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
-              "<t style='color:#708090'>Hauberk</t>",
+              "<t style='color:#708090'>Haub</t><t style='color:#4682B4'>e</t><t style='color:#708090'>rk</t>",
               "<t style='color:#C0C0C0'>R</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>ng Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
-              "Banded Armour","Splint Mail","Magic Cloak","Half Plate Mail","Mithril Chain Mail","Full Plate Mail", //TODO
+              "<t style='color:#A52A2A'>Ban</t><t style='color:#282828'>d</t><t style='color:#A52A2A'>e</t><t style='color:#282828'>d</t><t style='color:#A52A2A'> Armour</t>",
+              "<t style='color:#484848'>Spl</t><t style='color:#282828'>i</t><t style='color:#484848'>nt Ma</t><t style='color:#282828'>i</t><t style='color:#484848'>l</t>",
+              "<t style='color:#800080; font-weight: 900;'>Magic</t> <t style='color:#8B4513'>Cloak</t>",
+              "<t style='color:#C0C0C0'>Half Pl</t><t style='color:#282828'>a</t><t style='color:#C0C0C0'>te Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
+              "<t style='color:#C0C0C0'>M</t><t style='color:#4682B4'>i</t><t style='color:#C0C0C0'>thr</t><t style='color:#4682B4'>i</t><t style='color:#C0C0C0'>l Cha</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>n Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
+              "<t style='color:#C0C0C0'>Full Pl</t><t style='color:#282828'>a</t><t style='color:#C0C0C0'>te Ma</t><t style='color:#282828'>i</t><t style='color:#C0C0C0'>l</t>",
               "<t style='color:#FF1493'>Crystal</t> <t style='color:#9932CC'>Shard</t> <t style='color:#8B008B'>Mail</t>",
-              "Dragon Scale Mail","Heroic Cuirass","Stone Plate Mail", //TODO
+              "<t style='color:#484848'>Dr</t><t style='color:#FF4500'>a</t><t style='color:#484848'>gon Sc</t><t style='color:#FF4500'>a</t><t style='color:#484848'>le Ma</t><t style='color:#FF4500'>i</t><t style='color:#484848'>l</t>",
+              "<t style='color:#C4BE96'>H</t><t style='color:#B8860B'>e</t><t style='color:#C4BE96'>r</t><t style='color:#B8860B'>o</t><t style='color:#C4BE96'>ic Cuir</t><t style='color:#B8860B'>a</t><t style='color:#C4BE96'>ss</t>",
+              "<t style='color:#D2B48C'>Stone Pl</t><t style='color:#F4A460'>a</t><t style='color:#D2B48C'>te Ma</t><t style='color:#F4A460'>i</t><t style='color:#D2B48C'>l</t>",
               "<t style='color:#FFD700'>S</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>lid G</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>ld Arm</t><t style='color:#B8860B'>o</t><t style='color:#FFD700'>ur</t>",
               "<t style='color:#8B008B'>Crystal</t> <t style='color:#9932CC'>Plate</t> <t style='color:#FF1493'>Mail</t>",
-              "Nemean Lion Hide","Adamantine Armour","Powered Armour"];
+              "<t style='color:#A52A2A'>N</t><t style='color:#FF8C00'>e</t><t style='color:#A52A2A'>m</t><t style='color:#FF8C00'>ea</t><t style='color:#A52A2A'>n L</t><t style='color:#FF8C00'>io</t><t style='color:#A52A2A'>n H</t><t style='color:#FF8C00'>i</t><t style='color:#A52A2A'>d</t><t style='color:#FF8C00'>e</t>",
+              "<t style='color:#4682B4'>Adamantine A</t><t style='color:#000000'>r</t><t style='color:#4682B4'>mou</t><t style='color:#000000'>r</t>",
+              "<t style='color:#484848'>P</t><t style='color:#00BFFF'>o</t><t style='color:#484848'>w</t><t style='color:#00BFFF'>e</t><t style='color:#484848'>r</t><t style='color:#00BFFF'>e</t><t style='color:#484848'>d Arm</t><t style='color:#FF0000'>o</t><t style='color:#484848'>ur</t>"];
 var glyph = 0;
 var glyphs = ["",
               " of <t style='color:#FF4500'>Brim</t>s<t style='color:#FF4500'>tone</t>",
@@ -161,7 +172,7 @@ var orb = false;
 
 // Map tiles:
 var emptyBlock = '&nbsp;';
-var wallBlock = '&#9608;';
+var wallBlock = "<t style='background-color:#000000'>&#9608;</t>";
 var tileWater = "<t style='background-color:#1E90FF'>~</t>";
 var tileLava = "<t style='background-color:#FF4500'>~</t>";
 var tileSludge = "<t style='background-color:#00FF00'>~</t>";
@@ -1205,7 +1216,7 @@ function addStructure(special_rooms=false){
            "7......                   7.....7",
            "77 . 77                   77===77"];
  }
- else switch(r(222)) {
+ else switch(r(240)) {
   default:
    if(score > 1000){
      toAdd = ["...",
@@ -4092,6 +4103,347 @@ function addStructure(special_rooms=false){
              "7aaaaa+.....+aaaaa7",
              "77aaa77.....77aaa77",
              " 77777... ...77777 "];
+   break;
+
+   case 211:
+    toAdd = ["  WWWWWWW        ",
+             " WW3333.WW       ",
+             "WW...8...WWWWW   ",
+             "W1.WWWWW.....WW  ",
+             "WW...0...WW...WW ",
+             " WW3333.WWW.&..WW",
+             "  WWWWWWWW  .... "];
+   break;
+
+   case 212:
+    toAdd = ["  7777777  ",
+             " 77ssMss77 ",
+             "77sssssss77",
+             "7ss77+77ss7",
+             "7ss7$$$7ss7",
+             "7sM7$$$7Ms7",
+             "7ss7$$$7ss7",
+             "7ss77777ss7",
+             "77sssMsss77",
+             " 77sssss77 ",
+             "  777+777  ",
+             "     .     "];
+   break;
+
+   case 213:
+    toAdd = [" ======        ",
+             "==a=aa= 7777   ",
+             "=a....=77aa77  ",
+             "==.==..7....77 ",
+             "=a.===.+.....+.",
+             "=a...==7....77 ",
+             "==7787777aa77  ",
+             " 77...777777   ",
+             "77.....77      ",
+             "72..M..27      ",
+             "77.....77      ",
+             " 777t777       ",
+             "   777         "];
+   break;
+
+   case 214:
+    toAdd = [" 77777777777777777777777",
+             " 77A7-.MM.7a7$aaA7c..817",
+             " 77$77777?7a7$7777...777",
+             " 77$7.m.7.7$7.7.M+.c.817",
+             " 77+7+7+7+7+7+7+77...777",
+             ".7....7XXXXXXXXXX7c..817",
+             ".8....7XXXXXXXXXX7777777",
+             ".7....7XXXXXXXXXX7c..817",
+             " 77+7+7+7+7+7+7+77...777",
+             " 77$7.M.7.7$7.7.M+.c.817",
+             " 77$77777?7a7$7777...777",
+             " 77A7-.MM.7a7$aaA7c..817",
+             " 77777777777777777777777"];
+   break;
+
+   case 215:
+    toAdd = ["       ...       ",
+             "7777777...7777777",
+             "7$.1.$7...7$.1.$7",
+             "7.$.$.7...7.$.$.7",
+             "7..$..7.M.7..$..7",
+             "7c...c7...7c...c7",
+             "7...c.7+++7.c...7",
+             "7m.c......m..c..7",
+             "7.....m........m7",
+             "7..m...M_M..m...7",
+             "7&..m....m.....&7",
+             "77777777777777777"];
+   break;
+
+   case 216:
+    toAdd = ["         ...         ",
+             "       WWW.WWW       ",
+             "    ...WWW.WWW...    ",
+             "   WW...WW.WW...WW   ",
+             "  .WWW..WW.WW..WWW.  ",
+             "  ..WWW..W.W..WWW..  ",
+             "  ...WWW.W.W.WWW...  ",
+             " WW...WW.W.W.WW...WW ",
+             " WWWW....666....WWWW ",
+             ".WWWWWWW66a66WWWWWWW.",
+             "........6a[a6........",
+             ".WWWWWWW66a66WWWWWWW.",
+             " WWWW....666....WWWW ",
+             " WW...WW.W.W.WW...WW ",
+             "  ...WWW.W.W.WWW...  ",
+             "  ..WWW..W.W..WWW..  ",
+             "  .WWW..WW.WW..WWW.  ",
+             "   WW...WW.WW...WW   ",
+             "    ...WWW.WWW...    ",
+             "       WWW.WWW       ",
+             "         ...         "];
+   break;
+
+   case 217:
+    toAdd = ["        WWWWW     WWWWW        ",
+             "        W...W  m  W...W        ",
+             "        W.A.+.   .+.A.W        ",
+             "        W...W  m  W...W        ",
+             "    WWWWWW+WW     WW+WWWWWW    ",
+             "    W...W .         . W...W    ",
+             "   .+.A.+.m   m m   m.+.A.+.   ",
+             "    W...W             W...W    ",
+             "WWWWWWWWW    WW WW    WWWWWWWWW",
+             "W...W        W...W        W...W",
+             "W.A.+.m    m.+.A.+.m    m.+.A.W",
+             "W...W      . W...W .      W...W",
+             "WW+WW    WW+WWWWWWW+WW    WW+WW",
+             "  .    m W...W   W...W m    .  ",
+             " m m    .+.A.W   W.A.+.    m m ",
+             "       m W...W   W...W m       ",
+             "         WWWWW   WWWWW         "];
+   break;
+
+   case 218:
+    toAdd = ["                WWWWW        ",
+             "                W...W m      ",
+             "              m W.A.+.   m m ",
+             "                W...W m   .  ",
+             "            WWWWWW+WW   WW+WW",
+             "          m W...W .     W...W",
+             "     m m   .+.A.+.m   m.+.A.W",
+             "          m W...W     . W...W",
+             "    WWWWW   WWWWW   WW+WWWWWW",
+             "    W...W m       m W...W    ",
+             "  m.+.A.W    m m    W.A.W m  ",
+             "  . W...W m       m W...W    ",
+             "WW+WWW+WW   WWWWW   WW+WW    ",
+             "W...W .     W...W m   .      ",
+             "W.A.W m   m.+.A.+.   m m     ",
+             "W...W     . W...W m          ",
+             "WW+WW   WW+WWWWWW            ",
+             "  .   m W...W                ",
+             " m m    W.A.+.m              ",
+             "      m W...W                ",
+             "        WWWWW                "];
+   break;
+
+   case 219:
+    toAdd = ["WWWWW       WWWWW    ",
+             "W'''W m   m W...W    ",
+             "W'_'       .+.A.W    ",
+             "W'''W m   m W...W    ",
+             "WW WW       WW+WWWWWW",
+             "            W...W...W",
+             " m m    m   W.A.+.A.W",
+             "            W...W...W",
+             "        WWWWWWWWWW+WW",
+             "      m W...W     .  ",
+             " m m    W.A.+.m  m m ",
+             "  .   m W...W        ",
+             "WW+WW   WW+WWW+WW    ",
+             "W...W     . W...W m  ",
+             "W.A.+.m   m W.A.W    ",
+             "W...W .     W...W m  ",
+             "WWWWWW+WWWWWWW+WW    ",
+             "    W...W...W .      ",
+             "    W.A.+.A.+m m     ",
+             "    W...W...W        ",
+             "    WWWWWWWWW        "];
+   break;
+
+   case 220:
+    toAdd = ["    777               777    ",
+             "    72777     .     77727    ",
+             "    7)%%777   .   777:::7    ",
+             "    7%p%p%7   .   7:::::7    ",
+             "    7%%%%$777...777a::::7    ",
+             "    77%%p%%a77+77$:::::77    ",
+             "     7a%%$%!;+.+::::::$7     ",
+             "     7%p%%p%77+77::::::7     ",
+             "     77$%%%776.677:::a77     ",
+             "      7%pa776.$.677:::7      ",
+             "      777776..a..677777      ",
+             "     777766..$?$..667777     ",
+             "    77s$76.$a?A?a$.67d,77    ",
+             "  777$ss+....$?$....+,,$777  ",
+             " 77$ssss776...a...677#,,f$77 ",
+             "77sssssss766..$..667a,,,,,#77",
+             "7Ass$sss$7666...6667$,n$#,,i7",
+             "77777777777777877777777777777",
+             "         7a.......a7         ",
+             "         77$xxxxx$77         ",
+             "          7xxxxxxx7          ",
+             "          77$xxx$77          ",
+             "           7..M..7           ",
+             "           7.mmm.7           ",
+             "           77.M.77           ",
+             "            7...7            ",
+             "            77177            ",
+             "             777             "];
+   break;
+
+   case 221:
+    toAdd = ["WWWWWWWWW ",
+             "W.8.....W ",
+             "W.W..W..W ",
+             "W.^.WWW.W ",
+             "W.W..W..W ",
+             "W.^c..c.W ",
+             "W.W.cW..W ",
+             "W.^cWWW.W ",
+             "W.W.cW..W ",
+             "W1W...c.+.",
+             "WWWWWWWWW "];
+   break;
+
+   case 222:
+    toAdd = ["WWWWWWWW...WWWWWWWW",
+             "WWWW...........WWWW",
+             "WW.......m.......WW",
+             "W$....m.....m....$W",
+             "WWWW.....m.....WWWW",
+             "WWWWWWWW...WWWWWWWW",
+             "WWWi...........iWWW",
+             "WWWWWWWW...WWWWWWWW",
+             "WWWW.....m.....WWWW",
+             "W$....m.....m....$W",
+             "WW.......m.......WW",
+             "WWWW...........WWWW",
+             "WWWWWWWW...WWWWWWWW"];
+   break;
+
+   case 223:
+    toAdd = ["         WWWWWWWWWWWWWW",
+             "        WWWWW...WWWWWWX",
+             "        WWW.mmW.~~WWX~~",
+             "WWWWWWWWW...WWWWW~W~~X ",
+             "W$$$WWWWW.WWWWWWWXWX~~ ",
+             "W$i$.....MWWWWWWXXX~~  ",
+             "W====WWWWWWWWWWWXXWX~  ",
+             "W$i$.....MWWWWWWXXXX~  ",
+             "W$$$WWWWW.WWWWWWWXWXX~ ",
+             "WWWWWWWWW...WWWWWXW~XX ",
+             "        WWW.mmW.~~WW~~X",
+             "        WWWWW...WWWWWW~",
+             "         WWWWWWWWWWWWWW"];
+   break;
+
+   case 224:
+    toAdd = ["          .          ",
+             "        77877        ",
+             "     7777...7777     ",
+             "    77.........77    ",
+             "   77...........77   ",
+             "  77.............77  ",
+             "  7...666...666...7  ",
+             "  7...666.&.666...7  ",
+             " 77...666...666...77 ",
+             " 7.................7 ",
+             ".8.....&..1..&.....8.",
+             " 7.................7 ",
+             " 77...666...666...77 ",
+             "  7...666.&.666...7  ",
+             "  7...666...666...7  ",
+             "  77.............77  ",
+             "   77...........77   ",
+             "    77.........77    ",
+             "     7777...7777     ",
+             "        77877        ",
+             "          .          "];
+   break;
+
+   case 225:
+    toAdd = ["     WW...WW     ",
+             "     W.....W     ",
+             "     W.mmm.W     ",
+             "     W.....W     ",
+             "    WW.....WW    ",
+             "WWWWW7778777WWWWW",
+             "W....7$$.$$7....W",
+             "..m..7$...$7..m..",
+             "..m..8.._..8..m..",
+             "..m..7$...$7..m..",
+             "W....7$$.$$7....W",
+             "WWWWW7778777WWWWW",
+             "    WW.....WW    ",
+             "     W.....W     ",
+             "     W.mmm.W     ",
+             "     W.....W     ",
+             "     WW...WW     "];
+   break;
+
+   case 226:
+    toAdd = ["  W.....W  ",
+             "  W.....W  ",
+             "WWW.....WWW",
+             "Wa+.....+aW",
+             "WWW.....WWW",
+             "Wa+.....+aW",
+             "WWW.....WWW",
+             "Wa+.....+aW",
+             "WWW.....WWW",
+             "  W.....W  ",
+             "  W.....W  "];
+   break;
+
+   case 227:
+    toAdd = ["  WWWWWWWWWWWWW  ",
+             " ............... ",
+             "W.WWWW..WWWWWW..W",
+             "W.Wa....W..aaW..W",
+             "W.WW....W..WWW..W",
+             "W.Wa............W",
+             "W.W...WWWWW..W..W",
+             "W....WW......W..W",
+             "W...WW....a..W..W",
+             "W..WW...W....W..W",
+             "W..W.a..WW..aW..W",
+             "W..W....aWW..W..W",
+             "W..WaA.a..W..W..W",
+             "W..W..a....a.W..W",
+             "W..WWWWWWWWWWW..W",
+             " ............... ",
+             "  WWWWWWWWWWWWW  "];
+   break;
+
+   case 228:
+    toAdd = ["    WWWWWWWWWWWWW    ",
+             "    Wc.....c....W    ",
+             "    W..c......c.W    ",
+             "   WW...77877...WW   ",
+             "   Wc..77$.$77..cW   ",
+             "   W.c.7$.1.$7...W   ",
+             "  WW...77$.$77c..WW  ",
+             "  W...c.77777.....W  ",
+             "  Wc...........c..W  ",
+             " WW..WW..a........WW ",
+             ".+...Wa....WWW.....+.",
+             " WW..WWWW...aW...aWW ",
+             "  WWa..aWW..WW...WW  ",
+             "   WWW...W..Wa.WWW   ",
+             "     WW...M...WW     ",
+             "      WW.....WW      ",
+             "       WWW.WWW       ",
+             "         W+W         ",
+             "          .          "];
    break;
  }
 

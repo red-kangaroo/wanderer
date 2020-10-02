@@ -13,8 +13,7 @@ README
 * change keys for special display to something that doesn't interfere with browser shortcuts?
 
 * refactor player!!!
-* fun colors for armor
-* hints
+* more hints
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
 * make sure player doesn't start in lava or in a locked treasure room
@@ -95,6 +94,7 @@ README
 * fix diagonal rivers
 
 * game freezes on lever?
+* more fun effects on levers
 
 Mobs
 ====
