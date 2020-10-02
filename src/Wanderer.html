@@ -943,7 +943,7 @@ function getTileName(tile){
     case tileKey:        return "key";
     case tileArmor:      return "magic armour";
     case tileStaff:      return "magic staff";
-    case tileMobDoor:    return "heavy stone door";
+    case tileMobDoor:    return "heavy door";
     case tileGoldDoor:   return "locked door";
     case tileGoldWall:   return "golden wall";
     case tileTreasure:   return "memory trove";
@@ -1048,8 +1048,8 @@ function generateMap(){
  if(!r(5)) addLake();
  if(!r(2)) addRiver();
  if(!r(2)) addRiver();
- addStructure();
  while(!r(10)) addStructure();
+ addStructure(true);
 
  visited++;
 }
@@ -1166,7 +1166,7 @@ function addBoss(){
  } else msg += "But something goes wrong and the mechanisms halt with horrid screeching. ";
 }
 
-function addStructure(){
+function addStructure(special_rooms=false){
  var toAdd = [];
  var currentLine = "";
  // Individual rooms can be flagged not to be randomly mirrored/flipped/etc.
@@ -1178,8 +1178,9 @@ function addStructure(){
  // random, so no need to have them prepared before actually generating the room.
  var randMob = creatureList.sampleRec();
 
- //The winning place:
- if((r(visited)>20) && (r(distanceToOrigin())>=10) && (r(kills)>20)){
+ //TODO: Add starting vaults?
+ if((r(visited)>20) && (r(distanceToOrigin())>=10) && (r(kills)>20) && special_rooms){
+  //The winning place:
   toAdd = ["77===77                   77===77",
            "7.....7                   7.....7",
            "=.mmm.777777777777777777777.mmm.=",
@@ -2304,26 +2305,26 @@ function addStructure(){
    break;
 
    case 93:
-    toAdd = ["3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3",
-             "3.3"];
+    toAdd = ["W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W",
+             "W:W"];
    break;
 
    case 94:
@@ -4351,12 +4352,12 @@ function spawnMobs(){
   // More powerful enemies are towards the start of creatureList, so spawn more powerful enemies in later areas.
   var cHere = r(Math.max(creatureList.length-distanceToOrigin(),creatureList.length/2));
   for (var i = 0; i < cQ; i++) {
-   currCre[i] = cloneCreature(creatureList[cHere]);
+   currCre.push(cloneCreature(creatureList[cHere]));
    if(!r(10)) cHere = r(creatureList.length); // Change to any enemy.
    do {
-    currCre[i].x = r(mapWidth);
-    currCre[i].y = r(mapWidth);
-   } while(impassable.includes(currentMap[currCre[i].x][currCre[i].y]));
+    currCre[currCre.length-1].x = r(mapWidth);
+    currCre[currCre.length-1].y = r(mapWidth);
+   } while(impassable.includes(currentMap[currCre[currCre.length-1].x][currCre[currCre.length-1].y]));
   }
 }
 
@@ -5209,15 +5210,17 @@ function moveUser(x,y){
 
   case tileGoldDoor:
    if(keys > 0){
-     msg += "You unlock and open the door. ";
+     msg += "You unlock the door. ";
      keys -= 1;
+     currentMap[userPos.x][userPos.y]=tileMobDoor;
+     break;
    } else {
      // Won't normally happen, but the player might wander into a door from another map with no keys.
      msg += "You smash open the door. Ouch, that hurt! ";
      playerTakeDamage(r(10)+distanceToOrigin());
+     currentMap[userPos.x][userPos.y]=',';
+     break;
    }
-   currentMap[userPos.x][userPos.y]='.';
-   break;
 
   case tileStaff: //magic staff
    currentMap[userPos.x][userPos.y]='.';
