@@ -160,6 +160,7 @@ var aflame = 0;
 var blinded = 0;
 var bloodied = 0;
 var confused = 0;
+var hasted = 0;
 var phased = 0;
 var panicked = 0;
 var poisoned = 0;
@@ -220,10 +221,10 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      attack:"slams",
                      aggro:4,
                      x:0,y:0,
-                     flags: [["boonphase"],["boontime"],["boonscore"]][r(3)], // Random boon on death.
+                     flags: [["boonphase"],["boontime"],["boonscore"],["boonhaste"]][r(4)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","flingback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","icepool","smoke","chaos","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","dropscore","droppile","droptrap","worthless","confother","confgas","stunother","stungas","swap","jumpover"];
+var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","flingback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","icepool","smoke","chaos","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","boonhaste","dropscore","droppile","droptrap","worthless","confother","confgas","stunother","stungas","swap","jumpover","dumb","immobile","invisible"];
 var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>X</t>",
@@ -737,6 +738,25 @@ function getMobBehaviour(){
 
   case 24:
    return function(){
+    if(distanceBetween(userPos,this)<5 && !r(6)) {
+      var sq = [{x:userPos.x-1,y:userPos.y},{x:userPos.x+1,y:userPos.y},{x:userPos.x,y:userPos.y-1},{x:userPos.x,y:userPos.y+1}];
+      var blocks = 0;
+      for (var i = 0; i < sq.length; i++) {
+          if(inRangeCoords(sq[i].x,sq[i].y) && checkEmpty(sq[i].x,sq[i].y)) {
+            currCre.push(cloneCreature(mobIceBlock));
+            currCre[currCre.length-1].x = sq[i].x;
+            currCre[currCre.length-1].y = sq[i].y;
+            blocks += 1;
+          }
+      }
+      if(blocks>0)
+        msg += this.name+" encases you in an icy prison. ";
+    }
+    return false;
+   };
+
+  case 25:
+   return function(){
     if(!r(2) && currentMap[this.x][this.y] == emptyBlock){
       currentMap[this.x][this.y] = tileIce;
       if(distanceBetween(userPos,this)<10)
@@ -770,7 +790,7 @@ function getMobName(letter){
 
 function getUserChar(){
  var colour = 'red';
- if(poisoned>0) colour = '#90EE90';
+ if(poisoned>0) colour = '#00FF00';
  else if(confused>0) colour = '#FF1493';
  else if(phased>0) colour = '#4B0082';
  else if(timestop>0) colour = '#00BFFF';
@@ -5225,6 +5245,7 @@ function moveUser(x,y){
    confused--;
  }
  if(bloodied>0) bloodied--;
+ if(hasted>0 && (turn % 2 != 0)) hasted--;
  if(panicked>0) panicked--;
  if(phased>0){
    phased--;
@@ -5722,7 +5743,7 @@ function moveUser(x,y){
    }
    // Cure afflictions, but if you have none, you instead get a random boon.
    else if(!cureAll()){
-    switch(r(5)){
+    switch(r(6)){
      default:
       // Enchants armor, otherwise tries to give a different boon.
       if(glyph==0){
@@ -5751,6 +5772,11 @@ function moveUser(x,y){
       msg += "Your "+armors[armor]+" is engulfed in bright blue flames. ";
       armor += Math.min(1+r(distanceToOrigin()), 5);
       msg += "The flames subside, revealing a brand new "+armors[armor]+". ";
+      break;
+
+     case 4:
+      hasted += 60+r(100);
+      msg += "Your heart races. ";
       break;
     }
    }
@@ -5958,6 +5984,7 @@ function tryMove(x,y,i){
 
     case "dispel":
      msg += "You feel powerless. ";
+     if(hasted>0) hasted=0;
      if(phased>0) phased=0;
      if(timestop>0) timestop=0; // I'm not sure if this can even happen, but...
      if(ward>0) ward=0;
@@ -6030,6 +6057,7 @@ function tryMove(x,y,i){
 
 function doMove(x,y,i){
  if(userPos.x == x && userPos.y == y) return;
+ if(currCre[i].flags.includes("immobile")) return;
  // Not blocked by player, move.
  currCre[i].x = x;
  currCre[i].y = y;
@@ -6188,6 +6216,11 @@ function onDeath(i){
     msg += "You absorb some essence of memory from "+currCre[i].name+". ";
     break;
 
+  case "boonhaste":
+   hasted += Math.min(5+kills, 50);
+   msg += "You absorb some essence of speed from "+currCre[i].name+". ";
+   break;
+
    case "dropscore":
     if(currentMap[currCre[i].x][currCre[i].y]==emptyBlock)
       currentMap[currCre[i].x][currCre[i].y] = '$';
@@ -6214,6 +6247,7 @@ function onDeath(i){
 }
 
 function onExplosion(i){
+ var self = currCre[i];
  for(var k=-1; k < 2; k++){
   for(var l=-1; l < 2; l++){
    if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)){
@@ -6230,6 +6264,11 @@ function onExplosion(i){
       case tileTreeConif: case tileTreeLeafy: case tileTreeDead:
        msg += "The tree shatters into a thousand splinters. ";
        currentMap[currCre[i].x+k][currCre[i].y+l] = tileTreeStump;
+       break;
+
+      case tileMobDoor:
+       msg += "The door is blown off its hinges. ";
+       currentMap[currCre[i].x+k][currCre[i].y+l] = '.';
        break;
 
       case wallBlock:
@@ -6251,19 +6290,12 @@ function onExplosion(i){
  }
  // Kill mobs caught in the explosion:
  for(var m = 0; m < currCre.length; m++){
-  if(distanceBetween(currCre[i],currCre[m])<=2){
+  if(currCre[m] == self) continue;
+  else if(distanceBetween(self,currCre[m])<=2){
     if(currCre[m].flags.includes("boss")){
       // The boss is immune, but we still stun it.
       currCre[m].flags.push("stun");
-      msg += currCre[m].name+" teleports away from the explosion. ";
-      var p;
-      var q;
-      do {
-        p = r(mapWidth);
-        q = r(mapWidth);
-      } while(!checkEmpty(p,q));
-      currCre[m].x = p;
-      currCre[m].y = q;
+      msg += currCre[m].name+" is stunned by the explosion. ";
     } else if(currCre[m].flags.includes("lifesaved")){
      currCre[m].flags = currCre[m].flags.removeElement("lifesaved");
      currCre[m].icon = currCre[m].icon.replaceAt(25, currCre[m].icon.charAt(25).toUpperCase());
@@ -6275,19 +6307,22 @@ function onExplosion(i){
     }
   }
  }
+ // And finally kill the exploding mob:
+ onDeath(currCre.indexOf(self));
+ currCre = currCre.removeElement(self);
 }
 
 function moveCreatures(){
  for (var k = 0; k < currCre.length; k++) {
+  // Slow creatures only act once per two turns.
+  if((currCre[k].flags.includes("slow") || hasted>0) && (turn % 2 != 0))
+    continue;
+
   // Check for special action:
   if(!currCre[k].flags.includes("stun")) {
     if(currCre[k].behaviour()) continue;
   } else if(!r(4))
     currCre[k].flags = currCre[k].flags.removeElement("stun");
-
-  // Slow creatures only act once per two turns.
-  if(currCre[k].flags.includes("slow") && (turn % 2 != 0))
-    continue;
 
   // Get direction to player normalized to <-1,1>.
   var dist = distanceBetween(userPos,currCre[k]);
@@ -6311,13 +6346,13 @@ function moveCreatures(){
 
    if(dx!=0) nextStep.push({x: currCre[k].x+dx, y: currCre[k].y});
    if(dy!=0) nextStep.push({x: currCre[k].x, y: currCre[k].y+dy});
+   nextStep.shuffle();
    if(currCre[k].flags.includes("diagonal"))
      nextStep.push({x: currCre[k].x+dx, y: currCre[k].y+dy});
-   else if(stepsBetween(userPos,currCre[k])==2 && r(5)){
+   else if(stepsBetween(userPos,currCre[k])==2 && r(5) && !currCre[k].flags.includes("dumb")){
      // When one step away from player, sometimes don't move and let the player come.
      continue;
    }
-   nextStep.shuffle();
 
    // Move in one of possible directions, if blocked try the another:
    var moved = false;
@@ -6383,7 +6418,8 @@ function displayMap(highlight=""){
  }
  if(blinded==0 && highlight != "player") {
    for (i = 0; i < currCre.length; i++) {
-    outputMap[currCre[i].x][currCre[i].y]=currCre[i].icon;
+     if(!currCre[i].flags.includes("invisible") || (distanceBetween(userPos, currCre[i]) <= 2))
+       outputMap[currCre[i].x][currCre[i].y]=currCre[i].icon;
    }
  }
  // Always display the player:
@@ -6413,9 +6449,10 @@ function displayMap(highlight=""){
               ((blinded>0) ? "<t style='background-color:#000000; color:#FFFFFF;'>Blind</t> " : "") + // white on black
               ((bloodied>0) ? "<t style='color:#8A0303'>Bloodied</t> " : "") +
               ((confused>0) ? "<t style='color:#FF1493'>Confused</t> " : "") +
+              ((hasted>0) ? "<t style='color:#7FFF00; font-style: italic;'>Haste</t> " : "") +
               ((panicked>0) ? "<t style='color:#DC143C'>Panicked</t> " : "") +
               ((phased>0) ? "<t style='color:#4B0082'>Phasing</t> " : "") +
-              ((poisoned>0) ? "<t style='color:#90EE90'>Poisoned</t> " : "") +
+              ((poisoned>0) ? "<t style='color:#00FF00'>Poisoned</t> " : "") +
               ((stunned>0) ? "<t style='background-color:#FFFF00'>Stun</t> " : "") +
               ((timestop>0) ? "<t style='color:#00BFFF'>Time Stop</t> " : "") +
               ((ward>0) ? "<t style='color:#DAA520'>Ward</t> " : "");
@@ -6614,7 +6651,7 @@ function cloneCreature(creature){
  clone.name = creature.name;
  clone.attack = creature.attack;
  clone.aggro = creature.aggro;
- clone.flags = creature.flags;
+ clone.flags = creature.flags.slice();
  clone.behaviour = creature.behaviour;
 
  return clone;
