@@ -23,7 +23,6 @@ README
 
 * invisibility - doesn't work against adjacent mobs, otherwise they ignore player no matter their aggro range,
                  unless they have esp (but then boss should loose esp, also prevent ranged attacks against invisible player)
-* player haste - mobs only act on even turns (what about slow mobs? maybe nothing, all mobs act as slow)
 * rage - player looses control, avatar attacks until status ends
 
 * run in direction command
@@ -36,21 +35,21 @@ README
    area teleport (random already visited, or anywhere?)
    explosion
 * armor
-  explosions (destroy adjacent mobs and terrain, but grants no kills)
-  time mastery (randomly/on damage time stop)
-  water lily steps (immune to liquids, even beneficial effects)
-  zen (no hunger and invulnerable while blind??)
-  plant lordship (some effect when trampling grass, nettles and brambles)
-  sludge (cap damage taken at 1, but only when Poisoned)
-  hyperspace (diagonal movement)
-  invisibility
-  swiftness / haste
-  cowardice - extra armor and haste when Panicked
-  druidcraft (walk thru trees??)
+   explosions (destroy adjacent mobs and terrain, but grants no kills)
+   time mastery (randomly/on damage time stop)
+   zen (no hunger and invulnerable while blind??)
+   plant lordship (some effect when trampling grass, nettles and brambles)
+   sludge (cap damage taken at 1, but only when Poisoned)
+   hyperspace (diagonal movement)
+   druidcraft (walk thru trees??)
+
+   water lily steps (immune to liquids, even beneficial effects)
+   invisibility
+   cowardice - extra armor and hasted on hit when Panicked
 * staff
-  holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
-               adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
-  enslavement - Mob vs mob combat (as above?)
+   holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
+                adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
+   enslavement - Mob vs mob combat (as above?)
 * consumable: Scroll/Potion
   Convocation - blink mobs near
   tele adjacent away
@@ -94,7 +93,7 @@ README
 * fix diagonal rivers
 
 * game freezes on lever?
-* more fun effects on levers
+* more fun effects on levers and altars
 
 Mobs
 ====
@@ -103,7 +102,7 @@ Mobs
 * add cause of death msg
    Overwhelmed by XXX
 
-* mobBoulder, maybe once persistent currCre is a thing
+* mobBoulder
    immune to most attacks, instead pushed back
    onDeath leaves rubble
    behaviour when on liquid, plugs the pit, leaving just a .
@@ -128,8 +127,6 @@ antimagic - cannot be harmed with magic/when player under influence of magic
 paralysis
 haste - move faster, don't attack faster
 deal damage based on score, the higher score the higher damage
-invisible until >=2 squares away
-immobile - still attacks adjacent
 
 * behaviour:
 pull close - if player is in straight unobstructed orthogonal line, pull d4 squares closer
@@ -137,7 +134,6 @@ when near, create area of bad terrain around player
 when near, create bad terrain in * pattern around self (2-3 sq long?)
 reach attack
 fix shooting
-create ice blocks
 jump close from afar
 jump kick attack
 
@@ -151,3 +147,8 @@ https://briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated/
 https://github.com/bgrins/javascript-astar
 https://www.reddit.com/r/javascript/comments/71k0nr/i_made_a_very_fast_path_finding_library_what_do/
 https://easystarjs.com/     https://github.com/prettymuchbryce/easystarjs
+
+
+
+The creatures here grow more ferocious when they can smell blood on you.
+Some enemies cannot be seen but from up close.
