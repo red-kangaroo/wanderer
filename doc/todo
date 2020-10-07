@@ -8,6 +8,9 @@ README
 * story/very short lore?
 * preview:
    https://jbt.github.io/markdown-editor/
+* wiki!!
+* make links open in new tab, not over game
+
 * put the description into a collapsible:
    https://www.w3schools.com/howto/howto_js_collapsible.asp
 * change keys for special display to something that doesn't interfere with browser shortcuts?
@@ -33,7 +36,6 @@ README
 
 * traps
    area teleport (random already visited, or anywhere?)
-   explosion
 * armor
    explosions (destroy adjacent mobs and terrain, but grants no kills)
    time mastery (randomly/on damage time stop)
@@ -94,9 +96,15 @@ README
 
 * game freezes on lever?
 * more fun effects on levers and altars
+* "wilderness" maker, random floor/plants
+* morgue file in new raw window
+   https://www.geeksforgeeks.org/how-to-strip-out-html-tags-from-a-string-using-javascript/
 
 Mobs
 ====
+* simplify mobOrb
+   not slow!
+
 * adjacent mobs follow player between levels
 * prevent boss spawn when boss already present?
 * add cause of death msg
@@ -140,15 +148,9 @@ jump kick attack
 Not Now
 =======
 * boss bold and underlined - cannot do right now, because we replace letter with charAt
-* simplify mobOrb (not now, something is buggy)
 
 * add A* (maybe not, current AI is dangerous enough?)
 https://briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated/
 https://github.com/bgrins/javascript-astar
 https://www.reddit.com/r/javascript/comments/71k0nr/i_made_a_very_fast_path_finding_library_what_do/
 https://easystarjs.com/     https://github.com/prettymuchbryce/easystarjs
-
-
-
-The creatures here grow more ferocious when they can smell blood on you.
-Some enemies cannot be seen but from up close.
