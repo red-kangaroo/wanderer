@@ -34,6 +34,8 @@
     Welcome, Wanderer. You can check out the source code and report issues on
     <a href="https://github.com/red-kangaroo/wanderer">GitHub</a>, or post
     a comment on my <a href="https://attnam.blogspot.com/2020/08/wanderer.html">blog</a>.
+    <!-- There's also a <a href="https://github.com/red-kangaroo/wanderer/wiki">wiki</a> with
+    more information and spoilers. -->
     Have fun!
   </br></br>
     Use <code>F11</code> for fullscreen mode (recommended).
@@ -55,11 +57,11 @@
 </div>
 
 <script>
-var VERSION = "v2.1";
+const VERSION = "v2.1";
 
 // Map gen:
-var mapWidth = 50;
-var wallBreaks = 4; //higher reduces chance
+const mapWidth = 50;
+const wallBreaks = 4; //higher reduces chance
 var worldPos = {x:0,y:0};
 var worldData = [];
 var currentMap = [];
@@ -171,49 +173,71 @@ var ward = 0;
 var leap = false;
 var orb = false;
 
-// Map tiles:
-var emptyBlock = '&nbsp;';
-var wallBlock = "<t style='background-color:#000000'>&#9608;</t>";
-var tileWater = "<t style='background-color:#1E90FF'>~</t>";
-var tileLava = "<t style='background-color:#FF4500'>~</t>";
-var tileSludge = "<t style='background-color:#00FF00'>~</t>";
-var tileBlood = "<t style='background-color:#8A0303'>~</t>";
-var tileQuicksand = "<t style='background-color:#FFFF66; color:#DAA520;'>,</t>";
-var tileIce = "<t style='background-color:#00BFFF; color:#FFFFFF;'>.</t>";
-var tileBlindGas = "<t style='color:#696969'>#</t>";
-var tileConfGas = "<t style='color:#FF1493'>#</t>";
-var tileStunGas = "<t style='color:#FFFF00; font-weight: 900;'>#</t>";
-var tileKey = "<t style='color:#800080'>9</t>";
-var tileArmor = "<t style='color:#800080; font-weight: 900;'>]</t>"; //enchanted armor, normal is just ']'
-var tileMobDoor = "<t style='background-color:#8B4513'>+</t>";
-var tileGoldDoor = "<t style='background-color:#8B4513; color:#FFD700;'>+</t>";
-var tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
-var tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
-var tileTreasure = "<t style='color:#800080'>&#167;</t>";
-var tileBramble = "<t style='color:#32CD32'>!</t>";
-var tileNettles = "<t style='color:#DC143C'>!</t>";
-var tileGrassTall = "<t style='color:#32CD32'>;</t>";
-var tileGrassShort = "<t style='color:#32CD32'>.</t>";
-var tileBloodDrop = "<t style='color:#8A0303'>.</t>";
-var tileTreeStump = "<t style='color:#A52A2A; font-weight: 900;'>.</t>";
-var tileTreeConif = "<t style='color:#006400; font-weight: 900;'>4</t>";
-var tileTreeLeafy = "<t style='color:#32CD32'>8</t>";
-var tileTreeDead = "<t style='color:#A52A2A; font-weight: 900;'>|</t>";
-var tileBush = "<t style='color:#32CD32; font-weight: 900;'>%</t>";
-//var tileMacGuffin = "<t style='color:#FF00FF'>&#9959;</t>"; maybe use as summoning circle?
-var tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
-var tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
-var tileTeleporter = "<t style='color:#00FFFF'>0</t>";
+// Random hints or lore.
+const hints = ["You don't deserve forgiveness.",
+               "Did they really deserve it?",
+               "Too late for regrets.",
+               "Was it worth it?",
+               "You cannot fix it anymore.",
+               "Why did you do it?",
+               "Why them?",
+               "It wasn't supposed to be that way.",
+               "It wasn't for their own good. Not really.",
+               "Seek the levers once your Self glows again.",
+               "Conquering your demons brings a certain boon.",
+               "Have you lost your way?",
+               "You might never be the same again...",
+               "May you find that which you seek.",
+               "Strike down anyone who stands in your path.",
+               "Their blood shall nourish you.",
+               "Your journey's end awaits in the distance.",
+               "Nourish your Self or fade to oblivion.",
+               "Some creatures here cannot be seen but from up close.",
+               "Your enemies grow more ferocious when they can smell blood on you.",];
 
-var impassable = [wallBlock,tileGoldWall,tileGoldDoor,tileMobDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
-var liquids = [tileBlood,tileLava,tileQuicksand,tileSludge,tileWater];
-var gases = [tileBlindGas,tileConfGas,tileStunGas];
-var plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
-var plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
-var terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,tileQuicksand,plants_large]];
-var terrain_rare = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileBlood,gases]];
-var terrain_any = [emptyBlock,wallBlock,'.',',','?','^',tileWater,tileLava,tileSludge,tileBlood,tileQuicksand,tileIce,tileBlindGas,tileConfGas,tileStunGas,tileGoldWall,tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileBloodDrop,tileTreeStump,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush,tileSecretPath,tileTeleporter,['$','/',[']','_',tileKey,emptyBlock,wallBlock]]];
-var treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
+// Map tiles:
+const emptyBlock = '&nbsp;';
+const wallBlock = "<t style='background-color:#000000'>&#9608;</t>";
+const tileWater = "<t style='background-color:#1E90FF'>~</t>";
+const tileLava = "<t style='background-color:#FF4500'>~</t>";
+const tileSludge = "<t style='background-color:#00FF00'>~</t>";
+const tileBlood = "<t style='background-color:#8A0303'>~</t>";
+const tileQuicksand = "<t style='background-color:#FFFF66; color:#DAA520;'>,</t>";
+const tileIce = "<t style='background-color:#00BFFF; color:#FFFFFF;'>.</t>";
+const tileBlindGas = "<t style='color:#696969'>#</t>";
+const tileConfGas = "<t style='color:#FF1493'>#</t>";
+const tileStunGas = "<t style='color:#FFFF00; font-weight: 900;'>#</t>";
+const tileKey = "<t style='color:#800080'>9</t>";
+const tileArmor = "<t style='color:#800080; font-weight: 900;'>]</t>"; //enchanted armor, normal is just ']'
+const tileMobDoor = "<t style='background-color:#8B4513'>+</t>";
+const tileGoldDoor = "<t style='background-color:#8B4513; color:#FFD700;'>+</t>";
+const tileGoldWall = "<t style='color:#FFD700'>&#9608;</t>";
+const tileStaff = "<t style='color:#800080; font-weight: 900;'>}</t>";
+const tileTreasure = "<t style='color:#800080'>&#167;</t>";
+const tileBramble = "<t style='color:#32CD32'>!</t>";
+const tileNettles = "<t style='color:#DC143C'>!</t>";
+const tileGrassTall = "<t style='color:#32CD32'>;</t>";
+const tileGrassShort = "<t style='color:#32CD32'>.</t>";
+const tileBloodDrop = "<t style='color:#8A0303'>.</t>";
+const tileTreeStump = "<t style='color:#A52A2A; font-weight: 900;'>.</t>";
+const tileTreeConif = "<t style='color:#006400; font-weight: 900;'>4</t>";
+const tileTreeLeafy = "<t style='color:#32CD32'>8</t>";
+const tileTreeDead = "<t style='color:#A52A2A; font-weight: 900;'>|</t>";
+const tileBush = "<t style='color:#32CD32; font-weight: 900;'>%</t>";
+//const tilePentagram = "<t style='color:#FF00FF'>&#9959;</t>"; //maybe use as summoning circle?
+const tileMacGuffin = "<t style='color:#8B008B'>&#9765;</t>";
+const tileSecretPath = "<t style='color:#85C1E9'>&#9608;</t>";
+const tileTeleporter = "<t style='color:#00FFFF'>0</t>";
+
+const impassable = [wallBlock,tileGoldWall,tileGoldDoor,tileMobDoor,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
+const liquids = [tileBlood,tileLava,tileQuicksand,tileSludge,tileWater];
+const gases = [tileBlindGas,tileConfGas,tileStunGas];
+const plants_small = [tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileTreeStump];
+const plants_large = [tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush];
+const terrain = ['.',',','^','?','$',tileWater,tileGrassTall,[tileBramble,tileNettles,tileQuicksand,plants_large]];
+const terrain_rare = ['/','_',']',tileTeleporter,tileKey,[tileSludge,tileBlood,gases]];
+const terrain_any = [emptyBlock,wallBlock,'.',',','?','^',tileWater,tileLava,tileSludge,tileBlood,tileQuicksand,tileIce,tileBlindGas,tileConfGas,tileStunGas,tileGoldWall,tileBramble,tileNettles,tileGrassTall,tileGrassShort,tileBloodDrop,tileTreeStump,tileTreeConif,tileTreeLeafy,tileTreeDead,tileBush,tileSecretPath,tileTeleporter,['$','/',[']','_',tileKey,emptyBlock,wallBlock]]];
+const treasures = ['$',']','?','_','/',tileKey,tileArmor,tileStaff,tileTreasure,tileMacGuffin];
 
 var creatureChar = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWYZ&&@@".split('');
 var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
@@ -221,11 +245,11 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      attack:"slams",
                      aggro:4,
                      x:0,y:0,
-                     flags: [["boonphase"],["boontime"],["boonscore"],["boonhaste"]][r(4)], // Random boon on death.
+                     flags: [["slow","boonphase"],["slow","boontime"],["slow","boonscore"],["slow","boonhaste"]][r(4)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-var allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","flingback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","icepool","smoke","chaos","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","boonhaste","dropscore","droppile","droptrap","worthless","confother","confgas","stunother","stungas","swap","jumpover","dumb","immobile","invisible"];
-var attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
+const allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","flingback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","icepool","smoke","chaos","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","boonhaste","dropscore","droppile","droptrap","worthless","confother","confgas","stunother","stungas","swap","jumpover","dumb","immobile","invisible"];
+const attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>X</t>",
                name:"<t style='color:#8B008B'>Reflection of True Self</t>",
@@ -398,7 +422,7 @@ var mobIceBlock = {icon:"<t style='color:#00FFFF'>X</t>",
                    attack:"freezes",
                    aggro:0,
                    x:0,y:0,
-                   flags: ["worthless","slow"],
+                   flags: ["worthless","slow","immobile"],
                    behaviour: function(){ return true; } // Ice block sits in place and does nothing.
                   };
 var mobNames = {
@@ -996,25 +1020,6 @@ function getTileName(tile){
 }
 
 function getHint(says=""){
- // Random hints or lore.
- var hints = ["You don't deserve forgiveness.",
-              "Did they really deserve it?",
-              "Too late for regrets.",
-              "Was it worth it?",
-              "You cannot fix it anymore.",
-              "Why did you do it?",
-              "Why them?",
-              "Seek the levers once your Self glows again.",
-              "Conquering your inner demons brings a certain boon.",
-              "Water will not harm you, Wanderer.",
-              "Have you lost your way?",
-              "You might never be the same again...",
-              "May you find that which you seek.",
-              "Strike down anyone who stands in your path.",
-              "Their blood shall purify you.",
-              "Your journey's end awaits in the distance.",
-              "Nourish your Self or fade to oblivion.",];
-
  var compass = ["north","south","east","west"];
  var adj = ["mysterious","strange","rasping","barely audible","faint","familiar","unfamiliar","inhuman"];
  var voice = ["voice","whisper"];
@@ -1025,15 +1030,15 @@ function getHint(says=""){
    msg += says;
 
  if(score>1000 && says=="")
-   msg += "Seek the levers, Wanderer. Seek the levers! ";
+   msg += "Seek the levers, Wanderer. Seek the levers!";
  else {
-   switch(r(4)){
-    case 1:
+   switch(r(6)){
+    case 0:
      var which = r(staves.length);
      msg += "A staff"+staves[which]+" "+staffDesc[which]+".";
      break;
 
-    case 2:
+    case 1:
      var which = r(glyphs.length);
      msg += "An armour"+glyphs[which]+" "+glyphDesc[which]+".";
      break;
@@ -5217,7 +5222,8 @@ function moveUser(x,y){
   return;
  }
  // Hunger and status effects:
- score--;
+ if(!hasted || (turn % 2 != 0))
+   score--;
  if(poisoned>0){
   score--;
   poisoned--;
@@ -5417,7 +5423,7 @@ function moveUser(x,y){
      msg += "It seems to be stuck in time. ";
      break;
    }
-   switch(r(15)){
+   switch(r(16)){
     case 0:
      if(r(visited)>10){
       aflame += r(30)+r(30)+3;
@@ -5514,6 +5520,12 @@ function moveUser(x,y){
          currentMap[userPos.x+k][userPos.y+l] = trapTerrain;
       }
      }
+     break;
+
+    case 11:
+     msg += "The landmine explodes. ";
+     currentMap[userPos.x][userPos.y] = ',';
+     onExplosion();
      break;
 
     default:
@@ -6246,42 +6258,49 @@ function onDeath(i){
    currentMap[currCre[i].x][currCre[i].y] = tileBloodDrop;
 }
 
-function onExplosion(i){
- var self = currCre[i];
+function onExplosion(i=Infinity){
+ // Declare epicentre of the explosion. If it's not a mob exploding, the explosion
+ // will be around the player.
+ var self;
+ if(i == Infinity)
+   self = userPos;
+ else
+   self = currCre[i];
+
  for(var k=-1; k < 2; k++){
   for(var l=-1; l < 2; l++){
-   if(inRangeCoords(currCre[i].x+k,currCre[i].y+l)){
+   if(inRangeCoords(self.x+k,self.y+l)){
     // Destroy some terrain types:
-    switch (currentMap[currCre[i].x+k][currCre[i].y+l]) {
+    switch (currentMap[self.x+k][self.y+l]) {
       case tileNettles:
-       currentMap[currCre[i].x+k][currCre[i].y+l] = tileBloodDrop;
+       currentMap[self.x+k][self.y+l] = tileBloodDrop;
        break;
 
       case tileGrassTall: case tileBramble: case tileBush:
-       currentMap[currCre[i].x+k][currCre[i].y+l] = tileGrassShort;
+       currentMap[self.x+k][self.y+l] = tileGrassShort;
        break;
 
       case tileTreeConif: case tileTreeLeafy: case tileTreeDead:
        msg += "The tree shatters into a thousand splinters. ";
-       currentMap[currCre[i].x+k][currCre[i].y+l] = tileTreeStump;
+       currentMap[self.x+k][self.y+l] = tileTreeStump;
        break;
 
       case tileMobDoor:
        msg += "The door is blown off its hinges. ";
-       currentMap[currCre[i].x+k][currCre[i].y+l] = '.';
+       currentMap[self.x+k][self.y+l] = '.';
        break;
 
       case wallBlock:
-       currentMap[currCre[i].x+k][currCre[i].y+l] = ',';
+       currentMap[self.x+k][self.y+l] = ',';
        break;
 
       case tileBlindGas: case tileConfGas: case tileStunGas:
        msg += "The vapours disperse. ";
-       currentMap[currCre[i].x+k][currCre[i].y+l] = emptyBlock;
+       currentMap[self.x+k][self.y+l] = emptyBlock;
        break;
     }
     // Deal damage to the player if they get caught in the explosion:
-    if(userPos.x == currCre[i].x+k && userPos.y == currCre[i].y+l){
+    if(userPos.x == self.x+k && userPos.y == self.y+l){
      msg += "You are pummeled by the explosion. ";
      playerTakeDamage(10+parseInt(score/4));
     }
@@ -6307,9 +6326,11 @@ function onExplosion(i){
     }
   }
  }
- // And finally kill the exploding mob:
- onDeath(currCre.indexOf(self));
- currCre = currCre.removeElement(self);
+ if(i != Infinity){
+   // And finally kill the exploding mob:
+   onDeath(currCre.indexOf(self));
+   currCre = currCre.removeElement(self);
+ }
 }
 
 function moveCreatures(){
@@ -6349,8 +6370,11 @@ function moveCreatures(){
    nextStep.shuffle();
    if(currCre[k].flags.includes("diagonal"))
      nextStep.push({x: currCre[k].x+dx, y: currCre[k].y+dy});
-   else if(stepsBetween(userPos,currCre[k])==2 && r(5) && !currCre[k].flags.includes("dumb")){
+   else if(stepsBetween(userPos,currCre[k])==2 && r(4) &&
+           !currCre[k].flags.includes("dumb") && !(glyph==8 && bloodied>0)){
      // When one step away from player, sometimes don't move and let the player come.
+     // Dumb mobs and mobs enraged by player in a bloodied armour of the blood knight
+     // don't care and will just charge in.
      continue;
    }
 
