@@ -32,9 +32,9 @@
     There are so many worlds to explore, but only so much of you left...
   </br></br>
     Welcome, Wanderer. You can check out the source code and report issues on
-    <a href="https://github.com/red-kangaroo/wanderer">GitHub</a>, or post
-    a comment on my <a href="https://attnam.blogspot.com/2020/08/wanderer.html">blog</a>.
-    <!-- There's also a <a href="https://github.com/red-kangaroo/wanderer/wiki">wiki</a> with
+    <a href="https://github.com/red-kangaroo/wanderer" target="_blank">GitHub</a>, or post
+    a comment on my <a href="https://attnam.blogspot.com/2020/08/wanderer.html" target="_blank">blog</a>.
+    <!-- There's also a <a href="https://github.com/red-kangaroo/wanderer/wiki" target="_blank">wiki</a> with
     more information and spoilers. -->
     Have fun!
   </br></br>
@@ -93,7 +93,7 @@ var staves = ["",
               " of <t style='font-style: italic;'>Soa r i&nbsp;&nbsp;n&nbsp;&nbsp;&nbsp;g</t> Leap",
               " of <t style='color:#800080'>C</t><t style='color:#FF1493'>o</t><t style='color:#800080'>njuration</t>",
               " of <t style='color:#006400'>Bur</t><t style='color:#32CD32'>g</t><t style='color:#006400'>eonin</t><t style='color:#32CD32'>g</t>",
-              " of <t style='color:#"+Math.random().toString(16).substr(2,6)+"'>P</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>u</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>r</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>e</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'> C</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>h</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>a</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>o</t><t style='color:#"+Math.random().toString(16).substr(2,6)+"'>s</t>",];
+              " of <t style='color:#"+rc()+"'>P</t><t style='color:#"+rc()+"'>u</t><t style='color:#"+rc()+"'>r</t><t style='color:#"+rc()+"'>e</t><t style='color:#"+rc()+"'> C</t><t style='color:#"+rc()+"'>h</t><t style='color:#"+rc()+"'>a</t><t style='color:#"+rc()+"'>o</t><t style='color:#"+rc()+"'>s</t>",];
 var staffDesc = ["with no enchantment can whack your enemies good, but unfortunately lacks magical powers",
                  "may open ephemeral bridges to faraway locations",
                  "can momentarily remove you from the flow of time, rendering all monsters and mechanisms frozen and unable to affect you",
@@ -262,7 +262,7 @@ var mobBoss = {icon:"<t style='color:#8B008B'>X</t>",
                 var j;
                 var k;
                 // Change randomly:
-                this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
+                this.icon = this.icon.replaceAt(17, rc());
                 this.attack = attackVerbs[r(attackVerbs.length)];
 
                 // Handle panicked boss:
@@ -378,27 +378,8 @@ var mobBoss = {icon:"<t style='color:#8B008B'>X</t>",
                        !(userPos.x==this.x+x && userPos.y==this.y+y)){
                      msg += this.name+" conjures an orb of prismatic energy. ";
                      // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
-                     var mobOrb = {icon:"<t style='color:#800080'>*</t>",
-                                   name:"<t style='color:#800080'>Prismatic Orb</t>",
-                                   attack:"kamikazes",
-                                   aggro:10, // Doesn't really matter.
-                                   x:0, y:0,
-                                   flags:[{x:x,y:y}, "explode"],
-                                   behaviour: function(){
-                                    // Change colour randomly:
-                                    this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
-                                    // Move in one direction, then explode:
-                                    var i = currCre.indexOf(this);
-                                    if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
-                                     doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
-                                    } else {
-                                     msg += currCre[i].name+" explodes. ";
-                                     onExplosion(i);
-                                    }
-                                    return true;
-                                   }
-                                  };
-                     currCre.push(mobOrb);
+                     currCre.push(cloneCreature(mobOrb));
+                     currCre[currCre.length-1].flags[0] = {x:x,y:y};
                      currCre[currCre.length-1].x = this.x+x;
                      currCre[currCre.length-1].y = this.y+y;
                     }
@@ -425,6 +406,28 @@ var mobIceBlock = {icon:"<t style='color:#00FFFF'>X</t>",
                    flags: ["worthless","slow","immobile"],
                    behaviour: function(){ return true; } // Ice block sits in place and does nothing.
                   };
+var mobOrb = {icon:"<t style='color:#800080'>*</t>",
+              name:"<t style='color:#800080'>Prismatic Orb</t>",
+              attack:"kamikazes",
+              aggro:10, // Doesn't really matter.
+              x:0, y:0,
+              flags:["tmp", "explode"],
+              behaviour: function(){
+                // Change colour randomly:
+                this.icon = this.icon.replaceAt(17, rc());
+                // Move in one direction, then explode:
+                if(typeof(this.flags[0]) == "string")
+                  return true;
+                let i = currCre.indexOf(this);
+                if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
+                  doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
+                } else {
+                  msg += currCre[i].name+" explodes. ";
+                  onExplosion(i);
+                }
+                return true;
+              }
+             };
 var mobNames = {
   'a': ["Abortion","Abuse","Accusation","Addiction","Adversity","Aggression","Agony","Alienation","Anger","Anguish","Animosity","Annoyance","Anxiety","Apathy","Arrogance","Avarice"],
   'b': ["Bedlam","Betrayal","Bias","Bigotry","Bitterness","Blame","Blasphemy","Blemish","Boredom","Bravado","Browbeat"],
@@ -581,27 +584,8 @@ function getMobBehaviour(){
       if(distanceBetween(userPos,this)<10)
         msg += this.name+" conjures an orb of prismatic energy. ";
       // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
-      var mobOrb = {icon:"<t style='color:#800080'>*</t>",
-                    name:"<t style='color:#800080'>Prismatic Orb</t>",
-                    attack:"kamikazes",
-                    aggro:10, // Doesn't really matter.
-                    x:0, y:0,
-                    flags:[{x:x,y:y}, "explode"],
-                    behaviour: function(){
-                     // Change colour randomly:
-                     this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
-                     // Move in one direction, then explode:
-                     var i = currCre.indexOf(this);
-                     if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
-                      doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
-                     } else {
-                      msg += currCre[i].name+" explodes. ";
-                      onExplosion(i);
-                     }
-                     return true;
-                    }
-                   };
-      currCre.push(mobOrb);
+      currCre.push(cloneCreature(mobOrb));
+      currCre[currCre.length-1].flags[0] = {x:x,y:y};
       currCre[currCre.length-1].x = this.x+x;
       currCre[currCre.length-1].y = this.y+y;
       return true;
@@ -819,6 +803,7 @@ function getUserChar(){
  else if(phased>0) colour = '#4B0082';
  else if(timestop>0) colour = '#00BFFF';
  else if(ward>0) colour = '#DAA520';
+ //else if(foo) colour = '#'+rc();
 
  var bkg = '';
  if(currentMap[userPos.x][userPos.y] == tileWater) bkg = 'background-color:#1E90FF; ';
@@ -845,7 +830,11 @@ function getUserChar(){
  return "<t style='"+bkg+"color:"+colour+"; font-weight: 900;'>@</t>";
 }
 
-function r(x){return Math.floor(Math.random() * x);}
+// Random number:
+function r(x) { return Math.floor(Math.random() * x); }
+
+// Random color:
+function rc() { return Math.random().toString(16).substr(2,6); }
 
 var fname = ["Wyatt","Girbach","Galven","Jacinto","Scofield","Donovan","Hyden","Carter","Bucanan","Jann","Armand","Frakes","Willian","Leath","Cordell","Weyer","Crystal","Chalet","Genevive","Lavigne","Jeneva","Lavanchy","Naida","Dowe","Cayla","Armiger","Saturnina","Strachan","Rosette","Voight","Arlean","Sharpey","Matha","Hammacher","Jani","Lockley","Genni","Cherniako","Sandri","Bukheva","Fruri","Sautova","Zivast","Grindina","Raldi","Kovskina","Alell","Seva","Atiin","Seiniko","Tini","Echkov","Fani","Dova","Adir","Kourina","Nata","Ronova","Adkarya","Cheva","Zinia","Limova","Saba","Benkovoi","Albina","Penrova","Xena","Ginieksi","Lana","Dinova","Rina","Shukova","Vikta","Gounova","Zina","Wes","McRaven","Darwin","Blackford","Edison","Ghelfi","Arden","Maille","Lucius","Simril","Branden","Wethern","Brendon","Rosek","Nolan","Carthen","Koerner","Merlin","Haught","Lorilee","Reade","Britteny","Moneaux","Camila","Jennell","Woldt","Maris","Yueh","Edra","Calder","Alder","Denyse","McLaren","Maryln","Caldera","Zsand","Gleep","Wurp","Ul","Thok","Meem","Pubb","Skremp","Nex","Drub","Vree","Gooch","Hargag","Doop","Wozz","Furge","Forby","Grog","Dapp","Kor","Blim","Yar","Tzim","Ursk","Pizzle","Pang","Dhun","Rool","Rapp","Lorg","Xim","Hrum","Bogg","Krotch","Stith","Boof","Tankle","Mooth","Hagat","Raco","Thwyp","Bazh","Stroot","Crad","Ramst","Wump","Mugg","Din","Voll","Gant","Ylur","Paag","Hool","Hass","Stroop","Sass","Ambro","Quisp","Burzy","Koz","Mazz","Rump","Krang","Hulm","Gax","Nex","Glum","Zoot","Jank","Oort","Nex","Molp","Ferd","Sundar","Pipt","Mo","Urz","Ygg","Yann","Tunn","Bipp","Vela","Bork","Ryz","Milsh","Chook","Nabb","Val","Ernst","Bock","Hyggs","Chum","Izzy","Zur","Kal","Uk","Ur","Mon","Joff","Pyu","Kramm","James","John","Robert","Michael","William","David","Richard","Joseph","Thomas","Charles","Christopher","Daniel","Matthew","Anthony","Donald","Mark","Paul","Steven","Andrew","Kenneth","George","Joshua","Kevin","Brian","Edward","Ronald","Timothy","Jason","Jeffrey","Ryan","Jacob","Gary","Nicholas","Eric","Stephen","Jonathan","Larry","Justin","Scott","Brandon","Frank","Benjamin","Gregory","Raymond","Samuel","Patrick","Alexander","Jack","Dennis","Jerry","Tyler","Aaron","Henry","Jose","Douglas","Peter","Adam","Nathan","Zachary","Walter","Kyle","Harold","Carl","Jeremy","Gerald","Keith","Roger","Arthur","Terry","Lawrence","Sean","Christian","Ethan","Austin","Joe","Albert","Jesse","Willie","Billy","Bryan","Bruce","Noah","Jordan","Dylan","Ralph","Roy","Alan","Wayne","Eugene","Juan","Gabriel","Louis","Russell","Randy","Vincent","Philip","Logan","Bobby","Harry","Johnny","Mary","Patricia","Jennifer","Linda","Elizabeth","Barbara","Susan","Jessica","Sarah","Margaret","Karen","Nancy","Lisa","Betty","Dorothy","Sandra","Ashley","Kimberly","Donna","Emily","Carol","Michelle","Amanda","Melissa","Deborah","Stephanie","Rebecca","Laura","Helen","Sharon","Cynthia","Kathleen","Amy","Shirley","Angela","Anna","Ruth","Brenda","Pamela","Nicole","Katherine","Samantha","Christine","Catherine","Virginia","Debra","Rachel","Janet","Emma","Carolyn","Maria","Heather","Diane","Julie","Joyce","Evelyn","Joan","Victoria","Kelly","Christina","Lauren","Frances","Martha","Judith","Cheryl","Megan","Andrea","Olivia","Ann","Jean","Alice","Jacqueline","Hannah","Doris","Kathryn","Gloria","Teresa","Sara","Janice","Marie","Julia","Grace","Judy","Theresa","Madison","Beverly","Denise","Marilyn","Amber","Danielle","Rose","Brittany","Diana","Abigail","Natalie","Jane","Lori","Alexis","Tiffany","Kayla","Bo","Dave"];
 var nname = ["Ace","Lefty","Shorty","Too-Tall","Fatty","Skinny","Jackass","Deadeye","Hawkful","Toothless","All-In","Double-Down","Stabby","Cutter","Punchy","Drippy","Tubs","Stinky","Baldy","Half-Hand","One-Eye","Rotgut","Doom-breath","Cheesey","Cookie","Spanky","Squirt","Britches","Helmet-Head","Mush-mouth","Marbles","Crazy-Legs","Scooter","Daredevil","Pinky","Prettyboy","Loverboy","Firebug","Cutthroat","Eviscerator","Belly-shot","Rumble-belly","Grumpy","Happy","Lucky","The Bastard","Fingers","Lips","Gold-bug","Fangs","Stumpy","Knuckles","Knuckle-dragger","Eyebrows","Hunchback","Honest","Songbird","Itchy","Scratchy","Booze-hound","Dirty","Dingy","Dingbat","Goofball","Sheep-lover","Bloodshot","Ladies' Man","Dapper","Diamond","The Dandy","Hit-man","Bird-man","Breakout","Wipeout","Dusty","Cottonmouth","Sweet","Rattlesnake","Ox","Ogre","Two-Ton","The Card-Sharp","Chuckles","Funnyman","Undertaker","Gravedigger","Goldie","Poet","Doc","Little","Big","Old","Young","the Kid","Smash-mouth","Whiskey","Ice-man","Reverend","Crusher","Hoss","Snake","Admiral","Bird","Fuzz","Flame","Magician","Barber","Dandy","Twinkle Toes","Blush","Cobra","Yank","Sailor","Cloud","Bobo","Pugs","Bash","Shade","Pipi","Mitzi","Toon","Jewel","Angel","Tiny","Hammer","Blade","Mistletoe","Mugsy","Rouge","Dazzle","Rebel","Merry","Butch","Brick","Grim","Mayor","Arrow","Killer","Prince","Silly","Chipper","Sparrow","Dino","Stretch","Piggy","Butterfly","Bugs","Scruffy","Stout","Ruin","Jumbo","Chief","Sizzle","Freak","Vanilla","Grouch","Brow","Pops","Bad Boy","Fury","Hawk","Buster","Dummy","Berry","Joker","Sassy","Pogo","Pug","Hurricane","Moose","Crow","Robin","Slash","Miracle","Boomer","Jackal","Speed","Bingo","Bitsy","Beard","Honey","Beau","Cuddles","Mutt","Bigby","Queenie","Silence","Spud","Bull","Braveheart","Shadow","Stone","Magica","Mad Dog","Fuzzy","Blue","Bigshot","Spuds","Horse","Skippy","Daring","Marvel","Aggy","Red","Terminator","Bones","Worm","Gentle","Deedee","Major","Thunder","Slim","Nimble","Vulture","Thief","Trey","Pretzel","Stuffy","Gibby","Knight","Ziggy","Viper","Coocoo","Smasher","Glider","Darlin","Buck","Chuck","Lock","Beauty","Landslide","Fish","Dutch","Pig","Bambam","Dream","Black Magic","Dodo","Boogie","Mamba","Trouble","Tigress","Biggie","Creed","Tiger","Feathers","Silver","of the Seven Potencies","Grand Terakion","Devourer of Chaos","the White Crow","Bringer of Prophecy","Benevolent Bringer of Chaos","of the Indivisible Chrome","Master of the Mindless Fist","Weaver of Rainbow's Thread","Sailor of the Twenty-One Trials","Unwritten in the Endless Tome of Time","Prince of the Harlequins","Carver of Dragon Teeth","Herald of the False Prophet","Lion Among Men","the Thrice-Cursed","Merrymaker Extraordinaire","Voice of the Desert","First of the Chosen","Deathslayer","the Damned","of the Forbidden Sea","of the Bells","Adjudicator","Dragonblood","of Many Faces","the Noble Coward","the Hussar","Fellblade","the Fine-Fingered","Feyborne","First Voice of the Crimson Choir","Midnight's Squire","the Frozen Tyrant","the Graven","Mistress of the End","First Gate of the Winding Road","the Hunger Immemorial","Herald of Falling Stars","the Beckoning Quiet","the King of Fools","of the Hallowed Skies","the Last March","the Wild Walker","the Unblemished","the Moon Seer","the Answer","the Night Stalker","the Great Bear","the Unbroken","Honour's Blade","the Boulder","the Scarlet Lion","the Unyielding Anvil","the Iron Commander","Fate Breaker","Kingseeker","the Entitled","Ocean Drinker","Lord of the Dance","of the Great Tower","Earthbinder","of the Poisoned Mind","Terror of the Deeps","Bearer of the Unseeing Eye","the Burdened One","Eternal Servant of the Weave","of the Boundless Possibilites","the Eternal","First to Desire","Valiant Protector","Born of Ash","Suntouched","who Smiles at Death","the Ruin Sage","Embraced by the Moon","the Unyielding","Treachery Incarnate","Protector of Hope","the Fading Light","the Promised End","Reality Sculptor","Keeper of Silence","the Black Rose","Apostle of Dusk","the Bloodied","the Crusher","War Tooth","the Generous","Underfoot","Hart-Footed","Witch-Breaker","Horse Lord","the Wisest","Grim Face","North Bound","Little Bear","the Fair","the Crow","the Amorous","the Frantic","the Old","the Stout","Deep Drinker","the Swarthy","Battle-wise","the Learned","Deep Delver","the Champion","the Giant","Far-traveling","Longshanks","the Small","Silvertongue","Stormcrow","Billygoat","the Leech","Star-eyed","Longbeard","the Wild","Bee Friend","the Burned","the Subtle","the Clever","the Young","Gold-friend","Death's Friend","Half-Troll","the Gray","the Judge","Bee Stung","the Dreamer","Thick-skulled","the Hound","He-Man","Iron-side","Moon Jumper","the Quiet","the Gentle","the Unborn","Fox-bearded","the Red","Bald Pate","the Exile","Sword-splitter","the Bright","Far-seer","the Proud","the Fortunate","the Honest","the Unbowed","the Leaper","the Pious","the Lecherous","the Stingy","the Careless","the Crafty","the Diligent","the Innocent","the Blind Visionary","the Brilliant Mind","the Eternal Hunger","Gentle Heart","Light Lord","Lone Wolf","Love Fool","Loyal Heart","Nimble Mind","the Risen","Secret Master","the Unsung Hero","Grey Knight","Cheap Shot","the Bright One","Dead Mind","the Fake King","Ill Tempered","the Lost Hope","the Last Song","Numb Mind","Tragic Eyes","the Wandering Mind","from Above","from Afar","from Below","the Adept","the Albino","the Antiquarian","the Arcane","the Archaic","the Barbarian","the Batrachian","the Battler","the Bilious","the Bold","the Brave","the Civilized","the Collector","the Cryptic","the Curious","the Dandy","the Daring","the Decadent","the Delver","the Distant","the Eldritch","the Exotic","the Explorer","the Fearless","the Fickle","the Foul","the Furtive","the Gambler","the Ghastly","the Gibbous","the Great","the Grizzled","the Gruff","the Hairy","the Bald","the Haunted","the Heavy","the Hooded","the Hunter","the Imposing","the Irreverent","the Loathsome","the Loud","the Lovely","the Mantled","the Masked","the Merciful","the Mercurial","the Mighty","the Morose","the Mutable","the Mysterious","the Obscure","the Ominous","the Peculiar","the Perceptive","the Quick","the Ragged","the Ready","the Rough","the Rugose","the Scarred","the Searcher","the Shadowy","the Short","the Steady","the Uncanny","the Unexpected","the Unkonwable","the Verbose","the Vigorous","the Wanderer","the Wary","the Weird","of the Arid Wastes","of the Beetling Brow","of the Cyclopean City","of the Dread Wilds","of the Eerie Eyes","of the Foetid Swamp","of the Forgotten City","of the Haunted Heath","of the Hidden Valley","of the Howling Hills","of the Jagged Peaks","of the Menacing Mien","of the Savage Isle","of the Tangled Woods","of the Watchful Eyes","the Lean","the Cowled","the Veiled","the Merciless","the Tall"];
@@ -958,7 +947,7 @@ function newWorldName(){
    break;
  }
 
- return "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+wName+"</t>";
+ return "<t style='color:#"+rc()+"'>"+wName+"</t>";
 }
 
 function getWorldName(){
@@ -1151,10 +1140,12 @@ function addRiver(){
  }
 }
 
-function addLake(){
+function addLake(currStep=null){
  var stepsTaken = 0;
  var stepsFailed = 0;
- var currStep = {x:r(mapWidth),y:r(mapWidth)};
+
+ if(!currStep)
+   currStep = { x:r(mapWidth), y:r(mapWidth) };
 
  var liquid = emptyBlock; // Just to make sure we don't accidentaly make undefined lake.
  if(r(visited)>20) liquid = tileLava;
@@ -1241,7 +1232,7 @@ function addStructure(special_rooms=false){
            "7......                   7.....7",
            "77 . 77                   77===77"];
  }
- else switch(r(240)) {
+ else switch(r(260)) {
   default:
    if(score > 1000){
      toAdd = ["...",
@@ -4470,6 +4461,432 @@ function addStructure(special_rooms=false){
              "         W+W         ",
              "          .          "];
    break;
+
+   case 229:
+    toAdd = ["        ;;;        ",
+             "        ;P;        ",
+             "  ;;;;;;;;;;;;;;;  ",
+             "  ;P;PPP|+|PPP;P;  ",
+             "  ;;;P%%%;appP;;;  ",
+             "  ;PPPa7;%p7%PPP;  ",
+             "  ;P%%%%aAp%%%;P;  ",
+             "  ;Pp7%%777;;7%P;  ",
+             ";;;|a%%77$77a%%|;;;",
+             ";P;+p;A7$a$7Ap;+;P;",
+             ";;;|;%;77$77p%a|;;;",
+             "  ;P%7a;787%%7pP;  ",
+             "  ;P%%%p;M%a;ppP;  ",
+             "  ;PPPp7%%p7;PPP;  ",
+             "  ;;;Pp;a;;%%P;;;  ",
+             "  ;P;PPP|+|PPP;P;  ",
+             "  ;;;;;;;;;;;;;;;  ",
+             "        ;P;        ",
+             "        ;;;        "];
+   break;
+
+   case 230:
+    toAdd = ["          WWWWWWWWWW",
+             "         WWaWa._.aWW",
+             "        WW...W...WaW",
+             "       WW..A..WaW..W",
+             "      WWWWW/WWWW/.AW",
+             "     .....cWW''WW..W",
+             "    W.W../WW't'WaWaW",
+             "   WW..WcWW'''MW..WW",
+             "  WWW..cWW't'WW/A.aW",
+             " WWaW..WW'''MW/W..WW",
+             "WW..W/WM'''WW..WaWW ",
+             "Wa.A/WW't'WWc..WWW  ",
+             "WW..WM'''WWcW..WW   ",
+             "WaWaW't'WW/..W.W    ",
+             "W..WW''WWc.....     ",
+             "WA./WWWW/WWWWW      ",
+             "W..WaW..A..WW       ",
+             "WaW...W...WW        ",
+             "WWa.i.aWaWW         ",
+             "WWWWWWWWWW          "];
+   break;
+
+   case 231:
+    toAdd = ["WWWWW...WWWWW",
+             "WtWWWW+WWWWtW",
+             "W444WW.WW444W",
+             "WW4..=.=..4WW",
+             " W.t.ccc.t.W ",
+             " WW..cMc..WW ",
+             "  W..ccc..W  ",
+             "  WW.t.t.WW  ",
+             "   W.....W   ",
+             "   WW.M.WW   ",
+             "    WmmmW    ",
+             "    WWmWW    ",
+             "     W8W     ",
+             "      .      "];
+   break;
+
+   case 232:
+    toAdd = [" ::::::::: ",
+             "W::XXXXX::W",
+             "WXXXmXmXXXW",
+             "WXXmXaXmXXW",
+             "WXXXXXXXXXW",
+             "W::XXXXX::W",
+             "W:::::::::W",
+             "W::::[::::W",
+             "WW:::i:::WW",
+             "WWW:::::WWW",
+             "WWWWWWWWWWW"];
+   break;
+
+   case 233:
+    toAdd = ["WWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+             "WWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+             "Wa.+maWWW:$:::$:::$:WWWam+.aW",
+             "W..+m.WW::::1:::1::::WW.m+..W",
+             "W..W..Wa::::::a::::::aW..W..W",
+             "W..W..WW:::a:::::a:::WW..W..W",
+             "W..W..Wa:2::::A::::2:aW..W..W",
+             "W..W..WW:::::::::::::WW..W..W",
+             "WmmW..Wa::a:::a:::a::aW..WmmW",
+             "W..WmmWW::::a:::a::::WWmmW..W",
+             "W..W..Wa::::::i::::::aW..W..W",
+             "W..W..WW:2:a:::::a:2:WW..W..W",
+             "W..W..Wa::::::a::::::aW..W..W",
+             "W..W..WW:a:a::a::a:a:WW..W..W",
+             "W..W..WWWaWaW...WaWaWWW..W..W",
+             "W..W++WWWWWWW+++WWWWWWW++W..W",
+             "W..W..WaWaWaW...WaWaWaW..W..W",
+             "W..Wm....m...M.M...m....mW..W",
+             "W..W...m...m.....m...m...W..W",
+             "WmmWaWaWaWaWWaAaWWaWaWaWaWmmW",
+             "W++WWWWWWWWWWWWWWWWWWWWWWW++W",
+             " ..         WWWWW         .. "];
+   break;
+
+   case 234:
+    toAdd = ["      WWWWWWWWW      ",
+             "     Wa..aWa..aW     ",
+             "    WW...aWa...WW    ",
+             "    W....WWWW..aW    ",
+             "   WW...WW.a....WW   ",
+             "   Wa...W.a......W   ",
+             "  WW....W...WW...WW  ",
+             " WW.....W.a..WW...WW ",
+             ".+.......a.a..WW...+.",
+             " WW...WWa._.aWW...WW ",
+             "  WW...WWa.aWWa..WW  ",
+             "   W...aWWaWW...aW   ",
+             "   WW...aWWW....WW   ",
+             "    W..a.aWa....W    ",
+             "    WW.WWWW....WW    ",
+             "     Wa.......aW     ",
+             "      WWWWWWWWW      "];
+   break;
+
+   case 235:
+    toAdd = ["     WWWWWWWWW     ",
+             "    WW.......WW    ",
+             "    W.........W    ",
+             "   WW..WWWWW..WW   ",
+             "  WW...W.m.W...WW  ",
+             " WW...WWm.mWW...WW ",
+             ".+....Wm.1.mW.a..+.",
+             " W.Wa.Wm.m.mWaWW.W ",
+             " W.WWaWWm.mWW.aW.W ",
+             " Wa....WW+WWa....W ",
+             " WW..a.....aaW..WW ",
+             "  W.WWa....WWW..W  ",
+             "  W..W.aWaa.....W  ",
+             "  WWa...WWW....WW  ",
+             "   WWW.......WWW   ",
+             "     WWW...WWW     ",
+             "       WW+WW       ",
+             "         .         "];
+   break;
+
+   case 236:
+    toAdd = ["     WWWWWWW      ",
+             "    WW.....WW     ",
+             "   WW..WaW..WW    ",
+             "  WW...a.a...WW   ",
+             " WW...WWWWW...WW  ",
+             "4W.44.WaaaW...aWW ",
+             "W444WW.aWa.WW...W ",
+             "4444Waa...aaWcW.W ",
+             "444.WaW._.Wa+.W.+.",
+             "W4WcWaa...aaWcW.W ",
+             "W...WW.aWa.WW...W ",
+             "WW....WaaaW....WW ",
+             " WW...WWWWW...WW  ",
+             "  WWa..a.a...WW   ",
+             "   WW..WaW..WW    ",
+             "    WW.....WW     ",
+             "     WWWWWWW      "];
+   break;
+
+   case 237:
+    toAdd = ["WWWWWWWWWWW",
+             "W1Wc..W$$iW",
+             "W8W..c8$$$W",
+             "W.c.c.WWWWW",
+             ".......c..W",
+             "W..c.c.....",
+             "W.A.....WWW",
+             "Wcc...cWWWW",
+             "WWWW.WWWWWW"];
+   break;
+
+   case 238:
+    toAdd = ["WWW.7..7......7..7.WWW",
+             "WWW...........m....WWW",
+             "WWWm.7..7....7..7.mWWW",
+             "WWWW.....m......m.WWWW",
+             "WWWWm.7..7..7..7..WWWW",
+             " WWWW..m.........WWWW ",
+             "  WWWW......m...WWWW  ",
+             "   WWWWW......WWWWW   ",
+             "     WW777++777WW     ",
+             "       77a..a77       ",
+             "       7a....a7       ",
+             "       7..$$..7       ",
+             "       7..$$..7       ",
+             "       7a....a7       ",
+             "       77a..a77       ",
+             "       77777777       "];
+   break;
+
+   case 239:
+    toAdd = ["        %%        ",
+             "       %%%%       ",
+             "      %%%%%%      ",
+             "     %%mPP%%%     ",
+             "    %%%PPPP%%%    ",
+             "   %%%%PPPPm%m%   ",
+             "  %%%m%%PP%%%%%%  ",
+             " %%PP%%%%%m%%PPm% ",
+             "%%PPPP%%PP%%PPPP%%",
+             "%%PPPPmP$$PpPPPP%%",
+             " %%PP%%P$$pp%PP%% ",
+             "  %%m%%%PPppp%m%  ",
+             "   %%PP%%ppPPm%   ",
+             "   %PPPP%pPPPP%   ",
+             "   %PPPPm%PPPP%   ",
+             "   %%PP%%%mPP%%   ",
+             "    %%m%%%%%%%    ",
+             "     %%%%%%%%     ",
+             "      %%%%%%      ",
+             "       %%%%       ",
+             "        %%        "];
+   break;
+
+   case 240:
+    toAdd = [" .              ",
+             "W.WWWWWWWWWWWWWW",
+             "W...7.c....... W",
+             "W.7....7..."+['?','$','.'][r(3)]+"   W",
+             "...c.7.....    W",
+             "..........     W",
+             "...7.c.....    W",
+             "W7....7....    W",
+             "W.c.7....     iW",
+             "W.WWWWWWWWWWWWWW",
+             " .              "];
+   break;
+
+   case 241:
+    toAdd = ["     ..     ",
+             "|||||..|||||",
+             "|c-c|.^|cic|",
+             "|$c$|..|$c$|",
+             "||+||..||+||",
+             "|?c?|^.|?.?|",
+             "|?.?|..|?c?|",
+             "||+||++||+||",
+             "|.c......c.|",
+             "|acc....cca|",
+             "||||||||||||"];
+   break;
+
+   case 242:
+    toAdd = ["WWWW7..7WWWW",
+             "Wi666..666iW",
+             "W6666..6666W",
+             "W6666..6666W",
+             "76667..76667",
+             ".....mm.....",
+             ".....mm.....",
+             "76667..76667",
+             "W6666..6666W",
+             "W6666..6666W",
+             "Wi666..666iW",
+             "WWWW7..7WWWW"];
+   break;
+
+   case 243:
+    toAdd = ["      77777.     ",
+             "    777aaa7+7    ",
+             "   77.......77   ",
+             "  77.....777777  ",
+             " 77.....77aaa777 ",
+             " 77+7aa77.....77 ",
+             "777.7777...6...77",
+             "77...77...666..a7",
+             "7M.7..+..66766a17",
+             "77...77...666..a7",
+             "777.7777...6...77",
+             " 77+7aa77.....77 ",
+             " 77.....77aaa777 ",
+             "  77.....777777  ",
+             "   77.......77   ",
+             "    777aaa7+7    ",
+             "      77777.     "];
+   break;
+
+   case 244:
+    toAdd = ["WWWWWWWW.WWWWWWWW",
+             " WWWWWWWcWWWWWWW ",
+             " .WWWWW...WWWWW. ",
+             " ..WWW.....WWW.. ",
+             " ...W.......W... ",
+             " ...4.......4... ",
+             " .c.4...c...4.c. ",
+             " ...4.......4... ",
+             " ...W.......W... ",
+             " ..WWW.....WWW.. ",
+             " .WWWWW...WWWWW. ",
+             " WWWWWWWcWWWWWWW ",
+             "WWWWWWWW.WWWWWWWW"];
+   break;
+
+   case 245:
+    toAdd = ["        :        ",
+             "       :::       ",
+             "      ::X::      ",
+             "     ::XXX::     ",
+             "    ::XXXXX::    ",
+             "   ::::XXX::::   ",
+             "  ::X:::X:::X::  ",
+             " ::XXX:::::XXX:: ",
+             "::XXXXX:_:XXXXX::",
+             " ::XXX:::::XXX:: ",
+             "  ::X:::X:::X::  ",
+             "   ::::XXX::::   ",
+             "    ::XXXXX::    ",
+             "     ::XXX::     ",
+             "      ::X::      ",
+             "       :::       ",
+             "        :        "];
+   break;
+
+   case 246:
+    toAdd = ["         7              ",
+             "        7a7             ",
+             "       7aaa7            ",
+             "      7..M..7           ",
+             "     7...6...7          ",
+             "    7..76_67..7         ",
+             "   7.7...6...7.7        ",
+             "  7...66.M.66...7       ",
+             " 7..M.66...66.M..7 .    ",
+             "7.......7?7.......7..   ",
+             "7777+7777?7777?7777+7777",
+             "   ..7.......7?7.......7",
+             "    . 7..M.%%...%%.M..7 ",
+             "       7...%%.M.%%...7  ",
+             "        7.7...%...7.7   ",
+             "         7..7%_%7..7    ",
+             "          7...%...7     ",
+             "           7..M..7      ",
+             "            7aaa7       ",
+             "             7a7        ",
+             "              7         "];
+   break;
+
+   case 247:
+    toAdd = ["      .WWWWWW         ",
+             "     W.+...WW         ",
+             "    ..3W.A.WWWWW      ",
+             "   WW+WW...WWWWWWWW   ",
+             "   WW...xxx...WWWWW.  ",
+             "   WW.A.xxx.A.W...+.W ",
+             "  WWW...xxx...W.A.W3..",
+             "  WWWWWW...WWWW...WW+W",
+             "  WW...W.A.W...xxx...W",
+             "WWWW.A.W...+.A.xxx.A.W",
+             "WWWW...WW+WW...xxx...W",
+             "W...xxx...WW+WW...WWWW",
+             "W.A.xxx.A.+...W.A.WWWW",
+             "W...xxx...W.A.W...WW  ",
+             "W+WW...WWWW...WWWWWW  ",
+             "..3W.A.W...xxx...WWW  ",
+             " W.+...W.A.xxx.A.WW   ",
+             "  .WWWWW...xxx...WW   ",
+             "   WWWWWWWW...WW+WW   ",
+             "      WWWWW.A.W3..    ",
+             "         WW...+.W     ",
+             "         WWWWWW.      "];
+   break;
+
+   case 248:
+    toAdd = ["   WqW   ",
+             "  WWqWW  ",
+             " W.....W ",
+             "WW.....WW",
+             "==..A..ss",
+             "WW.....WW",
+             " W.....W ",
+             "  WWbWW  ",
+             "   WbW   "];
+   break;
+
+   case 249:
+    toAdd = ["WWWWWWWWWWW         ",
+             "WWW2$WWWWWW W W W W ",
+             "WWM44MWWc...W.W.W.W ",
+             "Wa44444+..........  ",
+             "Wa44444+..%...WWWWWW",
+             "WWM44MWW....cWWi$WWW",
+             "WWW$iWW.....WWM::MWW",
+             "WWWWWWc..%..+:::::$W",
+             "  ..........+:::::$W",
+             " W.W.W.W...cWWM::MWW",
+             " W W W W WWWWWW$2WWW",
+             "         WWWWWWWWWWW"];
+   break;
+
+   case 250:
+    toAdd = ["    WW'WW    ",
+             "   WWb'bWW   ",
+             "   WWb'bWW   ",
+             "   WWb'bWW   ",
+             "   Wbb'bbW   ",
+             "   Wbb'bbW   ",
+             "WWWWbb'bbWWWW",
+             ".'''''A'''''.",
+             "WW..'''''..WW",
+             " WWWW.'.WWWW ",
+             "   WW.'.WW   ",
+             "   WW.'.WW   ",
+             "    WW.WW    "];
+   break;
+
+   case 251:
+    toAdd = ["      =,       ",
+             "     ==,       ",
+             "    ,=,,,      ",
+             "   ,,==,,      ",
+             "==,,,===,,,,   ",
+             ",===,,,====,,, ",
+             ",,,===$$==,,=,,",
+             " ,,,==$$$,,==, ",
+             "  ,,===$A$==,, ",
+             "  ,====$$$=,,  ",
+             "  ,,====$==,   ",
+             "   ,======,,   ",
+             "   ,,,===,,    ",
+             "    ,,==,,     ",
+             "     ,=,,      "];
+   break;
  }
 
  // Mirror, flip, rotate:
@@ -4772,7 +5189,7 @@ function addUser(){
  }
  //TODO: Make sure player doesn't start in lava or in a locked treasure room!
 
- userName = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+newName()+"</t>";
+ userName = "<t style='color:#"+rc()+"'>"+newName()+"</t>";
 }
 
 function teleportUser(){
@@ -5306,27 +5723,8 @@ function moveUser(x,y){
   if((x != 0 || y != 0) && inRangeCoords(userPos.x+x,userPos.y+y) && checkEmpty(userPos.x+x,userPos.y+y)){
    msg += "You conjure an orb of prismatic energy. ";
    // Create an orb creature with behaviour that will move in one direction until blocked, then explode.
-   var mobOrb = {icon:"<t style='color:#800080'>*</t>",
-                 name:"<t style='color:#800080'>Prismatic Orb</t>",
-                 attack:"kamikazes",
-                 aggro:10, // Doesn't really matter.
-                 x:0, y:0,
-                 flags:[{x:x,y:y}, "explode"],
-                 behaviour: function(){
-                  // Change colour randomly:
-                  this.icon = this.icon.replaceAt(17, Math.random().toString(16).substr(2,6));
-                  // Move in one direction, then explode:
-                  var i = currCre.indexOf(this);
-                  if(tryMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i)){
-                   doMove(this.x+this.flags[0].x,this.y+this.flags[0].y,i);
-                  } else {
-                   msg += currCre[i].name+" explodes. ";
-                   onExplosion(i);
-                  }
-                  return true;
-                 }
-                };
-   currCre.push(mobOrb);
+   currCre.push(cloneCreature(mobOrb));
+   currCre[currCre.length-1].flags[0] = {x:x,y:y};
    currCre[currCre.length-1].x = userPos.x+x;
    currCre[currCre.length-1].y = userPos.y+y;
   } else {
@@ -5549,6 +5947,7 @@ function moveUser(x,y){
    }
    msg += "The lever clicks as you turn it. ";
    currentMap[userPos.x][userPos.y]='\\';
+
    // Create boss arena:
    if(score>1000){
      if(!r(2) && userPos.x>4 && userPos.x<(mapWidth-6) && userPos.y>4 && userPos.y<(mapWidth-6)){
@@ -5564,21 +5963,52 @@ function moveUser(x,y){
    } else if(!r(10))
      getHint("You hear a grinding voice saying: \"");
 
-   // Create secret paths:
-   var q = r(10)+1;
-   var testX = 0;
-   var testY = 0;
-   while(q){
-    testX = userPos.x+r(10)-5;
-    testY = userPos.y+r(10)-5;
-    if(inRangeCoords(testX,testY)){
-     if(currentMap[testX][testY]==wallBlock){
-      q--;
-      currentMap[testX][testY] = tileSecretPath;
+   let didSomething = false;
+   if(r(20)){
+     // Create secret paths:
+     let q = r(10)+1;
+     let testX = 0;
+     let testY = 0;
+     let tried = 100;
+     while(q && tried){
+       testX = userPos.x+r(10)-5;
+       testY = userPos.y+r(10)-5;
+       if(inRangeCoords(testX,testY) && currentMap[testX][testY]==wallBlock){
+         currentMap[testX][testY] = tileSecretPath;
+         didSomething = true;
+         q--;
+       } else
+         tried--;
      }
-    }
+     if(didSomething)
+       msg += "Walls crumble around you. ";
    }
-   msg += "Walls crumble around you. ";
+   if(!didSomething){
+     switch (r(4)) {
+       case 0: case 1:
+        addLake(userPos);
+        currentMap[userPos.x][userPos.y]='\\';
+        msg += "The very earth beneath your feet trembles. ";
+       break;
+
+       case 2:
+        addStructure();
+        currentMap[userPos.x][userPos.y]='\\';
+        msg += "The reality seems to stutter for a second. ";
+       break;
+
+       default:
+        for(let k=-1; k < 2; k++){
+         for(let l=-1; l < 2; l++){
+          if(inRangeCoords(userPos.x+k,userPos.y+l) && !impassable.includes(currentMap[userPos.x+k][userPos.y+l]))
+            currentMap[userPos.x+k][userPos.y+l] = '?';
+         }
+        }
+        currentMap[userPos.x][userPos.y]='\\';
+        msg += "Something falls from above. ";
+       break;
+     }
+   }
    break;
 
   case tileTeleporter:
@@ -6407,6 +6837,18 @@ function getFinalScore(){
  return "<t style='color:#8B008B; font-weight: bold;'>"+String(parseInt(winner))+"</t>";
 }
 
+function devRandCharacter(){
+  score = 500-r(500);
+  visited = r(20)+2;
+  staff = r(staves.length);
+  glyph = r(glyphs.length);
+  armor = r(20);
+  keys = r(5);
+  kills = r(30);
+  spawnMobs();
+  displayMap();
+}
+
 function displayMap(highlight=""){
  var displayString = "";
  var outputMap = [];
@@ -6609,23 +7051,6 @@ document.onkeydown = function(e) {
         case 27: //Esc
          displayMap();
          break;
-
-        //DEBUG
-        // case 66: //B
-        //  addBoss();
-        //  displayMap();
-        //  break;
-        // case 86: //V
-        //  score = 500-r(500);
-        //  visited = r(20)+2;
-        //  staff = r(staves.length);
-        //  glyph = r(glyphs.length);
-        //  armor = r(20);
-        //  keys = r(5);
-        //  kills = r(30);
-        //  spawnMobs();
-        //  displayMap();
-        //  break;
     }
 };
 
@@ -6689,7 +7114,7 @@ function initialise(){
  mobSelves.shuffle();
  for (; creatureChar.length>0; ) {
   var base = {icon:"",name:"",attack:undefined,aggro:0,x:0,y:0,flags:[],behaviour:function(){return false;}};
-  base.icon = "<t style='color:#"+Math.random().toString(16).substr(2,6)+"'>"+creatureChar.pop()+"</t>";
+  base.icon = "<t style='color:#"+rc()+"'>"+creatureChar.pop()+"</t>";
   base.name = "<t style='color:#"+base.icon.substr(17,6)+"'>"+getMobName(base.icon.charAt(25))+"</t>";
   base.attack = attackVerbs[r(attackVerbs.length)];
   base.aggro = r(10)+r(5)+4;
