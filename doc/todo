@@ -9,7 +9,6 @@ README
 * preview:
    https://jbt.github.io/markdown-editor/
 * wiki!!
-* make links open in new tab, not over game
 
 * put the description into a collapsible:
    https://www.w3schools.com/howto/howto_js_collapsible.asp
@@ -36,15 +35,17 @@ README
 
 * traps
    area teleport (random already visited, or anywhere?)
+* levers
+   better secret paths?
 * armor
    explosions (destroy adjacent mobs and terrain, but grants no kills)
    time mastery (randomly/on damage time stop)
    zen (no hunger and invulnerable while blind??)
    plant lordship (some effect when trampling grass, nettles and brambles)
-   sludge (cap damage taken at 1, but only when Poisoned)
    hyperspace (diagonal movement)
    druidcraft (walk thru trees??)
 
+   sludge (cap damage taken at 1, all other damage becomes Poisoned duration)
    water lily steps (immune to liquids, even beneficial effects)
    invisibility
    cowardice - extra armor and hasted on hit when Panicked
@@ -94,17 +95,13 @@ README
 * fix rotate
 * fix diagonal rivers
 
-* game freezes on lever?
-* more fun effects on levers and altars
+* more fun effects on altars
 * "wilderness" maker, random floor/plants
 * morgue file in new raw window
    https://www.geeksforgeeks.org/how-to-strip-out-html-tags-from-a-string-using-javascript/
 
 Mobs
 ====
-* simplify mobOrb
-   not slow!
-
 * adjacent mobs follow player between levels
 * prevent boss spawn when boss already present?
 * add cause of death msg
@@ -123,7 +120,6 @@ Mobs
 * lava/liquids block mobs??
    lava doesn't block mobs with flame/lavapool flags, etc.
 * add descriptions for mob abilities
-* spawn extra monsters on . OR respawn monsters on . (blood drops?)
 
 * passive attacks:
 bloody X bleed
