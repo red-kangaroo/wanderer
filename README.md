@@ -46,6 +46,8 @@ Press 'M' for message history.
 Press '?' in-game for more help.
 ```
 
+You can also check out the [wiki](https://github.com/red-kangaroo/wanderer/wiki "Wiki").
+
 ### Screenshots
 <div align="center">
 

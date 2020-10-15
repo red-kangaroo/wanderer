@@ -4,18 +4,20 @@ Wander/Wonder
 https://www.w3schools.com/colors/colors_names.asp
 https://www.w3schools.com/charsets/ref_utf_symbols.asp
 
-README
 * story/very short lore?
-* preview:
+* README preview:
    https://jbt.github.io/markdown-editor/
 * wiki!!
+* more hints
 
+* move JS to individual .js file and use /* jshint esversion: 6 */
+* just maybe look into disabling console? not that I'd expect cheaters, but...
+   https://davidwalsh.name/disable-console
 * put the description into a collapsible:
    https://www.w3schools.com/howto/howto_js_collapsible.asp
 * change keys for special display to something that doesn't interfere with browser shortcuts?
 
 * refactor player!!!
-* more hints
 * add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
 * make sure player doesn't start in lava or in a locked treasure room
