@@ -146,6 +146,7 @@ jump kick attack
 Not Now
 =======
 * boss bold and underlined - cannot do right now, because we replace letter with charAt
+* maybe boss fight instead places artifact in the middle of the arena, teleports player and boss on kill creates many §, so that non-combat staffs can be used better
 
 * add A* (maybe not, current AI is dangerous enough?)
 https://briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated/

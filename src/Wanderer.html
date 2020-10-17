@@ -8,7 +8,7 @@
   <style>
   body p,
   input {
-  	font-family:courier, monospace;
+    font-family:courier, monospace;
     /* font-size:15px; */
     line-height: 85%;
   }
@@ -28,7 +28,7 @@
 
 <div id="additional-info" style="position:absolute; top: 0px; right: 5px; max-width: 40%;">
   <h3>Wanderer v2.1</h3>
-	<p>
+  <p>
     There are so many worlds to explore, but only so much of you left...
   </br></br>
     Welcome, Wanderer. You can check out the source code and report issues on
@@ -45,11 +45,6 @@
   </br></br>
     Press <code>?</code> for game help.
   </p>
-
-	<!-- <form method="GET">
-	<input type="text" name="name" placeholder="Sunny Honey Bunny">
-	<input type="submit" value="Send">
-	</form> -->
 
   <h5>Nearby:</h5>
   <p id="nearbyList"></p>
@@ -360,7 +355,8 @@ var mobBoss = {icon:"<t style='color:#8B008B'>X</t>",
                  j = userPos.x + r(3)-1;
                  k = userPos.y + r(3)-1;
                  if(checkEmpty(j,k) && inRangeCoords(j,k) && (j != 0 || k != 0)){
-                  currentMap[this.x][this.y] = '^';
+                  if(currentMap[this.x][this.y]==emptyBlock)
+                    currentMap[this.x][this.y] = '$';
                   this.x = j;
                   this.y = k;
                   msg += this.name+" disappears and suddenly reappears near you. ";
@@ -1165,8 +1161,6 @@ function addLake(currStep=null){
 
 function addBoss(){
  var bossSpace = [];
- // I had it much more nicely and cleanly done, but it was buggy and broken. Now it's ugly and working. :(
-
  // Create boss arena:
  for(var k=-5; k < 6; k++){
   for(var l=-5; l < 6; l++){
@@ -5430,7 +5424,8 @@ function useStaff(){
    for(var m = 0; m < currCre.length; m++){
     if(distanceBetween(userPos,currCre[m])<=3){
       if(currCre[m].flags.includes("boss")){
-        msg += currCre[m].name+" shrugs off the magic. ";
+        currCre[m].flags.push("stun");
+        msg += currCre[m].name+" seems momentarily bewildered. ";
       } else {
         var newMob = cloneCreature(creatureList.sampleRec());
         newMob.x = currCre[m].x;
