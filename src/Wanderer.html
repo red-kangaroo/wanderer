@@ -1040,7 +1040,8 @@ function getHint(says=""){
 // Make map:
 function generateMap(){
  // Tiny chance that we create a crazy level full of special terrain.
- var chanceTerrain = !r(1000) && (visited>1);
+ let chanceTerrain = !r(1000) && (visited>1);
+ let rooms = [];
 
  for (var i = 0; i < mapWidth; i++) {
   currentMap[i] = []; // empty map
@@ -1069,10 +1070,15 @@ function generateMap(){
  if(!r(5)) addLake();
  if(!r(2)) addRiver();
  if(!r(2)) addRiver();
- while(!r(10)) addStructure();
- addStructure(true);
+ while(!r(10)){
+   let nr = addStructure();
+   if(nr) rooms.push(nr);
+ }
+ let nr = addStructure(true);
+ if(nr) rooms.push(nr);
 
  visited++;
+ return rooms;
 }
 
 function addRiver(){
@@ -5213,11 +5219,12 @@ function newMap(x,y){
  if(worldData[worldPos.x][worldPos.y]==null){
   worldData[worldPos.x][worldPos.y] = {
     map: [],
+    rooms: null,
     name: "",
     mobs: [],
   };
   worldData[worldPos.x][worldPos.y].name = newWorldName();
-  generateMap();
+  worldData[worldPos.x][worldPos.y].rooms = generateMap();
   spawnMobs();
   fixEntry(x,y,false);
  } else {
@@ -5654,6 +5661,11 @@ function killCreature(i){
  currCre = currCre.removeElement(currCre[i]);
  kills += 1;
  return true;
+}
+
+function inRoom(that){
+  for(xx)
+ return (area.x>-1 && area.x<mapWidth && area.y>-1 && area.y<mapWidth);
 }
 
 function inRange(area){
@@ -7217,11 +7229,12 @@ function initialise(){
  worldData[0] = [];
  worldData[0][0] = {
    map: [],
+   rooms: null,
    name: "",
    mobs: [],
  };
  worldData[0][0].name = newWorldName();
- generateMap();
+ worldData[0][0].rooms = generateMap();
  spawnMobs();
 
  var welcome = ["May you find that which you seek.",
