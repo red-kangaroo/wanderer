@@ -160,6 +160,7 @@ var confused = 0;
 var hasted = 0;
 var phased = 0;
 var panicked = 0;
+var paralysed = 0;
 var poisoned = 0;
 var stunned = 0;
 var timestop = 0;
@@ -243,7 +244,7 @@ var creatureList = [{icon:"<t style='color:#FF0000'>&</t>",
                      flags: [["slow","boonphase"],["slow","boontime"],["slow","boonscore"],["slow","boonhaste"]][r(4)], // Random boon on death.
                      behaviour: function(){ if(!r(6)) currentMap[this.x][this.y]=wallBlock; return false; }
                     }];
-const allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","flingback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","icepool","smoke","chaos","disenchant","convoke","panic","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","boonhaste","dropscore","droppile","droptrap","worthless","confother","confgas","stunother","stungas","swap","jumpover","dumb","immobile","invisible"];
+const allFlags = ["diagonal","venom","toxic","flame","agony","regen","blind","trapper","teleself","teleother","knockback","flingback","steal","bloodpool","lavapool","toxicpool","waterpool","sandpool","icepool","smoke","chaos","disenchant","convoke","panic","paralysis","dodge","bloody","dispel","extend","extraattack","pierce","slow","esp","lifesaved","invulnerable","explode","phase","dig","boonphase","boontime","boonscore","boonhaste","dropscore","droppile","droptrap","worthless","confother","confgas","stunother","stungas","swap","jumpover","dumb","lazy","immobile","invisible"];
 const attackVerbs = ["attacks","bashes","batters","bites","blasts","bleeds","buffets","chokes","claws","clobbers","clubs","crushes","cuts","disrupts","dissolves","freezes","gazes at","gores","headbutts","hits","impales","jabs","jolts","kicks","kisses","nibbles","pelts","pricks","pummels","punches","rends","rips","scratches","sears","shocks","slams","slaps","slashes","smacks","smashes","smites","splatters","squeezes","stabs","stings","stomps at","strangles","strikes","swats","thrashes","touches","tramples","whacks","whips","zaps"];
 var currCre = [];
 var mobBoss = {icon:"<t style='color:#8B008B'>X</t>",
@@ -767,6 +768,31 @@ function getMobBehaviour(){
         msg += this.name+" freezes the ground. ";
     }
     return false;
+   };
+
+  case 26:
+   return function(){
+     if(distanceBetween(userPos,this)<5 && !r(5)){
+       msg += this.name+" curses you! ";
+       if(hasted>0){
+         msg += "You suddenly slow down. ";
+         hasted = 0;
+       } else if(!paralysed && !r(4)){
+         // No stunlocking to death, so only allow paralysis when not already paralysed.
+         msg += "You feel your muscles getting a little stiff. ";
+         paralysed += r(4)+1;
+       } else {
+         let cantrips = [
+           "You feel troubled. ",
+           "You feel a wave of unholy energy pass over you. ",
+           "You resist. ",
+           "You shudder. ",
+         ];
+         msg += cantrips.sampleRec();
+       }
+      return true;
+     }
+     return false;
    };
  }
 }
@@ -5459,6 +5485,10 @@ function cureAll(){
   panicked = 0;
   cured = true;
  }
+ if(paralysed>0){
+  paralysed = 0;
+  cured = true;
+ }
  if(poisoned>0){
   poisoned = 0;
   cured = true;
@@ -5497,7 +5527,9 @@ function playerTakeDamage(dmg,i=9999){
    // Armor piercing monster attack:
    if(currCre[i].flags.includes("pierce")) resist = 0;
  }
- if(bloodied>0) dmg += r(kills); // Extra damage when bloodied.
+ // Extra damage when bloodied, capped at +50 damage.
+ if(bloodied>0) dmg += Math.min(r(kills), 50);
+ // Apply damage resistance, then deal the damage and show it in message.
  dmg = Math.max(1, dmg-resist);
  score -= dmg;
  msg += "["+((dmg > Math.max(10, score/10)) ? "<t style='color:#FF0000'>"+String(dmg)+"</t> " : String(dmg))+" dmg] ";
@@ -5723,7 +5755,7 @@ function moveUser(x,y){
 
  // Do nothing but display win message if the player already won:
  if(haveWon){
-  msg = "<t style='color:#FF1493'>You win!</t><br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Maybe there is a meaning to everything, after all.<br />Press 'F5' to play again.";
+  msg = "<t style='color:#FF1493'>You win!</t><br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Maybe there is a meaning to everything, after all.<br />Press <code>F5</code> to play again.";
   displayMap();
   return;
  }
@@ -5801,7 +5833,7 @@ function moveUser(x,y){
    cureAll();
    staff = 0;
   }else{
-   msg = "You fade away...<br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Better luck next life!<br />Press 'F5' to play again.";
+   msg = "You fade away...<br />Your final score is "+getFinalScore()+" after "+String(turn)+" turns. Better luck next life!<br />Press <code>F5</code> to play again.";
    displayMap();
    return;
   }
@@ -5910,7 +5942,7 @@ function moveUser(x,y){
      msg += "It seems to be stuck in time. ";
      break;
    }
-   switch(r(16)){
+   switch(r(20)){
     case 0:
      if(r(visited)>10){
       aflame += r(30)+r(30)+3;
@@ -6013,6 +6045,37 @@ function moveUser(x,y){
      msg += "The landmine explodes. ";
      currentMap[userPos.x][userPos.y] = ',';
      onExplosion();
+     break;
+
+    case 12:
+     if(hasted>0){
+       msg += "You suddenly slow down. ";
+       hasted = 0;
+     } else if(!paralysed){
+       // No stunlocking to death, so only allow paralysis when not already paralysed.
+       msg += "You feel your muscles getting a little stiff. ";
+       paralysed += r(4)+1;
+     }
+     break;
+
+    case 13:
+     msg += "You feel powerless. ";
+     if(hasted>0) hasted=0;
+     if(phased>0) phased=0;
+     if(timestop>0) timestop=0; // I'm not sure if this can even happen, but...
+     if(ward>0) ward=0;
+     break;
+
+    case 14:
+     aflame *= 2;
+     blinded *= 2;
+     bloodied *= 2;
+     confused *= 2;
+     panicked *= 2;
+     paralysed *= 2;
+     poisoned *= 2;
+     stunned *= 2;
+     msg += "You feel much worse than before. ";
      break;
 
     default:
@@ -6121,7 +6184,7 @@ function moveUser(x,y){
    } else {
      // Won't normally happen, but the player might wander into a door from another map with no keys.
      msg += "You smash open the door. Ouch, that hurt! ";
-     playerTakeDamage(r(10)+distanceToOrigin());
+     playerTakeDamage(r(10)+Math.ceil(score/20));
      currentMap[userPos.x][userPos.y]=',';
      break;
    }
@@ -6349,7 +6412,16 @@ function moveUser(x,y){
 
  if(timestop>0){
   timestop--;
- }else moveCreatures();
+ } else {
+   // First handle paralysis:
+   while (paralysed > 0) {
+     paralysed--;
+     msg += "You are <t style='color:#FF0000'>paralysed</t>! ";
+     moveCreatures();
+   }
+   // Then all mobs take their normal turn:
+   moveCreatures();
+ }
 
  // Staff of Burgeoning leaves behind tall grass:
  if(staff==8 && currentMap[userPos.x][userPos.y]==emptyBlock && !r(5))
@@ -6415,9 +6487,20 @@ function tryMove(x,y,i){
     case "panic":
      if(glyph==3)
        msg += currCre[i].name+" seems a little taken aback. ";
-     else{
+     else {
        msg += "You panic! ";
        panicked += r(10)+kills;
+     }
+     break;
+
+    case "paralysis":
+     if(hasted>0){
+       msg += "You suddenly slow down. ";
+       hasted = 0;
+     } else if(!paralysed && !r(3)){
+       // No stunlocking to death, so only allow paralysis when not already paralysed.
+       msg += "You feel your muscles getting a little stiff. ";
+       paralysed += r(4)+1;
      }
      break;
 
@@ -6527,6 +6610,7 @@ function tryMove(x,y,i){
      bloodied *= 2;
      confused *= 2;
      panicked *= 2;
+     paralysed *= 2;
      poisoned *= 2;
      stunned *= 2;
      msg += "You feel much worse than before. ";
@@ -6910,6 +6994,7 @@ function moveCreatures(){
    if(moved) continue;
   }
 
+  if(currCre[k].flags.includes("lazy") && !currCre[k].flags.includes("stun")) continue;
   // Move randomly otherwise.
   nextStep = [{x: currCre[k].x+1, y: currCre[k].y},{x: currCre[k].x-1, y: currCre[k].y},{x: currCre[k].x, y: currCre[k].y+1},{x: currCre[k].x, y: currCre[k].y-1}];
   if(currCre[k].flags.includes("diagonal")) nextStep.push({x: currCre[k].x+1, y: currCre[k].y+1},{x: currCre[k].x+1, y: currCre[k].y-1},{x: currCre[k].x-1, y: currCre[k].y+1},{x: currCre[k].x-1, y: currCre[k].y-1});
@@ -7009,6 +7094,7 @@ function displayMap(highlight=""){
               ((panicked>0) ? "<t style='color:#DC143C'>Panicked</t> " : "") +
               ((phased>0) ? "<t style='color:#4B0082'>Phasing</t> " : "") +
               ((poisoned>0) ? "<t style='color:#00FF00'>Poisoned</t> " : "") +
+              ((paralysed>0) ? "<t style='background-color:#FF0000'>Stiffening</t> " : "") +
               ((stunned>0) ? "<t style='background-color:#FFFF00'>Stun</t> " : "") +
               ((timestop>0) ? "<t style='color:#00BFFF'>Time Stop</t> " : "") +
               ((ward>0) ? "<t style='color:#DAA520'>Ward</t> " : "");
@@ -7112,7 +7198,8 @@ document.onkeydown = function(e) {
                "Press 'M' for message history.\n"+
                "Hold 'Ctrl' to highlight your avatar.\n"+
                "Hold 'Alt' to highlight monsters and treasure.\n"+
-               "Hold 'Shift' to outline the nearby area in green and the furthest you could reach with your current Self in red.\n\n"+
+               "Hold 'Shift' to outline the nearby area in green and the furthest you can currently reach in red.\n\n"+
+               "Your journey's end awaits in the distance.\n"+
                "Gather the '$' memories of your life, or you may fade away before you reach your closure.");
          displayMap();
          break;
@@ -7227,7 +7314,6 @@ function initialise(){
  var welcome = ["May you find that which you seek.",
                 "Strike down anyone who stands in your path.",
                 "Their blood shall purify you.",
-                "Your journey's end awaits in the distance.",
                 "Nourish your Self or fade to oblivion.",
                 "Seek the levers once your Self glows again. ",
                 "Venture beyond, where new lands await. ",
@@ -7241,7 +7327,7 @@ function initialise(){
    glyph = 1+r(glyphs.length-1);
  }
  newMap(0,0);
- msg += "Welcome, Wanderer. "+welcome.sampleRec()+"<br />Press '?' for help. ";
+ msg += "Welcome, Wanderer. "+welcome.sampleRec()+"<br />Press <code>?</code> for help. ";
  displayMap();
 }
 

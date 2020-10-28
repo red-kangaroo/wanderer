@@ -7,7 +7,6 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
 * story/very short lore?
 * README preview:
    https://jbt.github.io/markdown-editor/
-* wiki!!
 * more hints
 
 * move JS to individual .js file and use /* jshint esversion: 6 */
@@ -18,7 +17,6 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
 * change keys for special display to something that doesn't interfere with browser shortcuts?
 
 * refactor player!!!
-* add <code></code> around instruction messages? (eg. Press '?', etc.)
 * also would be nice if bumping into a wall doesn't cost you a turn since that's usually on accident
 * make sure player doesn't start in lava or in a locked treasure room
    fixEntry // arrival vaults
@@ -50,7 +48,7 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
    sludge (cap damage taken at 1, all other damage becomes Poisoned duration)
    water lily steps (immune to liquids, even beneficial effects)
    invisibility
-   cowardice - extra armor and hasted on hit when Panicked
+   cowardice - extra armor and hasted on hit when Panicked; fight-or-flight instead of paralysed?
 * staff
    holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
                 adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
@@ -88,6 +86,8 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
    +1 whenever you step on statue
    mostly just flavour, but has the potential to swamp levels
 * terrain that spawn creatures around player, pentagram?
+* something for ./W randomized per room, randeach tile
+* "wilderness" maker, random floor/plants
 
 * vaults:
    https://github.com/caveadventure/incavead/blob/20beae583df9f7494e6ab2a77d375f4f5d5f4551/data/vaults.cfg
@@ -98,7 +98,6 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
 * fix diagonal rivers
 
 * more fun effects on altars
-* "wilderness" maker, random floor/plants
 * morgue file in new raw window
    https://www.geeksforgeeks.org/how-to-strip-out-html-tags-from-a-string-using-javascript/
 
@@ -130,7 +129,6 @@ stun
 
 * flags:
 antimagic - cannot be harmed with magic/when player under influence of magic
-paralysis
 haste - move faster, don't attack faster
 deal damage based on score, the higher score the higher damage
 
