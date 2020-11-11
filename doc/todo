@@ -37,6 +37,7 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
    area teleport (random already visited, or anywhere?)
 * levers
    better secret paths?
+   spawn sawblades?
 * armor
    explosions (destroy adjacent mobs and terrain, but grants no kills)
    time mastery (randomly/on damage time stop)
@@ -86,7 +87,6 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
    +1 whenever you step on statue
    mostly just flavour, but has the potential to swamp levels
 * terrain that spawn creatures around player, pentagram?
-* something for ./W randomized per room, randeach tile
 * "wilderness" maker, random floor/plants
 
 * vaults:
@@ -96,6 +96,7 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
   * starting vault where player has no armour/staff, but vault has 1
 * fix rotate
 * fix diagonal rivers
+* room refactor ended at 201
 
 * more fun effects on altars
 * morgue file in new raw window
@@ -107,6 +108,12 @@ Mobs
 * prevent boss spawn when boss already present?
 * add cause of death msg
    Overwhelmed by XXX
+
+* new boss, snake
+   Xxxxxxx  - All Your Mistakes
+   body parts are invulnerable, only head can be killed
+   when head damaged, it will swap places with tail end
+   random chance to get this or normal boss
 
 * mobBoulder
    immune to most attacks, instead pushed back
