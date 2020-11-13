@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html class="v2" dir="ltr" lang="en">
 <head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVTZ5YS5NQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-WVTZ5YS5NQ');
+  </script>
+
   <title>Wanderer</title>
 </head>
 
@@ -430,7 +439,7 @@ var mobSawBlade = {icon:"<t style='color:#800000'>X</t>",
                    attack:"shreds",
                    aggro:0,
                    x:0,y:0,
-                   flags: ["tmp","worthless","invulnerable","lazy","bloodattack","knockback","dropnone"],
+                   flags: ["tmp","worthless","invulnerable","bloodattack","knockback","dropnone"],
                    behaviour: function(){
                      if(typeof(this.flags[0]) == "string"){
                        this.flags[0] = Object.create({});
@@ -6704,11 +6713,9 @@ function tryPlayerMove(x,y){
 
  // Only allow the player to walk through heavy door with no adjacent mobs:
  if(currentMap[x][y]==tileMobDoor){
-   for (i = 0; i < currCre.length; i++) {
-     if(stepsBetween(userPos,currCre[i])<=1){
-       msg += "You cannot haul the heavy door open while "+currCre[i].name+" is so close. ";
-       return false;
-     }
+   if(getAdjacentMobs()>0 && !timestop){
+     msg += "You have no time to haul the heavy door open with enemies so close. ";
+     return false;
    }
    return true;
  }
@@ -6728,7 +6735,10 @@ function damageCreature(i){
    msg += "You strike "+currCre[i].name+". ";
  if(currCre[i].flags.includes("invulnerable")) {
    msg += currCre[i].name+" ignores your attack. ";
-   currCre[i].flags.push("stun"); // Because otherwise it's too easy to get locked in place by invulnerable enemy.
+   if(!currCre[i].flags.includes("dropnone"))
+     currCre[i].flags.push("stun");
+   // Because otherwise it's too easy to get locked in place by invulnerable enemy,
+   // but we're special casing it to prevent stunned sawblades.
    return;
  }
  if(currCre[i].flags.includes("boss") && timestop>0) {
@@ -8115,7 +8125,8 @@ function moveCreatures(){
    nextStep.shuffle();
    if(currCre[k].flags.includes("diagonal"))
      nextStep.push({x: currCre[k].x+dx, y: currCre[k].y+dy});
-   else if(stepsBetween(userPos,currCre[k])==2 && r(4) &&
+   else if(stepsBetween(userPos,currCre[k])==2 && r(3) &&
+           !(getAdjacentMobs() || blinded || panicked || paralysed || stunned) &&
            !currCre[k].flags.includes("dumb") && !(glyph==8 && bloodied>0)){
      // When one step away from player, sometimes don't move and let the player come.
      // Dumb mobs and mobs enraged by player in a bloodied armour of the blood knight
@@ -8151,6 +8162,14 @@ function getFinalScore(){
  if(staff!=0) winner *= 1.1;
  if(glyph!=0) winner *= 1.1;
  return "<t style='color:#8B008B; font-weight: bold;'>"+String(parseInt(winner))+"</t>";
+}
+
+function getAdjacentMobs(){
+  let count = 0;
+  for (let i = 0; i < currCre.length; i++) {
+    if(stepsBetween(userPos,currCre[i])<=1) count++;
+  }
+  return count;
 }
 
 //DEBUG
