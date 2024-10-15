@@ -115,7 +115,10 @@ var ward = 0;
 var leap = false;
 var orb = false;
 
-// Random hints or lore.
+// Commands:
+const BLOCKED_KEYS = [16, 17, 18, 37, 38, 39, 40, 123];
+
+// Random hints or lore:
 const hints = ["You don't deserve forgiveness.",
                "Did they really deserve it?",
                "Too late for regrets.",
@@ -1228,7 +1231,7 @@ function addStructure(special_rooms=false){
            "7......                   7.....7",
            "77 . 77                   77===77"];
  }
- else switch(r(330)) {
+ else switch(r(333)) {
   default:
    if(score > 1000){
      toAdd = ["w.w",
@@ -2443,14 +2446,14 @@ function addStructure(special_rooms=false){
    case 102:
     toAdd = ["WWWWWWWWWWWWW ",
              ".....w......WW",
-             ".WWWWWWWWW...W",
+             ".WWWWWWWWWW..W",
              "WW...^...WWW.W",
-             " W.WWWWW.WWWwW",
-             " W.Wi15$.WWW.W",
-             " W.WWWWWWWW..W",
-             " W....WWW....W",
-             " WWW...w...WWW",
-             "   WWWWWWWWW  "];
+             " W.WWWWW.xWWwW",
+             " W.Wi15$.WW..W",
+             " W.WWWWW0WW..W",
+             " W....WWWW...W",
+             " WW....w...WWW",
+             "  WWWWWWWWWW  "];
    break;
 
    case 103:
@@ -6056,6 +6059,18 @@ function addStructure(special_rooms=false){
    case 320:
     toAdd = ["1w"];
    break;
+
+   case 321:
+    if(r(2))  // horizontal
+      toAdd = ["XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+               "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+               "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"];
+    else {  // vertical
+      toAdd = [];
+      for (let i = 0; i < mapWidth; i++)
+        toAdd.push("XXX");
+    }
+   break;
  }
 
  // Mirror, flip, rotate:
@@ -8253,7 +8268,11 @@ function displayMap(highlight=""){
 
 // Player commands:
 document.onkeydown = function(e) {
-    switch (e.keyCode) {
+    var keypress = e.keyCode;
+    if (BLOCKED_KEYS.includes(keypress))
+        e.preventDefault();
+
+    switch (keypress) {
         case 65: //A
         case 72: //H
         case 100://4
@@ -8330,7 +8349,11 @@ document.onkeydown = function(e) {
 };
 
 document.onkeyup = function(e) {
-    switch (e.keyCode) {
+    var keypress = e.keyCode;
+    if (BLOCKED_KEYS.includes(keypress))
+        e.preventDefault();
+
+    switch (keypress) {
         case 16: //Shift
         case 17: //Ctrl
         case 18: //Alt
