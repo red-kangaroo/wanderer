@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html class="v2" dir="ltr" lang="en">
+<head>
+  <title>WandereRL</title>
+  <link rel="icon" type="image/x-icon" href="./src/ankh.ico">
+</head>
+
+<body>
+  <style>
+  body p,
+  input {
+    font-family:courier, monospace;
+    /* font-size:15px; */
+    line-height: 85%;
+  }
+  code {
+    color: crimson;
+    font-weight: bold;
+    background-color: #f1f1f1;
+    padding: 2px;
+    font-size: 105%;
+  }
+  </style>
+
+<div id="game-window" style="position:relative; max-width: 60%;">
+  <p id="mapText"></p>
+  <p id="statusLine"></p>
+</div>
+
+<div id="additional-info" style="position:absolute; top: 0px; right: 5px; max-width: 40%;">
+  <h3>WandereRL v2.2</h3>
+  <p>
+    There are so many worlds to explore, but only so much of you left...
+  </br></br>
+    Welcome, Wanderer. You can check out the source code and report issues on
+    <a href="https://github.com/red-kangaroo/wanderer" target="_blank">GitHub</a>, or post
+    a comment on my <a href="https://attnam.blogspot.com/2020/08/wanderer.html" target="_blank">blog</a>.
+    There's also a <a href="https://github.com/red-kangaroo/wanderer/wiki" target="_blank">wiki</a> with
+    more information and spoilers.
+    Have fun!
+  </br></br>
+    Use <code>F11</code> for fullscreen mode (recommended).
+  </br></br>
+    Use <code>Ctrl +</code> and <code>Ctrl -</code> to adjust the size
+    to your liking.
+  </br></br>
+    Press <code>?</code> for game help.
+  </p>
+
+  <h5>Nearby:</h5>
+  <p id="nearbyList"></p>
+  <p id="msgWindow"></p>
+</div>
+
+<script src="src/game.js"></script>
+</body>
+</html>

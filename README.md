@@ -1,6 +1,6 @@
 <div align="center">
 
-# Wanderer
+# WandereRL
 
 ![Screenshot](doc/w1.png)
 </div>
@@ -11,7 +11,7 @@ A small roguelike game written in JavaScript.
 
 ### How to play
 
-Playable in browser [here](https://red-kangaroo.github.io/wanderer/ "Wanderer").
+Playable in browser [here](https://red-kangaroo.github.io/wanderer/ "WandereRL").
 
 Have fun!
 
