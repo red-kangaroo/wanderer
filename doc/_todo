@@ -13,7 +13,7 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
     https://www.toptal.com/developers/keycode
 * auto fullscreen?
     https://stackoverflow.com/questions/23913111/firefox-browser-rejected-fullscreen-change
-* new pics to README
+* new pics, video to README
 
 * move JS to individual .js file and use /* jshint esversion: 6 */
 * just maybe look into disabling console? not that I'd expect cheaters, but...

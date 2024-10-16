@@ -6071,6 +6071,70 @@ function addStructure(special_rooms=false){
         toAdd.push("XXX");
     }
    break;
+
+   case 322:
+    toAdd = ["WWWW..W..WWWW",
+             "WAX...w...XaW",
+             "WXX..WWW..XXW",
+             "W...........W",
+             "..W..444..W..",
+             "WwW..4i4..WwW",
+             "..W..444..W..",
+             "W...........W",
+             "WXX..WWW..XXW",
+             "WaX...w...XAW",
+             "WWWW..W..WWWW"];
+   break;
+
+   case 323:
+    toAdd = ["WWWWW   WWWWW",
+             "W$$$W   W$$$W",
+             "W$$$W   W$$$W",
+             "W$$$W   W$$$W",
+             "WW8WWW WWW8WW",
+             "W..sssssss..W",
+             "W.sssssssss.W",
+             "W.sssssssss.W",
+             "W.ss7...7ss.W",
+             "W.ss..C..ss.W",
+             "W.ss.C_C.ss.W",
+             "W.ss..C..ss.W",
+             "W.ss7...7ss.W",
+             "W..sss.sss..W",
+             "WW..ss.ss..WW",
+             "WWW.......WWW",
+             "WWWWWW+WWWWWW",
+             "WWWWWP.PWWWWW",
+             "WWW P...P WWW",
+             " - P.....P   ",
+             "   ..   ..   "];
+   break;
+
+   case 324:
+    toAdd = [" 7777777 ",
+             " 7A$2$A7 ",
+             " 7$$$$$7 ",
+             " 7$$A$$7 ",
+             " 7$$$$$7 ",
+             " 7A$$$A7 ",
+             " 7778777 ",
+             "....w....",
+             " 7777777 "];
+   break;
+
+   case 325:
+    toAdd = ["WWW     WWW",
+             "W333333333W",
+             "W3.......3W",
+             " 3.WWWWW.3 ",
+             " 3.W$$$W.3 ",
+             " 3.W$$$+.3 ",
+             " 3.W$$$W.3 ",
+             " 3.WWWWW.3 ",
+             "W3.......3W",
+             "W333333333W",
+             "WWW     WWW"];
+   break;
  }
 
  // Mirror, flip, rotate:
