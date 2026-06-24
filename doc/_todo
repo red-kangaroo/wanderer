@@ -60,6 +60,8 @@ https://www.w3schools.com/charsets/ref_utf_symbols.asp
    holy light - 20 radius light on dark levels (even though walls, unlike the FOV);
                 adjacent mobs turned into mobAlly (follows as other mobs, doesn't attack player, instead if adjacent to mob, attacks them; Hope, Love, Truth, ...)
    enslavement - Mob vs mob combat (as above?)
+   of the Saw
+   of Ice
 * consumable: Scroll/Potion
   Convocation - blink mobs near
   tele adjacent away
